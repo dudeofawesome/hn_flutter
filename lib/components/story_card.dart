@@ -39,26 +39,29 @@ class StoryCard extends StatelessWidget {
   Widget build (BuildContext context) {
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
-    final titleColumn = new Padding(
-      padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Text(
-            this.story.title,
-            style: Theme.of(context).textTheme.title.copyWith(
-              fontSize: 18.0,
+    final titleColumn = new GestureDetector(
+      onTap: () => this._openStory(context),
+      child: new Padding(
+        padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+        child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            new Text(
+              this.story.title,
+              style: Theme.of(context).textTheme.title.copyWith(
+                fontSize: 18.0,
+              ),
             ),
-          ),
-          new Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              new Text(this.story.by),
-              new Text(' • '),
-              new Text('4 hours ago'),
-            ],
-          ),
-        ],
+            new Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                new Text(this.story.by),
+                new Text(' • '),
+                new Text('4 hours ago'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
 
@@ -99,52 +102,74 @@ class StoryCard extends StatelessWidget {
           ],
         ),
       ) :
-      new Padding(
-        padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-        child: new SimpleHTML(this.story.text),
+      new GestureDetector(
+        onTap: () => this._openStory(context),
+        child: new Padding(
+          padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+          child: new SimpleHTML(this.story.text),
+        ),
       );
 
     final bottomRow = new Row(
       children: <Widget>[
-        new Padding(
-          padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              new Text('${this.story.score} points'),
-              new Text('${this.story.descendants} comments'),
-            ],
+        new Expanded(
+          child: new GestureDetector(
+            onTap: () => this._openStory(context),
+            child: new Padding(
+              padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text('${this.story.score} points'),
+                  new Text('${this.story.descendants} comments'),
+                ],
+              ),
+            ),
           ),
         ),
-        new Expanded(
-          child: new Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              new IconButton(
-                icon: const Icon(Icons.arrow_upward),
-                tooltip: 'Upvote',
-                onPressed: () => _upvoteStory(),
-                color: this.story.computed.upvoted ? Colors.orange : Colors.grey,
-              ),
-              // new IconButton(
-              //   icon: const Icon(Icons.arrow_downward),
-              //   tooltip: 'Downvote',
-              //   onPressed: () => _downvoteStory(),
-              //   color: this.story.computed.downvoted ? Colors.blue : Colors.grey,
-              // ),
-              new IconButton(
-                icon: const Icon(Icons.star),
-                tooltip: 'Save',
-                onPressed: () => _saveStory(),
-                color: this.story.computed.saved ? Colors.amber : Colors.grey,
-              ),
-              new IconButton(
-                icon: const Icon(Icons.more_vert),
-              ),
-            ],
-          ),
+        new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            new IconButton(
+              icon: const Icon(Icons.arrow_upward),
+              tooltip: 'Upvote',
+              onPressed: () => _upvoteStory(),
+              color: this.story.computed.upvoted ? Colors.orange : Colors.grey,
+            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.arrow_downward),
+            //   tooltip: 'Downvote',
+            //   onPressed: () => _downvoteStory(),
+            //   color: this.story.computed.downvoted ? Colors.blue : Colors.grey,
+            // ),
+            new IconButton(
+              icon: const Icon(Icons.star),
+              tooltip: 'Save',
+              onPressed: () => _saveStory(),
+              color: this.story.computed.saved ? Colors.amber : Colors.grey,
+            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.more_vert),
+            // ),
+            new PopupMenuButton<OverflowMenuItems>(
+              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
+                const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.SHARE,
+                  child: const Text('Share'),
+                ),
+                const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.HIDE,
+                  child: const Text('Hide'),
+                ),
+                const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.VIEW_PROFILE,
+                  child: const Text('View Profile'),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );

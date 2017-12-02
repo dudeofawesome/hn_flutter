@@ -65,7 +65,7 @@ class HNItemComputed {
   }) {
     this.urlHostname = 'medium.com';
     this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg';
-    this.upvoted = true;
+    this.upvoted = false;
     this.downvoted = false;
     this.saved = false;
     this.hidden = false;

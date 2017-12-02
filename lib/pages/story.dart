@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class StoryPage extends StatefulWidget {
-  StoryPage ({Key key}) : super(key: key);
+  final int id;
+
+  StoryPage ({
+    Key key,
+    this.id,
+  }) : super(key: key);
 
   @override
   _StoryPageState createState () => new _StoryPageState();
@@ -60,6 +65,7 @@ class _StoryPageState extends State<StoryPage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            new Text('ID: ${widget.id}'),
             new Text(
               'You have pushed the button this many times:',
             ),
