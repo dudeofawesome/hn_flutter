@@ -1,21 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class StoryPage extends StatefulWidget {
+class UserPage extends StatefulWidget {
   final int id;
-  final int itemId;
+  final int userId;
 
-  StoryPage ({
+  UserPage ({
     Key key,
     this.id,
-    @required this.itemId,
+    @required this.userId,
   }) : super(key: key);
 
   @override
-  _StoryPageState createState () => new _StoryPageState();
+  _UserPageState createState () => new _UserPageState();
 }
 
-class _StoryPageState extends State<StoryPage> {
+class _UserPageState extends State<UserPage> {
   int _counter = 0;
 
   void _incrementCounter () {
@@ -41,7 +41,7 @@ class _StoryPageState extends State<StoryPage> {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text('{{Story Name}}'),
+        title: new Text('{{User Name}}'),
         actions: <Widget>[
           const IconButton(
             icon: const Icon(Icons.sort),
@@ -68,7 +68,7 @@ class _StoryPageState extends State<StoryPage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Text('ID: ${widget.itemId}'),
+            new Text('ID: ${widget.userId}'),
             new Text(
               'You have pushed the button this many times:',
             ),

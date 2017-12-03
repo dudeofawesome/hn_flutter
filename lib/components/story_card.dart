@@ -20,7 +20,7 @@ class StoryCard extends StatelessWidget {
   }
 
   _openStory (BuildContext ctx) async {
-    Navigator.pushNamed(ctx, '/story:${this.story.id}');
+    Navigator.pushNamed(ctx, '/stories:${this.story.id}');
   }
 
   void _incrementCounter () {
@@ -33,6 +33,16 @@ class StoryCard extends StatelessWidget {
   }
 
   void _saveStory () {
+  }
+
+  void _shareStory () {
+  }
+
+  void _hideStory () {
+  }
+
+  void _viewProfile (BuildContext ctx) {
+    Navigator.pushNamed(ctx, '/users:${this.story.id}');
   }
 
   @override
@@ -168,6 +178,16 @@ class StoryCard extends StatelessWidget {
                   child: const Text('View Profile'),
                 ),
               ],
+              onSelected: (OverflowMenuItems selection) {
+                switch (selection) {
+                  case OverflowMenuItems.HIDE:
+                    return this._hideStory();
+                  case OverflowMenuItems.SHARE:
+                    return this._shareStory();
+                  case OverflowMenuItems.VIEW_PROFILE:
+                    return this._viewProfile(context);
+                }
+              },
             ),
           ],
         ),

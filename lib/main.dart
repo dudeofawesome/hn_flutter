@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart' show
 
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
+import 'package:hn_flutter/pages/user.dart';
 
 void main() => runApp(new HNApp());
 
@@ -22,21 +23,35 @@ class HNAppState extends State<HNApp> {
     final List<String> path = settings.name.split('/');
     // We only support paths that start with a slash, so bail if
     // the first component is not empty:
-    if (path[0] != '')
+    if (path[0] != '') {
       return null;
+    }
     // If the path is "/stock:..." then show a stock page for the
     // specified stock symbol.
-    if (path[1].startsWith('story:')) {
+    if (path[1].startsWith('stories:')) {
       // We don't yet support subpages of a stock, so bail if there's
       // any more path components.
-      if (path.length != 2)
+      if (path.length != 2) {
         return null;
+      }
       // Extract the symbol part of "stock:..." and return a route
       // for that symbol.
-      final String symbol = path[1].substring(6);
+      final int itemId = int.parse(path[1].substring(6));
       return new MaterialPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new StoryPage(),
+        builder: (BuildContext context) => new StoryPage(itemId: itemId),
+      );
+    }
+
+    if (path[1].startsWith('users:')) {
+      if (path.length != 2) {
+        return null;
+      }
+
+      final int userId = int.parse(path[1].substring(6));
+      return new MaterialPageRoute<Null>(
+        settings: settings,
+        builder: (BuildContext context) => new UserPage(userId: userId),
       );
     }
     // The other paths we support are in the routes table.
