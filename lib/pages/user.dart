@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 class UserPage extends StatefulWidget {
   final int id;
-  final int userId;
+  final String userName;
 
   UserPage ({
     Key key,
     this.id,
-    @required this.userId,
+    @required this.userName,
   }) : super(key: key);
 
   @override
@@ -68,7 +68,7 @@ class _UserPageState extends State<UserPage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Text('ID: ${widget.userId}'),
+            new Text('Username: ${widget.userName}'),
             new Text(
               'You have pushed the button this many times:',
             ),

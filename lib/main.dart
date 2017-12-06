@@ -10,6 +10,8 @@ import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/user.dart';
 
+import 'package:hn_flutter/router.dart';
+
 void main() => runApp(new HNApp());
 
 class HNApp extends StatefulWidget {
@@ -28,7 +30,7 @@ class HNAppState extends State<HNApp> {
     }
     // If the path is "/stock:..." then show a stock page for the
     // specified stock symbol.
-    if (path[1].startsWith('stories:')) {
+    if (path[1].startsWith('${Routes.STORIES}:')) {
       // We don't yet support subpages of a stock, so bail if there's
       // any more path components.
       if (path.length != 2) {
@@ -43,15 +45,15 @@ class HNAppState extends State<HNApp> {
       );
     }
 
-    if (path[1].startsWith('users:')) {
+    if (path[1].startsWith('${Routes.USERS}:')) {
       if (path.length != 2) {
         return null;
       }
 
-      final int userId = int.parse(path[1].substring(6));
+      final String userName = path[1].substring(6);
       return new MaterialPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new UserPage(userId: userId),
+        builder: (BuildContext context) => new UserPage(userName: userName),
       );
     }
     // The other paths we support are in the routes table.

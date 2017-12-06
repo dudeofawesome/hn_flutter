@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
+import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/components/simple_html.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 
@@ -20,10 +21,7 @@ class StoryCard extends StatelessWidget {
   }
 
   _openStory (BuildContext ctx) async {
-    Navigator.pushNamed(ctx, '/stories:${this.story.id}');
-  }
-
-  void _incrementCounter () {
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.story.id}');
   }
 
   void _upvoteStory () {
@@ -42,7 +40,7 @@ class StoryCard extends StatelessWidget {
   }
 
   void _viewProfile (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/users:${this.story.id}');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}:${this.story.by}');
   }
 
   @override
