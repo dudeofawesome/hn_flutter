@@ -146,10 +146,10 @@ class SimpleHTML extends StatelessWidget {
 
     body = body
       .replaceAllMapped(
-        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-\.:]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
+        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-\.:\&\?]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
         (match) => '[${match[2]}](${match[1]})'
       )
-      // .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
+      .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
       .replaceAll(new RegExp(r'\<\/?b\>', caseSensitive: false), '**')
       .replaceAll(new RegExp(r'\<\/?i\>', caseSensitive: false), '_')
       .replaceAll(new RegExp(r'\<\/?p\>', caseSensitive: false), '\n\n')
@@ -159,13 +159,6 @@ class SimpleHTML extends StatelessWidget {
     return new MarkdownBody(
       data: body,
     );
-    // return new RichText(
-    //   text: new TextSpan(
-    //     // text: this.body,
-    //     style: DefaultTextStyle.of(context).style,
-    //     children: [this._transformNode(context, this.doc.body)],
-    //   ),
-    // );
   }
 }
 
