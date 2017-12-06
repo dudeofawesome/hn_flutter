@@ -139,16 +139,22 @@ class SimpleHTML extends StatelessWidget {
   @override
   Widget build (BuildContext context) {
     String body = this.doc.body.innerHtml;
-    body = body.replaceAllMapped(
-      new RegExp(r'\<a href="(.*)"\>(.*)\<\/a\>'),
-      (match) => '[${match[2]}](${match[1]})'
-    );
-    body = body.replaceAll(new RegExp(r'\<\/?a\>'), '');
-    body = body.replaceAll(new RegExp(r'\<\/?b\>'), '**');
-    body = body.replaceAll(new RegExp(r'\<\/?i\>'), '_');
-    body = body.replaceAll(new RegExp(r'\<\/?p\>'), '\n\n');
-    body = body.replaceAll(new RegExp(r'\<\/?s\>'), '~~');
-    body = body.replaceAll(new RegExp(r'\<\/?u\>'), '__');
+    body = body
+      .replaceAll('&#x2F;', '/')
+      .replaceAll('&#x27;', '\'')
+      .replaceAll('&amp;', '&');
+
+    body = body
+      .replaceAllMapped(
+        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-\.:]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
+        (match) => '[${match[2]}](${match[1]})'
+      )
+      // .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
+      .replaceAll(new RegExp(r'\<\/?b\>', caseSensitive: false), '**')
+      .replaceAll(new RegExp(r'\<\/?i\>', caseSensitive: false), '_')
+      .replaceAll(new RegExp(r'\<\/?p\>', caseSensitive: false), '\n\n')
+      .replaceAll(new RegExp(r'\<\/?s\>', caseSensitive: false), '~~')
+      .replaceAll(new RegExp(r'\<\/?u\>', caseSensitive: false), '__');
 
     return new MarkdownBody(
       data: body,
