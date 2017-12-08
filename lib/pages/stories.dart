@@ -4,6 +4,8 @@ import 'package:hn_flutter/components/story_card.dart' show StoryCard;
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 
+import 'package:hn_flutter/router.dart';
+
 class StoriesPage extends StatefulWidget {
   StoriesPage({Key key}) : super(key: key);
 
@@ -32,6 +34,52 @@ class _StoriesPageState extends State<StoriesPage> {
         this._stories = stories;
       });
     });
+  }
+
+  void _changeSortMode (SortModes sortModes) {
+  }
+
+  _openStoryDialog (BuildContext ctx) async {
+    String storyId;
+
+    storyId = await showDialog(
+      context: ctx,
+      child: new SimpleDialog(
+        title: const Text('Enter story ID'),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        children: <Widget>[
+          new TextField(
+            autofocus: true,
+            decoration: new InputDecoration(
+              labelText: 'Story ID',
+            ),
+            onChanged: (String val) => storyId = val,
+          ),
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              new FlatButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: const Text('CANCEL'),
+              ),
+              new FlatButton(
+                onPressed: () {
+                  Navigator.pop(ctx, storyId);
+                },
+                child: const Text('GO'),
+              ),
+            ],
+          ),
+        ],
+      )
+    );
+
+    if (storyId != null) {
+      print(storyId);
+      Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
+    }
   }
 
   @override
@@ -138,6 +186,75 @@ class _StoriesPageState extends State<StoriesPage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: const Text('Hacker News'),
+        actions: <Widget>[
+          // const IconButton(
+          //   icon: const Icon(Icons.sort),
+          //   tooltip: 'Sort',
+          // ),
+
+
+          new PopupMenuButton<SortModes>(
+            icon: const Icon(Icons.sort),
+            itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
+              const PopupMenuItem<SortModes>(
+                value: SortModes.TOP,
+                child: const Text('Top'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.NEW,
+                child: const Text('New'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.BEST,
+                child: const Text('Best'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.ASK_HN,
+                child: const Text('Ask HN'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.SHOW_HN,
+                child: const Text('Show HN'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.JOB,
+                child: const Text('Jobs'),
+              ),
+            ],
+            onSelected: (SortModes selection) => this._changeSortMode(selection),
+          ),
+
+
+
+        ],
+      ),
+      drawer: new Drawer(
+        child: new ListView(
+          children: <Widget>[
+            new UserAccountsDrawerHeader(
+              accountEmail: const Text('louis@orleans.io'),
+              accountName: const Text('Louis Orleans'),
+            ),
+            new MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: new Column(
+                children: <Widget>[
+                  new ListTile(
+                    leading: const Icon(Icons.open_in_new),
+                    title: const Text('Open Story'),
+                    onTap: () => this._openStoryDialog(context),
+                  ),
+                  const Divider(),
+                  new ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Settings'),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
       body: this._stories?.length > 0 ? storyCards : loadingStories,
       floatingActionButton: new FloatingActionButton(
@@ -147,4 +264,13 @@ class _StoriesPageState extends State<StoriesPage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+enum SortModes {
+  TOP,
+  NEW,
+  BEST,
+  ASK_HN,
+  SHOW_HN,
+  JOB,
 }
