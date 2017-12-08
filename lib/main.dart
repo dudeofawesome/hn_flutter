@@ -38,7 +38,7 @@ class HNAppState extends State<HNApp> {
       }
       // Extract the symbol part of "stock:..." and return a route
       // for that symbol.
-      final int itemId = int.parse(path[1].substring(6));
+      final int itemId = int.parse(path[1].substring(Routes.STORIES.length + 1));
       return new MaterialPageRoute<Null>(
         settings: settings,
         builder: (BuildContext context) => new StoryPage(itemId: itemId),
@@ -50,7 +50,7 @@ class HNAppState extends State<HNApp> {
         return null;
       }
 
-      final String userName = path[1].substring(6);
+      final String userName = path[1].substring(Routes.USERS.length + 1);
       return new MaterialPageRoute<Null>(
         settings: settings,
         builder: (BuildContext context) => new UserPage(userName: userName),
