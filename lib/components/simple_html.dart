@@ -154,7 +154,11 @@ class SimpleHTML extends StatelessWidget {
       .replaceAll(new RegExp(r'\<\/?i\>', caseSensitive: false), '_')
       .replaceAll(new RegExp(r'\<\/?p\>', caseSensitive: false), '\n\n')
       .replaceAll(new RegExp(r'\<\/?s\>', caseSensitive: false), '~~')
-      .replaceAll(new RegExp(r'\<\/?u\>', caseSensitive: false), '__');
+      .replaceAll(new RegExp(r'\<\/?u\>', caseSensitive: false), '__')
+      .replaceAllMapped(
+        new RegExp(r'^([0-9]+)\.', caseSensitive: false),
+        (match) => '${match[1]}\\.'
+      );
 
     return new MarkdownBody(
       data: body,
