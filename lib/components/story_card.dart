@@ -20,7 +20,7 @@ class StoryCard extends StatelessWidget {
     }
   }
 
-  _openStory (BuildContext ctx) async {
+  void _openStory (BuildContext ctx) {
     Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.story.id}');
   }
 
@@ -162,6 +162,7 @@ class StoryCard extends StatelessWidget {
             //   icon: const Icon(Icons.more_vert),
             // ),
             new PopupMenuButton<OverflowMenuItems>(
+              icon: const Icon(Icons.more_horiz),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
                 const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.SHARE,
