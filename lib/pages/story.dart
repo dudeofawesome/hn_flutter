@@ -1,7 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flux/flutter_flux.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
-class StoryPage extends StatefulWidget {
+import 'package:hn_flutter/router.dart';
+import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/components/simple_html.dart';
+
+class StoryPage extends StoreWatcher {
   final int id;
   final int itemId;
 
@@ -12,78 +18,297 @@ class StoryPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StoryPageState createState () => new _StoryPageState();
-}
+  void initStores(ListenToStore listenToStore) {
+    listenToStore(itemStoreToken);
+  }
 
-class _StoryPageState extends State<StoryPage> {
-  int _counter = 0;
+  void _upvoteStory () {
+  }
 
-  void _incrementCounter () {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _downvoteStory () {
+  }
+
+  void _saveStory () {
+  }
+
+  void _shareStory () {
+  }
+
+  void _changeSortMode (SortModes sortModes) {
+  }
+
+  _reply (int itemId) {
+  }
+
+  _openStoryUrl (String url) async {
+    if (await UrlLauncher.canLaunch(url)) {
+      await UrlLauncher.launch(url, forceWebView: true);
+    }
+  }
+
+  void _viewProfile (BuildContext ctx, String author) {
+    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new Text('{{Story Name}}'),
-        actions: <Widget>[
-          const IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: 'Sort',
-          ),
-        ],
-      ),
-      body: new Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+
+    final HNItemStore itemStore = stores[itemStoreToken];
+    final item = itemStore.items.firstWhere((item) => item.id == this.itemId);
+
+    final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
+
+    final titleColumn = new GestureDetector(
+      // onTap: () => this._openStory(context),
+      child: new Padding(
+        padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
         child: new Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug paint" (press "p" in the console where you ran
-          // "flutter run", or select "Toggle Debug Paint" from the Flutter tool
-          // window in IntelliJ) to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            new Text('ID: ${widget.itemId}'),
             new Text(
-              'You have pushed the button this many times:',
+              item.title,
+              style: Theme.of(context).textTheme.title.copyWith(
+                fontSize: 18.0,
+              ),
             ),
-            new Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+            new Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                new Text(item.by),
+                new Text(' • '),
+                new Text('4 hours ago'),
+              ],
             ),
           ],
         ),
       ),
+    );
+
+    final preview = item.text == null ?
+      new GestureDetector(
+        onTap: () => this._openStoryUrl(item.url),
+        child: new Stack(
+          alignment: AlignmentDirectional.bottomStart,
+          children: <Widget>[
+            // new Image.network(
+            //   this.story.computed.imageUrl,
+            //   fit: BoxFit.cover,
+            // ),
+            new Container(
+              decoration: new BoxDecoration(
+                color: const Color.fromRGBO(0, 0, 0, 0.5),
+              ),
+              width: double.INFINITY,
+              child: new Padding(
+                padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    new Text(
+                      item.computed.urlHostname,
+                      style: linkOverlayText,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    new Text(
+                      item.url,
+                      style: linkOverlayText,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ) :
+      new GestureDetector(
+        // onTap: () => this._openStory(context),
+        child: new Padding(
+          padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+          child: new SimpleHTML(item.text),
+        ),
+      );
+
+    final bottomRow = new Row(
+      children: <Widget>[
+        new Expanded(
+          child: new GestureDetector(
+            // onTap: () => this._openStory(context),
+            child: new Padding(
+              padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text('${item.score} points'),
+                  new Text('${item.descendants} comments'),
+                ],
+              ),
+            ),
+          ),
+        ),
+        new Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            new IconButton(
+              icon: const Icon(Icons.arrow_upward),
+              tooltip: 'Upvote',
+              onPressed: () => _upvoteStory(),
+              color: item.computed.upvoted ? Colors.orange : Colors.grey,
+            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.arrow_downward),
+            //   tooltip: 'Downvote',
+            //   onPressed: () => _downvoteStory(),
+            //   color: this.story.computed.downvoted ? Colors.blue : Colors.grey,
+            // ),
+            new IconButton(
+              icon: const Icon(Icons.star),
+              tooltip: 'Save',
+              onPressed: () => _saveStory(),
+              color: item.computed.saved ? Colors.amber : Colors.grey,
+            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.more_vert),
+            // ),
+            new PopupMenuButton<OverflowMenuItems>(
+              icon: const Icon(Icons.more_horiz),
+              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
+                const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.SHARE,
+                  child: const Text('Share'),
+                ),
+                const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.VIEW_PROFILE,
+                  child: const Text('View Profile'),
+                ),
+              ],
+              onSelected: (OverflowMenuItems selection) {
+                switch (selection) {
+                  case OverflowMenuItems.SHARE:
+                    return this._shareStory();
+                  case OverflowMenuItems.VIEW_PROFILE:
+                    return this._viewProfile(context, item.by);
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+
+    final storyCard = new Container(
+      width: double.INFINITY,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: const [
+          const BoxShadow(
+            color: Colors.black,
+            blurRadius: 5.0,
+          ),
+        ],
+      ),
+      // child: new Column(
+      //   children: [
+      //     new Padding(
+      //       padding: const EdgeInsets.fromLTRB(8.0, 16.0, 16.0, 8.0),
+      //       child: new Column(
+      //         mainAxisSize: MainAxisSize.min,
+      //         crossAxisAlignment: CrossAxisAlignment.start,
+      //         children: <Widget>[
+      //           const Text('test'),
+      //           new Text('ID: ${item.id}'),
+      //         ],
+      //       ),
+      //     ),
+      //   ],
+      // ),
+      child: new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: item.text == null ?
+          <Widget>[
+            preview,
+            titleColumn,
+            bottomRow,
+          ] :
+          <Widget>[
+            titleColumn,
+            preview,
+            bottomRow,
+          ],
+      ),
+    );
+
+    return new Scaffold(
+      appBar: new AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: new Text(item?.title),
+        actions: <Widget>[
+          new PopupMenuButton<SortModes>(
+            icon: const Icon(Icons.sort),
+            itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
+              const PopupMenuItem<SortModes>(
+                value: SortModes.TOP,
+                child: const Text('Top'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.NEW,
+                child: const Text('New'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.BEST,
+                child: const Text('Best'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.ASK_HN,
+                child: const Text('Ask HN'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.SHOW_HN,
+                child: const Text('Show HN'),
+              ),
+              const PopupMenuItem<SortModes>(
+                value: SortModes.JOB,
+                child: const Text('Jobs'),
+              ),
+            ],
+            onSelected: (SortModes selection) => this._changeSortMode(selection),
+          ),
+        ],
+      ),
+      body: new Column(
+        children: <Widget>[
+          storyCard,
+        ],
+      ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => this._reply(item.id),
         tooltip: 'Reply',
-        child: const Icon(Icons.replay),
+        child: const Icon(Icons.reply),
       ),
     );
   }
+}
+
+enum OverflowMenuItems {
+  SHARE,
+  VIEW_PROFILE,
+}
+
+enum SortModes {
+  TOP,
+  NEW,
+  BEST,
+  ASK_HN,
+  SHOW_HN,
+  JOB,
 }

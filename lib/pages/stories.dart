@@ -1,39 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/components/story_card.dart' show StoryCard;
-import 'package:hn_flutter/sdk/hn_story_service.dart';
-import 'package:hn_flutter/sdk/models/hn_item.dart';
+// import 'package:hn_flutter/sdk/hn_story_service.dart';
+// import 'package:hn_flutter/sdk/models/hn_item.dart';
+import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/router.dart';
 
-class StoriesPage extends StatefulWidget {
-  StoriesPage({Key key}) : super(key: key);
+class StoriesPage extends StoreWatcher { // State<StoriesPage> {
+  // final HNStoryService _hnStoryService = new HNStoryService();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+  StoriesPage () {
+    // this._hnStoryService.getTopStories().then((stories) {
+    //   print(stories);
+    //   setState(() {
+    //     this._stories = stories;
+    //   });
+    // });
+  }
 
   @override
-  _StoriesPageState createState() => new _StoriesPageState();
-}
-
-class _StoriesPageState extends State<StoriesPage> {
-  HNStoryService _hnStoryService = new HNStoryService();
-
-  List<HNItem> _stories = new List();
-
-  _StoriesPageState () {
-    this._hnStoryService.getTopStories().then((stories) {
-      print(stories);
-      setState(() {
-        this._stories = stories;
-      });
-    });
+  void initStores(ListenToStore listenToStore) {
+    listenToStore(itemStoreToken);
   }
 
   void _changeSortMode (SortModes sortModes) {
@@ -62,13 +51,13 @@ class _StoriesPageState extends State<StoriesPage> {
                 onPressed: () {
                   Navigator.pop(ctx);
                 },
-                child: const Text('CANCEL'),
+                child: new Text('Cancel'.toUpperCase()),
               ),
               new FlatButton(
                 onPressed: () {
                   Navigator.pop(ctx, storyId);
                 },
-                child: const Text('GO'),
+                child: new Text('Go'.toUpperCase()),
               ),
             ],
           ),
@@ -83,16 +72,17 @@ class _StoriesPageState extends State<StoriesPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    final HNItemStore itemStore = stores[itemStoreToken];
 
     final storyCards = new ListView(
-      children: this._stories.map<Widget>((story) => new StoryCard(
+      children: itemStore.items.map<Widget>((story) => new StoryCard(
         story: story,
       )).toList()..addAll([
         // Bottom padding for FAB and home gesture bar
@@ -256,12 +246,12 @@ class _StoriesPageState extends State<StoriesPage> {
           ],
         ),
       ),
-      body: this._stories?.length > 0 ? storyCards : loadingStories,
+      body: itemStore.items.length > 0 ? storyCards : loadingStories,
       floatingActionButton: new FloatingActionButton(
         // onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
