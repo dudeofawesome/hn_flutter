@@ -5,13 +5,13 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `/Users/dudeofawesome/Library/Developer/flutter/bin/cache/artifacts/engine/ios`)
-  - url_launcher (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.1/ios`)
+  - url_launcher (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.3/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: /Users/dudeofawesome/Library/Developer/flutter/bin/cache/artifacts/engine/ios
   url_launcher:
-    :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.1/ios
+    :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.3/ios
 
 SPEC CHECKSUMS:
   Flutter: d674e78c937094a75ac71dd77e921e840bea3dbf
