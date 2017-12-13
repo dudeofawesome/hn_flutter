@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/components/simple_html.dart';
+import 'package:hn_flutter/components/comment.dart';
 
 class StoryPage extends StoreWatcher {
   final int id;
@@ -206,6 +207,7 @@ class StoryPage extends StoreWatcher {
 
     final storyCard = new Container(
       width: double.INFINITY,
+      margin: const EdgeInsets.only(bottom: 8.0),
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: const [
@@ -247,6 +249,13 @@ class StoryPage extends StoreWatcher {
       ),
     );
 
+    final comments = new Column(
+      children: new Iterable.generate(5, (i) => new Comment(
+          itemId: i,
+        ))
+        .toList(),
+    );
+
     return new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -255,6 +264,7 @@ class StoryPage extends StoreWatcher {
         actions: <Widget>[
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
+            tooltip: 'Sort',
             itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
               const PopupMenuItem<SortModes>(
                 value: SortModes.TOP,
@@ -268,26 +278,15 @@ class StoryPage extends StoreWatcher {
                 value: SortModes.BEST,
                 child: const Text('Best'),
               ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.ASK_HN,
-                child: const Text('Ask HN'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.SHOW_HN,
-                child: const Text('Show HN'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.JOB,
-                child: const Text('Jobs'),
-              ),
             ],
             onSelected: (SortModes selection) => this._changeSortMode(selection),
           ),
         ],
       ),
-      body: new Column(
+      body: new ListView(
         children: <Widget>[
           storyCard,
+          comments,
         ],
       ),
       floatingActionButton: new FloatingActionButton(
@@ -308,7 +307,4 @@ enum SortModes {
   TOP,
   NEW,
   BEST,
-  ASK_HN,
-  SHOW_HN,
-  JOB,
 }

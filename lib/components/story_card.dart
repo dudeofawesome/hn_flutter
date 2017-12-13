@@ -144,19 +144,19 @@ class StoryCard extends StatelessWidget {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               onPressed: () => _upvoteStory(),
-              color: this.story.computed.upvoted ? Colors.orange : Colors.grey,
+              color: this.story.computed.upvoted ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
             //   onPressed: () => _downvoteStory(),
-            //   color: this.story.computed.downvoted ? Colors.blue : Colors.grey,
+            //   color: this.story.computed.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               onPressed: () => _saveStory(),
-              color: this.story.computed.saved ? Colors.amber : Colors.grey,
+              color: this.story.computed.saved ? Colors.amber : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.more_vert),
