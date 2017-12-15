@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/hn_comment_service.dart';
+
 import 'package:hn_flutter/components/simple_html.dart';
 import 'package:hn_flutter/components/comment.dart';
 
@@ -16,7 +18,10 @@ class StoryPage extends StoreWatcher {
     Key key,
     this.id,
     @required this.itemId,
-  }) : super(key: key);
+  }) : super(key: key) {
+    // final HNCommentService hnCommentService = new HNCommentService();
+    // hnCommentService.getItemByID(id)
+  }
 
   @override
   void initStores(ListenToStore listenToStore) {
@@ -162,19 +167,19 @@ class StoryPage extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               onPressed: () => _upvoteStory(),
-              color: item.computed.upvoted ? Colors.orange : Colors.grey,
+              color: item.computed.upvoted ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
             //   onPressed: () => _downvoteStory(),
-            //   color: this.story.computed.downvoted ? Colors.blue : Colors.grey,
+            //   color: this.story.computed.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               onPressed: () => _saveStory(),
-              color: item.computed.saved ? Colors.amber : Colors.grey,
+              color: item.computed.saved ? Colors.amber : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.more_vert),
@@ -250,10 +255,13 @@ class StoryPage extends StoreWatcher {
     );
 
     final comments = new Column(
-      children: new Iterable.generate(5, (i) => new Comment(
-          itemId: i,
-        ))
-        .toList(),
+      // children: new Iterable.generate(5, (i) => new Comment(
+      //     itemId: i,
+      //   ))
+      //   .toList(),
+      children: item.kids.map((kid) => new Comment(
+        itemId: kid,
+      )).toList(),
     );
 
     return new Scaffold(

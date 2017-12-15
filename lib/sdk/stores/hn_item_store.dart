@@ -6,7 +6,12 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   HNItemStore () {
     triggerOnAction(addHNItem, (HNItem item) {
-      this._items.add(item);
+      final HNItem found = this._items.firstWhere((el) => el.id == item.id, orElse: () {
+        this._items.add(item);
+      });
+      if (found != null) {
+        this._items[this._items.indexOf(found)] = item;
+      }
     });
   }
 
