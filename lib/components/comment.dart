@@ -13,12 +13,10 @@ import 'package:hn_flutter/sdk/hn_comment_service.dart';
 import 'package:hn_flutter/components/simple_html.dart';
 
 class Comment extends StoreWatcher {
-  final int id;
   final int itemId;
 
   Comment ({
     Key key,
-    this.id,
     @required this.itemId,
   }) : super(key: key);
 
@@ -75,30 +73,36 @@ class Comment extends StoreWatcher {
     if (item != null) {
       final content = new GestureDetector(
         onTap: () => this._highlightComment(),
-        child: new SimpleHTML(item.text),
+        child: new SimpleHTML(item.text ?? (item.computed.loading ? 'Loading…' : 'Error')),
       );
 
-      final topRow = new Row(
-        children: <Widget>[
-          new Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
-            child: new Text(
-              item.by,
-              style: new TextStyle(
-                fontWeight: FontWeight.w600,
+      final topRow = !item.computed.loading ?
+        new Row(
+          children: <Widget>[
+            new Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
+              child: new Text(
+                item.by,
+                style: new TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          item.score != null ? new Padding(
-            padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-            child: new Text('${item.score} points'),
-          ) : new Container(),
-          new Padding(
-            padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
-            child: new Text('${'2 hours ago'}${'*'}'),
-          ),
-        ],
-      );
+            item.score != null ? new Padding(
+              padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+              child: new Text('${item.score} points'),
+            ) : new Container(),
+            new Padding(
+              padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
+              child: new Text('${'2 hours ago'}${'*'}'),
+            ),
+          ],
+        ) :
+        new Row(
+          children: <Widget>[
+            const Text('Loading…'),
+          ],
+        );
 
       final buttonRow = new Container(
         decoration: new BoxDecoration(

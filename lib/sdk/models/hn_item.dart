@@ -46,6 +46,7 @@ class HNItem {
 }
 
 class HNItemComputed {
+  bool loading;
   String urlHostname;
   String imageUrl;
   bool upvoted;
@@ -55,22 +56,15 @@ class HNItemComputed {
   bool seen;
 
   HNItemComputed ({
-    this.urlHostname,
-    this.imageUrl,
-    this.upvoted,
-    this.downvoted,
-    this.saved,
-    this.hidden,
-    this.seen,
-  }) {
-    this.urlHostname = 'medium.com';
-    this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg';
-    this.upvoted = false;
-    this.downvoted = false;
-    this.saved = false;
-    this.hidden = false;
-    this.seen = false;
-  }
+    this.loading = false,
+    this.urlHostname = 'medium.com',
+    this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg',
+    this.upvoted = false,
+    this.downvoted = false,
+    this.saved = false,
+    this.hidden = false,
+    this.seen = false,
+  });
 
   HNItemComputed.fromItem (HNItem item) {
     if (item.url != null) {
@@ -78,6 +72,7 @@ class HNItemComputed {
       this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg';
     }
 
+    this.loading = false;
     this.upvoted = false;
     this.downvoted = false;
     this.saved = false;
