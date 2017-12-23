@@ -1,14 +1,35 @@
 class HNItem {
+  /// The item's unique id.
   int id;
+  /// `true` if the item is deleted.
+  bool deleted;
+  /// `true` if the item is dead.
+  bool dead;
+  /// The type of item. One of `"job"`, `"story"`, `"comment"`, `"poll"`, or `"pollopt"`.
   String type;
+  /// The title of the story, poll or job.
   String title;
+  /// The URL of the story.
   String url;
+  /// The comment, story or poll text. HTML.
   String text;
+  /// Creation date of the item, in [Unix Time](http://en.wikipedia.org/wiki/Unix_time).
   int time;
+  /// The username of the item's author.
   String by;
+  /// The story's score, or the votes for a pollopt.
   int score;
+  /// In the case of stories or polls, the total comment count.
   int descendants;
+  /// The ids of the item's comments, in ranked display order.
   List<int> kids;
+  /// The comment's parent: either another comment or the relevant story.
+  int parent;
+  /// The pollopt's associated poll.
+  dynamic poll;
+  /// A list of related pollopts, in display order.
+  dynamic parts;
+
   HNItemComputed computed;
 
   HNItem ({
