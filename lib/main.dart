@@ -81,17 +81,7 @@ class HNAppState extends State<HNApp> {
 
     return new MaterialApp(
       title: 'Hacker News',
-      theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.deepOrange,
-      ),
+      theme: this.theme,
       // localizationsDelegates: <LocalizationsDelegate<dynamic>>[
       //   new _StocksLocalizationsDelegate(),
       //   GlobalMaterialLocalizations.delegate,
@@ -109,6 +99,21 @@ class HNAppState extends State<HNApp> {
         // '/story': (BuildContext context) => new StoriesPage()
       },
       onGenerateRoute: _getRoute,
+    );
+  }
+
+  ThemeData get theme {
+    return new ThemeData(
+      // This is the theme of your application.
+      //
+      // Try running your application with "flutter run". You'll see the
+      // application has a blue toolbar. Then, without quitting the app, try
+      // changing the primarySwatch below to Colors.green and then invoke
+      // "hot reload" (press "r" in the console where you ran "flutter run",
+      // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+      // counter didn't reset back to zero; the application is not restarted.
+      primarySwatch: Colors.deepOrange,
+      scaffoldBackgroundColor: Colors.grey[300],
     );
   }
 }
