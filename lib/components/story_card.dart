@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/components/simple_html.dart';
@@ -65,7 +66,7 @@ class StoryCard extends StatelessWidget {
               children: <Widget>[
                 new Text(this.story.by),
                 new Text(' • '),
-                new Text('4 hours ago'),
+                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(this.story.time * 1000))),
               ],
             ),
           ],

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
@@ -88,7 +89,7 @@ class StoryPage extends StoreWatcher {
               children: <Widget>[
                 new Text(item.by),
                 new Text(' • '),
-                new Text('4 hours ago'),
+                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))),
               ],
             ),
           ],

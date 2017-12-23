@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
-import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+// import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
@@ -76,8 +77,10 @@ class Comment extends StoreWatcher {
         child: new SimpleHTML(item.text ?? (item.computed.loading ? 'Loading…' : 'Error')),
       );
 
-      final topRow = !item.computed.loading ?
-        new Row(
+      Widget topRow;
+
+      if (!item.computed.loading) {
+        topRow = new Row(
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
@@ -94,15 +97,18 @@ class Comment extends StoreWatcher {
             ) : new Container(),
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
-              child: new Text('${'2 hours ago'}${'*'}'),
+              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))} ${'*'}'),
             ),
           ],
-        ) :
-        new Row(
+        );
+      } else {
+        topRow = new Row(
           children: <Widget>[
             const Text('Loading…'),
           ],
         );
+      }
+
 
       final buttonRow = new Container(
         decoration: new BoxDecoration(
@@ -174,7 +180,7 @@ class Comment extends StoreWatcher {
 
       return new GestureDetector(
         onTap: () {
-          print('yay');
+          print('comment ${item.id} touched');
           selectItem(item.id);
         },
         child: new Container(
