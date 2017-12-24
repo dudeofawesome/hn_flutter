@@ -15,10 +15,12 @@ import 'package:hn_flutter/components/simple_html.dart';
 
 class Comment extends StoreWatcher {
   final int itemId;
+  final int depth;
 
   Comment ({
     Key key,
     @required this.itemId,
+    this.depth = 0,
   }) : super(key: key);
 
   @override
@@ -178,45 +180,60 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      return new GestureDetector(
-        onTap: () {
-          print('comment ${item.id} touched');
-          selectItem(item.id);
-        },
-        child: new Container(
-          width: double.INFINITY,
-          decoration: new BoxDecoration(
-            border: new Border(
-              left: const BorderSide(
-                width: 4.0,
-                color: Colors.red,
-              ),
-              bottom: const BorderSide(
-                width: 1.0,
-                color: Colors.black12,
-              ),
-            ),
-            color: selectedItemStore.item == item.id ?
-              Theme.of(context).primaryColor.withOpacity(0.3) :
-              Theme.of(context).cardColor,
-          ),
-          child: new Column(
-            children: <Widget>[
-              new Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+      final childComments = item.kids != null ? new Column(
+        children: item.kids.map((kid) => new Comment(
+          itemId: kid,
+          depth: depth + 1,
+        )).toList(),
+      ) : new Container();
+
+      return new Column(
+        children: <Widget>[
+          new GestureDetector(
+            onTap: () {
+              print('comment ${item.id} touched');
+              selectItem(item.id);
+            },
+            child: new Padding(
+              padding: new EdgeInsets.only(left: this.depth * 4.0),
+              child: new Container(
+                width: double.INFINITY,
+                decoration: new BoxDecoration(
+                  border: new Border(
+                    left: const BorderSide(
+                      width: 4.0,
+                      color: Colors.red,
+                    ),
+                    bottom: const BorderSide(
+                      width: 1.0,
+                      color: Colors.black12,
+                    ),
+                  ),
+                  color: selectedItemStore.item == item.id ?
+                    Theme.of(context).primaryColor.withOpacity(0.3) :
+                    Theme.of(context).cardColor,
+                ),
                 child: new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    topRow,
-                    content,
+                    new Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                      child: new Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          topRow,
+                          content,
+                        ],
+                      ),
+                    ),
+                    selectedItemStore.item == item.id ? buttonRow : new Container(),
                   ],
                 ),
               ),
-              selectedItemStore.item == item.id ? buttonRow : new Container(),
-            ],
+            ),
           ),
-        ),
+          childComments,
+        ],
       );
     } else {
       // TODO: I need to find a better place to retrieve the item. This gets called on every repaint
