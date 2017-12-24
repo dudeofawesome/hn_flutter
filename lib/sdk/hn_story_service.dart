@@ -9,10 +9,12 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 class HNStoryService {
   HNConfig _config = new HNConfig();
 
-  Future<List<HNItem>> getTopStories () {
+  Future<List<HNItem>> getTopStories ({
+    int skip = 0,
+  }) {
     return http.get('${this._config.url}/topstories.json')
       .then((res) => JSON.decode(res.body))
-      .then((List<int> body) => body.sublist(0, 5))
+      .then((List<int> body) => body.sublist(skip, 5))
       .then((List<int> body) => Future.wait(body.map((itemId) => this.getItemByID(itemId)).toList()));
   }
 

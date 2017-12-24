@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/components/story_card.dart' show StoryCard;
-// import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/hn_story_service.dart';
 // import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/router.dart';
 
 class StoriesPage extends StoreWatcher { // State<StoriesPage> {
-  // final HNStoryService _hnStoryService = new HNStoryService();
+  final HNStoryService _hnStoryService = new HNStoryService();
 
   StoriesPage () {
     // this._hnStoryService.getTopStories().then((stories) {
@@ -81,15 +81,34 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     // than having to individually change instances of widgets.
     final HNItemStore itemStore = stores[itemStoreToken];
 
+    final stories = itemStore.items
+      .where((item) => item.type == 'story' || item.type == 'job');
+
     final storyCards = new ListView(
-      children: itemStore.items.map<Widget>((story) => new StoryCard(
-        story: story,
-      )).toList()..addAll([
-        // Bottom padding for FAB and home gesture bar
-        const SizedBox(
-          height: 56.0 + 24.0,
-        ),
-      ]),
+      children: stories
+        .map<Widget>((story) => new StoryCard(
+          story: story,
+        )).toList()..addAll([
+          new Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: new FlatButton(
+              child: new Column(
+                children: <Widget>[
+                  const Padding(
+                    padding: const EdgeInsets.only(bottom: 6.0),
+                    child: const Icon(Icons.replay),
+                  ),
+                  const Text('Load more'),
+                ],
+              ),
+              onPressed: () => this._hnStoryService.getTopStories(skip: stories.length),
+            ),
+          ),
+          // Bottom padding for FAB and home gesture bar
+          const SizedBox(
+            height: 56.0,
+          ),
+        ]),
     );
 
     final loadingStories = const Center(
