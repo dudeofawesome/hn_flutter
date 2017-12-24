@@ -1,3 +1,5 @@
+import 'package:hn_flutter/sdk/simple_html_to_markdown.dart';
+
 class HNItem {
   /// The item's unique id.
   int id;
@@ -68,6 +70,7 @@ class HNItem {
 
 class HNItemComputed {
   bool loading;
+  String markdown;
   String urlHostname;
   String imageUrl;
   bool upvoted;
@@ -91,6 +94,10 @@ class HNItemComputed {
     if (item.url != null) {
       this.urlHostname = Uri.parse(item.url).host;
       this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg';
+    }
+
+    if (item.text != null) {
+      this.markdown = new SimpleHTMLtoMarkdown(item.text).transform();
     }
 
     this.loading = false;

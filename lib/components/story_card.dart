@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 import 'package:hn_flutter/router.dart';
-import 'package:hn_flutter/components/simple_html.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 class StoryCard extends StatelessWidget {
@@ -115,7 +115,7 @@ class StoryCard extends StatelessWidget {
         onTap: () => this._openStory(context),
         child: new Padding(
           padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new SimpleHTML(this.story.text),
+          child: new MarkdownBody(data: this.story.computed.markdown),
         ),
       );
 

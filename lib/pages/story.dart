@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 
-import 'package:hn_flutter/components/simple_html.dart';
 import 'package:hn_flutter/components/comment.dart';
 
 class StoryPage extends StoreWatcher {
@@ -138,7 +138,7 @@ class StoryPage extends StoreWatcher {
         // onTap: () => this._openStory(context),
         child: new Padding(
           padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new SimpleHTML(item.text),
+          child: new MarkdownBody(data: item.computed.markdown),
         ),
       );
 

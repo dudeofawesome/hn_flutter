@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 // import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
@@ -10,8 +11,6 @@ import 'package:hn_flutter/sdk/stores/selected_item_store.dart';
 import 'package:hn_flutter/sdk/actions/selected_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
-
-import 'package:hn_flutter/components/simple_html.dart';
 
 class Comment extends StoreWatcher {
   final int itemId;
@@ -74,7 +73,7 @@ class Comment extends StoreWatcher {
     // );
 
     if (item != null) {
-      final content = new SimpleHTML(item.text ?? (item.computed.loading ? 'Loading…' : 'Error'));
+      final content = new MarkdownBody(data: item.computed.markdown ?? (item.computed.loading ? 'Loading…' : 'Error'));
 
       Widget topRow;
 
