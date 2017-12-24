@@ -104,11 +104,7 @@ class Comment extends StoreWatcher {
           ],
         );
       } else {
-        topRow = new Row(
-          children: <Widget>[
-            const Text('Loading…'),
-          ],
-        );
+        topRow = new Container();
       }
 
       final buttonRow = new Container(

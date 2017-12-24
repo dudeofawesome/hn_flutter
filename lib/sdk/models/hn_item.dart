@@ -28,7 +28,7 @@ class HNItem {
   /// The pollopt's associated poll.
   dynamic poll;
   /// A list of related pollopts, in display order.
-  dynamic parts;
+  List<dynamic> parts;
 
   HNItemComputed computed;
 

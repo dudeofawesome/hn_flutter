@@ -213,9 +213,6 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
             ],
             onSelected: (SortModes selection) => this._changeSortMode(selection),
           ),
-
-
-
         ],
       ),
       drawer: new Drawer(
@@ -233,12 +230,16 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
                   new ListTile(
                     leading: const Icon(Icons.open_in_new),
                     title: const Text('Open Story'),
-                    onTap: () => this._openStoryDialog(context),
+                    onTap: () {
+                      this._openStoryDialog(context);
+                    },
                   ),
                   const Divider(),
                   new ListTile(
                     leading: const Icon(Icons.settings),
                     title: const Text('Settings'),
+                    onTap: () {
+                    }
                   ),
                 ],
               ),
@@ -248,9 +249,9 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
       ),
       body: itemStore.items.length > 0 ? storyCards : loadingStories,
       floatingActionButton: new FloatingActionButton(
-        // onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        tooltip: 'New Story',
         child: new Icon(Icons.add),
+        // onPressed: _incrementCounter,
       ),
     );
   }
