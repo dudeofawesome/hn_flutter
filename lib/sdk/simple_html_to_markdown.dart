@@ -1,5 +1,6 @@
 import 'package:html/dom.dart' as Dom;
 import 'package:html/parser.dart' show parse;
+import 'package:html_unescape/html_unescape_small.dart' show HtmlUnescape;
 
 class SimpleHTMLtoMarkdown {
   final Dom.Document doc;
@@ -9,14 +10,12 @@ class SimpleHTMLtoMarkdown {
   ) : doc = parse(body);
 
   String transform () {
-    String body = this.doc.body.innerHtml
-      .replaceAll('&#x2F;', '/')
-      .replaceAll('&#x27;', '\'')
-      .replaceAll('&amp;', '&');
+    String body = new HtmlUnescape()
+      .convert(this.doc.body.innerHtml);
 
     return body
       .replaceAllMapped(
-        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-\.:\&\?]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
+        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-_\.:\&\?]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
         (match) => '[${match[2]}](${match[1]})'
       )
       .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
