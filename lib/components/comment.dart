@@ -74,10 +74,7 @@ class Comment extends StoreWatcher {
     // );
 
     if (item != null) {
-      final content = new GestureDetector(
-        onTap: () => this._highlightComment(),
-        child: new SimpleHTML(item.text ?? (item.computed.loading ? 'Loading…' : 'Error')),
-      );
+      final content = new SimpleHTML(item.text ?? (item.computed.loading ? 'Loading…' : 'Error'));
 
       Widget topRow;
 
