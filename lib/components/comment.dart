@@ -118,13 +118,16 @@ class Comment extends StoreWatcher {
         child: new Padding(
           padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
           child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               new IconButton(
                 icon: const Icon(Icons.arrow_upward),
                 color: item.computed.upvoted ? Colors.orange : Colors.white,
                 tooltip: 'Upvote',
-                onPressed: () => this._upvoteComment(),
+                onPressed: () {
+                  selectItem(item.id);
+                  this._upvoteComment();
+                },
               ),
               // new IconButton(
               //   icon: const Icon(Icons.arrow_downward),
@@ -136,19 +139,28 @@ class Comment extends StoreWatcher {
                 icon: const Icon(Icons.reply),
                 color: Colors.white,
                 tooltip: 'Reply',
-                onPressed: () => this._reply(item.id),
+                onPressed: () {
+                  selectItem(item.id);
+                  this._reply(item.id);
+                },
               ),
               new IconButton(
                 icon: const Icon(Icons.star),
                 color: item.computed.saved ? Colors.amber : Colors.white,
                 tooltip: 'Save',
-                onPressed: () => this._saveComment(),
+                onPressed: () {
+                  selectItem(item.id);
+                  this._saveComment();
+                },
               ),
               new IconButton(
                 icon: const Icon(Icons.person),
                 color: Colors.white,
                 tooltip: 'View Profile',
-                onPressed: () => this._viewProfile(context, item.by),
+                onPressed: () {
+                  selectItem(item.id);
+                  this._viewProfile(context, item.by);
+                },
               ),
               new PopupMenuButton<OverflowMenuItems>(
                 icon: const Icon(
@@ -166,6 +178,7 @@ class Comment extends StoreWatcher {
                   ),
                 ],
                 onSelected: (OverflowMenuItems selection) {
+                  selectItem(item.id);
                   switch (selection) {
                     case OverflowMenuItems.SHARE:
                       return this._shareComment();
