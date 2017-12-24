@@ -111,7 +111,6 @@ class Comment extends StoreWatcher {
         );
       }
 
-
       final buttonRow = new Container(
         decoration: new BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -187,6 +186,15 @@ class Comment extends StoreWatcher {
         )).toList(),
       ) : new Container();
 
+      Color commentColor;
+      if (this.depth > 0) {
+        int index = this.depth - 1;
+        while (index > commentColors.length) {
+          index -= commentColors.length;
+        }
+        commentColor = commentColors[index];
+      }
+
       return new Column(
         children: <Widget>[
           new GestureDetector(
@@ -195,15 +203,15 @@ class Comment extends StoreWatcher {
               selectItem(item.id);
             },
             child: new Padding(
-              padding: new EdgeInsets.only(left: this.depth * 4.0),
+              padding: new EdgeInsets.only(left: this.depth > 0 ? (this.depth - 1) * 4.0 : 0.0),
               child: new Container(
                 width: double.INFINITY,
                 decoration: new BoxDecoration(
                   border: new Border(
-                    left: const BorderSide(
+                    left: this.depth > 0 ? new BorderSide(
                       width: 4.0,
-                      color: Colors.red,
-                    ),
+                      color: commentColor,
+                    ) : const BorderSide(),
                     bottom: const BorderSide(
                       width: 1.0,
                       color: Colors.black12,
@@ -248,6 +256,14 @@ class Comment extends StoreWatcher {
     }
   }
 }
+
+const List<Color> commentColors = const [
+  Colors.red,
+  Colors.blue,
+  Colors.purple,
+  Colors.green,
+  Colors.yellow,
+];
 
 enum OverflowMenuItems {
   SHARE,
