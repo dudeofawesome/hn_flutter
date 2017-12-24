@@ -13,6 +13,7 @@ dependencies:
   url_launcher: ^1.0.1
   flutter_flux: ^4.0.1
   timeago: ^1.2.0
+  html_unescape: ^0.1.5
 
 dev_dependencies:
   flutter_test:
