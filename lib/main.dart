@@ -57,10 +57,10 @@ class HNAppState extends State<HNApp> {
         return null;
       }
 
-      final String userName = path[1].substring(Routes.USERS.length + 1);
+      final String userId = path[1].substring(Routes.USERS.length + 1);
       return new MaterialPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new UserPage(userName: userName),
+        builder: (BuildContext context) => new UserPage(userId: userId),
       );
     }
     // The other paths we support are in the routes table.
