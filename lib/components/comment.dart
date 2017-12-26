@@ -9,17 +9,18 @@ import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/selected_item_store.dart';
 import 'package:hn_flutter/sdk/actions/selected_item_actions.dart';
-import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 
 class Comment extends StoreWatcher {
   final int itemId;
   final int depth;
+  final bool loadChildren;
 
   Comment ({
     Key key,
     @required this.itemId,
     this.depth = 0,
+    this.loadChildren = true,
   }) : super(key: key);
 
   @override
@@ -184,12 +185,14 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      final childComments = item.kids != null ? new Column(
-        children: item.kids.map((kid) => new Comment(
-          itemId: kid,
-          depth: depth + 1,
-        )).toList(),
-      ) : new Container();
+      final childComments = item.kids != null && this.loadChildren ?
+        new Column(
+          children: item.kids.map((kid) => new Comment(
+            itemId: kid,
+            depth: depth + 1,
+          )).toList(),
+        ) :
+        new Container();
 
       Color commentColor;
       if (this.depth > 0) {
