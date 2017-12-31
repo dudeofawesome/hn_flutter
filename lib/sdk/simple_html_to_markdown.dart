@@ -15,7 +15,7 @@ class SimpleHTMLtoMarkdown {
 
     return body
       .replaceAllMapped(
-        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-_\.:\&\?\=]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
+        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-_\.:\&\?\=\#]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
         (match) => '[${match[2]}](${match[1]})'
       )
       .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
