@@ -9,7 +9,7 @@ import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 import 'package:hn_flutter/sdk/hn_user_service.dart';
 
-import 'package:hn_flutter/components/comment.dart';
+import 'package:hn_flutter/components/user_about_tab.dart';
 
 class UserPage extends StoreWatcher {
   final String userId;
@@ -54,52 +54,20 @@ class UserPage extends StoreWatcher {
       _hnStoryService.getUserByID(this.userId);
     }
 
-    final aboutPreview = new Padding(
-      padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-      child: user != null ?
-        user.computed.aboutMarkdown != null ?
-          new MarkdownBody(data: user.computed.aboutMarkdown) :
-          new Container() :
-        const Padding(
-          padding: const EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 16.0),
-          child: const Center(
-            child: const SizedBox(
-              width: 24.0,
-              height: 24.0,
-              child: const CircularProgressIndicator(value: null),
-            ),
-          ),
-        ),
-    );
-
-    final bottomRow = new Row(
-      children: <Widget>[
-        new Expanded(
-          child: new Padding(
-            padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Text('${user?.karma ?? 0} karma points'),
-                new Text('${user?.submitted?.length ?? 0} comments'),
-              ],
-            ),
-          ),
-        ),
-        new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
+    return new DefaultTabController(
+      length: choices.length,
+      child: new Scaffold(
+        appBar: new AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: new Text(user?.id ?? this.userId),
+          actions: <Widget>[
             new IconButton(
-              icon: const Icon(Icons.star),
+              icon: const Icon(Icons.star_border),
               tooltip: 'Save',
               onPressed: () => _saveStory(),
               // color: user.computed.saved ? Colors.amber : Colors.black,
             ),
-            // new IconButton(
-            //   icon: const Icon(Icons.more_vert),
-            // ),
             new PopupMenuButton<OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
@@ -115,71 +83,23 @@ class UserPage extends StoreWatcher {
                 }
               },
             ),
+
+          ],
+          bottom: new TabBar(
+            // isScrollable: true,
+            tabs: choices.map((choice) => new Tab(
+              text: choice.title.toUpperCase(),
+              icon: new Icon(choice.icon),
+            )).toList(),
+          ),
+        ),
+        body: new TabBarView(
+          children: <Widget>[
+            new UserAboutTab(user),
+            const Text('B'),
+            const Text('C'),
           ],
         ),
-      ],
-    );
-
-    final headerCard = new Container(
-      width: double.INFINITY,
-      margin: const EdgeInsets.only(bottom: 8.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: const [
-          const BoxShadow(
-            color: Colors.black,
-            blurRadius: 5.0,
-          ),
-        ],
-      ),
-      // child: new Column(
-      //   children: [
-      //     new Padding(
-      //       padding: const EdgeInsets.fromLTRB(8.0, 16.0, 16.0, 8.0),
-      //       child: new Column(
-      //         mainAxisSize: MainAxisSize.min,
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: <Widget>[
-      //           const Text('test'),
-      //           new Text('ID: ${item.id}'),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // ),
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          aboutPreview,
-          bottomRow,
-        ],
-      ),
-    );
-
-    final comments = user?.submitted != null ?
-      new Column(
-        children: user.submitted
-          .sublist(0, 15)
-          .map((kid) => new Comment(
-            itemId: kid,
-            loadChildren: false,
-          )).toList(),
-      ) :
-      new Container();
-
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new Text(user?.id ?? this.userId),
-        actions: <Widget>[],
-      ),
-      body: new ListView(
-        children: <Widget>[
-          headerCard,
-          comments,
-        ],
       ),
     );
   }
@@ -193,4 +113,40 @@ enum SortModes {
   TOP,
   NEW,
   BEST,
+}
+
+class Choice {
+  const Choice({ this.title, this.icon });
+  final String title;
+  final IconData icon;
+}
+
+const List<Choice> choices = const <Choice>[
+  const Choice(title: 'User', icon: Icons.account_box),
+  const Choice(title: 'Submitted', icon: Icons.forum),
+  const Choice(title: 'Comments', icon: Icons.chat),
+];
+
+class ChoiceCard extends StatelessWidget {
+  const ChoiceCard({ Key key, this.choice }) : super(key: key);
+
+  final Choice choice;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextStyle textStyle = Theme.of(context).textTheme.display1;
+    return new Card(
+      color: Colors.white,
+      child: new Center(
+        child: new Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            new Icon(choice.icon, size: 128.0, color: textStyle.color),
+            new Text(choice.title, style: textStyle),
+          ],
+        ),
+      ),
+    );
+  }
 }
