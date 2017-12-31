@@ -9,6 +9,7 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
+import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryPage extends StoreWatcher {
@@ -296,6 +297,7 @@ class StoryPage extends StoreWatcher {
         children: <Widget>[
           storyCard,
           comments,
+          const FABBottomPadding(),
         ],
       ),
       floatingActionButton: new FloatingActionButton(
