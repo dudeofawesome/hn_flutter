@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
@@ -23,6 +25,10 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
+  }
+
+  Future<Null> _refresh () async {
+    this._hnStoryService.getTopStories();
   }
 
   void _changeSortMode (SortModes sortModes) {
@@ -241,7 +247,12 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
           ],
         ),
       ),
-      body: itemStore.items.length > 0 ? storyCards : loadingStories,
+      body: itemStore.items.length > 0 ?
+        new RefreshIndicator(
+          onRefresh: this._refresh,
+          child: storyCards,
+        ) :
+        loadingStories,
       floatingActionButton: new FloatingActionButton(
         tooltip: 'New Story',
         child: new Icon(Icons.add),
