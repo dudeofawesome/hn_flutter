@@ -42,24 +42,22 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
             decoration: new InputDecoration(
               labelText: 'Story ID',
             ),
+            keyboardType: TextInputType.number,
             onChanged: (String val) => storyId = val,
           ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              new FlatButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                child: new Text('Cancel'.toUpperCase()),
-              ),
-              new FlatButton(
-                onPressed: () {
-                  Navigator.pop(ctx, storyId);
-                },
-                child: new Text('Go'.toUpperCase()),
-              ),
-            ],
+          new ButtonTheme.bar( // make buttons use the appropriate styles for cards
+            child: new ButtonBar(
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text('Cancel'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                new FlatButton(
+                  child: new Text('View'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx, storyId),
+                ),
+              ],
+            ),
           ),
         ],
       )
@@ -68,6 +66,51 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     if (storyId != null) {
       print(storyId);
       Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
+    }
+  }
+
+  _openUserDialog (BuildContext ctx) async {
+    String userId;
+
+    userId = await showDialog(
+      context: ctx,
+      child: new SimpleDialog(
+        title: const Text('Enter user ID'),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        children: <Widget>[
+          new TextField(
+            autofocus: true,
+            autocorrect: false,
+            keyboardType: TextInputType.text,
+            decoration: new InputDecoration(
+              labelText: 'User ID',
+            ),
+            onChanged: (String val) => userId = val,
+          ),
+          new Container(
+            height: 8.0,
+          ),
+          new ButtonTheme.bar( // make buttons use the appropriate styles for cards
+            child: new ButtonBar(
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text('Cancel'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                new FlatButton(
+                  child: new Text('View'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx, userId),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
+    );
+
+    if (userId != null) {
+      print(userId);
+      Navigator.pushNamed(ctx, '/${Routes.USERS}:$userId');
     }
   }
 
@@ -172,10 +215,17 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
               child: new Column(
                 children: <Widget>[
                   new ListTile(
-                    leading: const Icon(Icons.open_in_new),
+                    leading: const Icon(Icons.book),
                     title: const Text('Open Story'),
                     onTap: () {
                       this._openStoryDialog(context);
+                    },
+                  ),
+                  new ListTile(
+                    leading: const Icon(Icons.account_circle),
+                    title: const Text('Open User'),
+                    onTap: () {
+                      this._openUserDialog(context);
                     },
                   ),
                   const Divider(),
