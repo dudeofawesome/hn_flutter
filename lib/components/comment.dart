@@ -6,6 +6,7 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/stores/selected_item_store.dart';
 import 'package:hn_flutter/sdk/actions/selected_item_actions.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
@@ -75,8 +76,6 @@ class Comment extends StoreWatcher {
     // );
 
     if (item != null) {
-      final content = new SimpleMarkdown(item.computed.markdown ?? (item.computed.loading ? 'Loading…' : 'Error'));
-
       Widget topRow;
 
       if (!item.computed.loading) {
@@ -104,6 +103,8 @@ class Comment extends StoreWatcher {
       } else {
         topRow = new Container();
       }
+
+      final content = new SimpleMarkdown(item.computed.markdown ?? (item.computed.loading ? 'Loading…' : 'Error'));
 
       final buttonRow = new Container(
         decoration: new BoxDecoration(
@@ -186,7 +187,7 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      final childComments = item.kids != null && this.loadChildren ?
+      final childComments = item.kids != null && this.loadChildren && !item.computed.hidden ?
         new Column(
           children: item.kids.map((kid) => new Comment(
             itemId: kid,
@@ -210,6 +211,10 @@ class Comment extends StoreWatcher {
             onTap: () {
               print('comment ${item.id} touched');
               selectItem(item.id);
+            },
+            onLongPress: () {
+              print('comment ${item.id} pressed');
+              showHideItem(item.id);
             },
             child: new Padding(
               padding: new EdgeInsets.only(left: this.depth > 0 ? (this.depth - 1) * 4.0 : 0.0),
@@ -239,7 +244,7 @@ class Comment extends StoreWatcher {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           topRow,
-                          content,
+                          !item.computed.hidden ? content : new Container(),
                         ],
                       ),
                     ),
@@ -249,7 +254,9 @@ class Comment extends StoreWatcher {
               ),
             ),
           ),
-          childComments,
+          !item.computed.hidden ?
+            childComments :
+            new Container(),
         ],
       );
     } else {

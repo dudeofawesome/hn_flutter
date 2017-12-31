@@ -13,6 +13,13 @@ class HNItemStore extends Store {
         this._items[this._items.indexOf(found)] = item;
       }
     });
+
+    triggerOnAction(showHideItem, (int itemId) {
+      final HNItem item = this._items.firstWhere((el) => el.id == itemId);
+
+      // TODO: don't mutate the old state but rather make a clone
+      item.computed.hidden = !item.computed.hidden;
+    });
   }
 
   final List<HNItem> _items = <HNItem>[];
