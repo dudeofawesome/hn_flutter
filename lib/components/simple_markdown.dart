@@ -21,7 +21,16 @@ class SimpleMarkdown extends StatelessWidget {
 
   @override
   Widget build (BuildContext context) {
-    final styleSheet = new MarkdownStyleSheet.fromTheme(Theme.of(context));
+    final theme = Theme.of(context);
+    final styleSheet = new MarkdownStyleSheet.fromTheme(theme).copyWith(
+      blockquote: new TextStyle(
+        color: Colors.white,
+      ),
+      blockquoteDecoration: new BoxDecoration(
+        color: theme.accentColor,
+        borderRadius: new BorderRadius.circular(3.0),
+      ),
+    );
 
     return new MarkdownBody(
       data: this.data,
