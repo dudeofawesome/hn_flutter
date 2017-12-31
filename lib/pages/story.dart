@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
@@ -6,7 +8,7 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
-import 'package:hn_flutter/sdk/hn_comment_service.dart';
+import 'package:hn_flutter/sdk/hn_story_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
@@ -46,6 +48,11 @@ class StoryPage extends StoreWatcher {
   }
 
   _reply (int itemId) {
+  }
+
+  Future<Null> refreshStory () async {
+    final HNStoryService hnStoryService = new HNStoryService();
+    await hnStoryService.getItemByID(this.itemId);
   }
 
   _openStoryUrl (String url) async {
@@ -293,12 +300,15 @@ class StoryPage extends StoreWatcher {
           ),
         ],
       ),
-      body: new ListView(
-        children: <Widget>[
-          storyCard,
-          comments,
-          const FABBottomPadding(),
-        ],
+      body: new RefreshIndicator(
+        onRefresh: this.refreshStory,
+        child: new ListView(
+          children: <Widget>[
+            storyCard,
+            comments,
+            const FABBottomPadding(),
+          ],
+        ),
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: () => this._reply(item.id),
