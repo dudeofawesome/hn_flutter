@@ -357,12 +357,12 @@ class Comment extends StoreWatcher {
                         ],
                       ),
                     ),
-                    selectedItemStore.item == item.id ? buttonRow : new Container(),
                   ],
                 ),
               ),
             ),
           ),
+          selectedItemStore.item == item.id ? buttonRow : new Container(),
           !item.computed.hidden ?
             childComments :
             new Container(),
