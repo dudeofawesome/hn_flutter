@@ -18,10 +18,14 @@ class HNStoryService {
       .then((List<int> body) => Future.wait(body.map((itemId) => this.getItemByID(itemId)).toList()));
   }
 
-  Future<HNItem> getItemByID (int id) => http.get('${this._config.url}/item/$id.json')
-    .then((res) => JSON.decode(res.body))
-    .then((item) => new HNItem.fromMap(item))
-    .then((item) {
-      addHNItem(item);
-    });
+  Future<HNItem> getItemByID (int id) {
+    addHNItem(new HNItem(id: id, computed: new HNItemComputed(loading: true)));
+
+    return http.get('${this._config.url}/item/$id.json')
+      .then((res) => JSON.decode(res.body))
+      .then((item) => new HNItem.fromMap(item))
+      .then((item) {
+        addHNItem(item);
+      });
+  }
 }
