@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/components/story_card.dart';
+import 'package:hn_flutter/components/fab_bottom_padding.dart';
 
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
@@ -152,9 +153,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
             ),
           ),
           // Bottom padding for FAB and home gesture bar
-          const SizedBox(
-            height: 56.0,
-          ),
+          const FABBottomPadding(),
         ]),
     );
 
