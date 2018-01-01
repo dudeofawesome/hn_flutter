@@ -51,7 +51,9 @@ class UserAboutTab extends StatelessWidget {
       ),
     );
 
-    final userCreated = new DateTime.fromMillisecondsSinceEpoch(user?.created * 1000);
+    final userCreated = user?.created != null ?
+      new DateTime.fromMillisecondsSinceEpoch(user.created * 1000) :
+      new DateTime.now();
     final String accountAge =
       '${new DateTime.now().difference(userCreated).inDays} days' ??
       '? years';
