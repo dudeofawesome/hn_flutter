@@ -17,12 +17,24 @@ class Comment extends StoreWatcher {
   final int itemId;
   final int depth;
   final bool loadChildren;
+  final List<BarButtons> buttons;
+  final List<BarButtons> overflowButtons;
 
   Comment ({
     Key key,
     @required this.itemId,
     this.depth = 0,
     this.loadChildren = true,
+    this.buttons = const [
+      BarButtons.UPVOTE,
+      BarButtons.REPLY,
+      BarButtons.SAVE,
+      BarButtons.VIEW_PROFILE,
+    ],
+    this.overflowButtons = const [
+      BarButtons.SHARE,
+      BarButtons.COPY_TEXT,
+    ],
   }) : super(key: key);
 
   @override
@@ -51,6 +63,10 @@ class Comment extends StoreWatcher {
 
   void _viewProfile (BuildContext ctx, String author) {
     Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+  }
+
+  void _viewContext (BuildContext ctx, int parent) {
+    // Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
   }
 
   void _copyText (String text) {
@@ -114,75 +130,164 @@ class Comment extends StoreWatcher {
           padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              new IconButton(
-                icon: const Icon(Icons.arrow_upward),
-                color: item.computed.upvoted ? Colors.orange : Colors.white,
-                tooltip: 'Upvote',
-                onPressed: () {
-                  selectItem(item.id);
-                  this._upvoteComment();
-                },
-              ),
-              // new IconButton(
-              //   icon: const Icon(Icons.arrow_downward),
-              //   color: this.story.computed.downvoted ? Colors.blue : Colors.black,
-              //   tooltip: 'Downvote',
-              //   onPressed: () => _downvoteStory(),
-              // ),
-              new IconButton(
-                icon: const Icon(Icons.reply),
-                color: Colors.white,
-                tooltip: 'Reply',
-                onPressed: () {
-                  selectItem(item.id);
-                  this._reply(item.id);
-                },
-              ),
-              new IconButton(
-                icon: const Icon(Icons.star),
-                color: item.computed.saved ? Colors.amber : Colors.white,
-                tooltip: 'Save',
-                onPressed: () {
-                  selectItem(item.id);
-                  this._saveComment();
-                },
-              ),
-              new IconButton(
-                icon: const Icon(Icons.person),
-                color: Colors.white,
-                tooltip: 'View Profile',
-                onPressed: () {
-                  selectItem(item.id);
-                  this._viewProfile(context, item.by);
-                },
-              ),
-              new PopupMenuButton<OverflowMenuItems>(
+            children: this.buttons.map((button) {
+              switch (button) {
+                case BarButtons.UPVOTE:
+                  return new IconButton(
+                    icon: const Icon(Icons.arrow_upward),
+                    color: item.computed.upvoted ? Colors.orange : Colors.white,
+                    tooltip: 'Upvote',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._upvoteComment();
+                    },
+                  );
+                case BarButtons.DOWNVOTE:
+                  return new IconButton(
+                    icon: const Icon(Icons.arrow_downward),
+                    color: item.computed.downvoted ? Colors.blue : Colors.black,
+                    tooltip: 'Downvote',
+                    onPressed: () {
+                      selectItem(item.id);
+                      // this._downvoteStory()
+                    },
+                  );
+                case BarButtons.REPLY:
+                  return new IconButton(
+                    icon: const Icon(Icons.reply),
+                    color: Colors.white,
+                    tooltip: 'Reply',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._reply(item.id);
+                    },
+                  );
+                case BarButtons.SAVE:
+                  return new IconButton(
+                    icon: const Icon(Icons.star),
+                    color: item.computed.saved ? Colors.amber : Colors.white,
+                    tooltip: 'Save',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._saveComment();
+                    },
+                  );
+                case BarButtons.VIEW_PROFILE:
+                  return new IconButton(
+                    icon: const Icon(Icons.person),
+                    color: Colors.white,
+                    tooltip: 'View Profile',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._viewProfile(context, item.by);
+                    },
+                  );
+                case BarButtons.VIEW_CONTEXT:
+                  return new IconButton(
+                    icon: const Icon(Icons.person),
+                    color: Colors.white,
+                    tooltip: 'View Profile',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._viewContext(context, item.parent);
+                    },
+                  );
+                case BarButtons.COPY_TEXT:
+                  return new IconButton(
+                    icon: const Icon(Icons.content_copy),
+                    color: Colors.white,
+                    tooltip: 'Copy Text',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._copyText(item.text);
+                    },
+                  );
+                case BarButtons.SHARE:
+                  return new IconButton(
+                    icon: const Icon(Icons.share),
+                    color: Colors.white,
+                    tooltip: 'Share',
+                    onPressed: () {
+                      selectItem(item.id);
+                      this._shareComment();
+                    },
+                  );
+              }
+              // TODO: remove this once I figure out how to make the List type not be exclusively `IconButton`s
+              return Null;
+            }).toList()..add(
+              new PopupMenuButton<BarButtons>(
                 icon: const Icon(
                   Icons.more_horiz,
                   color: Colors.white,
                 ),
-                itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-                  const PopupMenuItem<OverflowMenuItems>(
-                    value: OverflowMenuItems.SHARE,
-                    child: const Text('Share'),
-                  ),
-                  const PopupMenuItem<OverflowMenuItems>(
-                    value: OverflowMenuItems.COPY_TEXT,
-                    child: const Text('Copy Text'),
-                  ),
-                ],
-                onSelected: (OverflowMenuItems selection) {
+                itemBuilder: (BuildContext ctx) => this.overflowButtons.map((button) {
+                  switch (button) {
+                    case BarButtons.UPVOTE:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.UPVOTE,
+                        child: const Text('Upvote'),
+                      );
+                    case BarButtons.DOWNVOTE:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.DOWNVOTE,
+                        child: const Text('Downvote'),
+                      );
+                    case BarButtons.REPLY:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.REPLY,
+                        child: const Text('Reply'),
+                      );
+                    case BarButtons.SAVE:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.SAVE,
+                        child: const Text('Save'),
+                      );
+                    case BarButtons.VIEW_PROFILE:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.VIEW_PROFILE,
+                        child: const Text('View Profile'),
+                      );
+                    case BarButtons.VIEW_CONTEXT:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.SHARE,
+                        child: const Text('Share'),
+                      );
+                    case BarButtons.COPY_TEXT:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.SHARE,
+                        child: const Text('Share'),
+                      );
+                    case BarButtons.SHARE:
+                      return const PopupMenuItem<BarButtons>(
+                        value: BarButtons.SHARE,
+                        child: const Text('Share'),
+                      );
+                  }
+                }).toList(),
+                onSelected: (BarButtons selection) {
                   selectItem(item.id);
                   switch (selection) {
-                    case OverflowMenuItems.SHARE:
-                      return this._shareComment();
-                    case OverflowMenuItems.COPY_TEXT:
+                    case BarButtons.UPVOTE:
+                      return this._upvoteComment();
+                    case BarButtons.DOWNVOTE:
+                      return this._downvoteComment();
+                    case BarButtons.REPLY:
+                      return this._reply(item.id);
+                    case BarButtons.SAVE:
+                      return this._saveComment();
+                    case BarButtons.VIEW_PROFILE:
+                      return this._viewProfile(context, item.by);
+                    case BarButtons.VIEW_CONTEXT:
+                      return this._viewContext(context, item.parent);
+                    case BarButtons.COPY_TEXT:
                       return this._copyText(item.text);
+                    case BarButtons.SHARE:
+                      return this._shareComment();
                   }
                 },
-              ),
-            ],
+              )
+            ),
           ),
         ),
       );
@@ -293,4 +398,15 @@ enum SortModes {
   ASK_HN,
   SHOW_HN,
   JOB,
+}
+
+enum BarButtons {
+  UPVOTE,
+  DOWNVOTE,
+  REPLY,
+  SAVE,
+  VIEW_PROFILE,
+  VIEW_CONTEXT,
+  COPY_TEXT,
+  SHARE,
 }
