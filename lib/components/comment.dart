@@ -126,7 +126,7 @@ class Comment extends StoreWatcher {
 
       final content = new SimpleMarkdown(item.computed.markdown ?? (item.computed.loading ? 'Loading…' : 'Error'));
 
-      final List<Widget> buttons = this.buttons.map((button) {
+      final List<Widget> buttons = this.buttons.map<Widget>((button) {
         switch (button) {
           case BarButtons.UPVOTE:
             return new IconButton(
@@ -209,8 +209,6 @@ class Comment extends StoreWatcher {
               },
             );
         }
-        // TODO: remove this once I figure out how to make the List type not be exclusively `IconButton`s
-        return Null;
       }).toList();
 
       if (this.overflowButtons?.length > 0) {
@@ -375,7 +373,6 @@ class Comment extends StoreWatcher {
         ],
       );
     } else {
-      // TODO: I need to find a better place to retrieve the item. This gets called on every repaint
       print('getting item $itemId');
       final HNCommentService _hnStoryService = new HNCommentService();
       _hnStoryService.getItemByID(itemId);
