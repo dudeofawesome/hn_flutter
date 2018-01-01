@@ -17,7 +17,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
 
   StoriesPage ({
     Key key
-  }) : super(key: key)
+  }) : super(key: key);
 
   @override
   void initStores(ListenToStore listenToStore) {
