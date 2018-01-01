@@ -92,6 +92,10 @@ class Comment extends StoreWatcher {
     // );
 
     if (item != null) {
+      if (item.type != 'comment') {
+        return new Container();
+      }
+
       Widget topRow;
 
       if (!item.computed.loading) {
