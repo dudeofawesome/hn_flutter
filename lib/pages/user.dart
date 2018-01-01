@@ -2,14 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
-import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
-import 'package:hn_flutter/sdk/hn_comment_service.dart';
 import 'package:hn_flutter/sdk/hn_user_service.dart';
 
 import 'package:hn_flutter/components/user_about_tab.dart';
+import 'package:hn_flutter/components/user_comments_tab.dart';
 
 class UserPage extends StoreWatcher {
   final String userId;
@@ -97,7 +96,7 @@ class UserPage extends StoreWatcher {
           children: <Widget>[
             new UserAboutTab(user),
             const Text('B'),
-            const Text('C'),
+            new UserCommentsTab(user),
           ],
         ),
       ),
