@@ -20,9 +20,13 @@ class HNItemStore extends Store {
       // TODO: don't mutate the old state but rather make a clone
       item.computed.hidden = !item.computed.hidden;
     });
+
+    triggerOnAction(sortItems, (List<int> sortedItemIds) {
+      this._items.setAll(0, sortedItemIds.map((itemId) => this._items.firstWhere((item) => item.id == itemId)));
+    });
   }
 
-  final List<HNItem> _items = <HNItem>[];
+  List<HNItem> _items = <HNItem>[];
 
   List<HNItem> get items => new List.unmodifiable(_items);
   // String get currentMessage => _currentMessage;

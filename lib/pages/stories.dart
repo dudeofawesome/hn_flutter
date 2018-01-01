@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
-import 'package:hn_flutter/components/story_card.dart' show StoryCard;
+import 'package:hn_flutter/components/story_card.dart';
+
 import 'package:hn_flutter/sdk/hn_story_service.dart';
-// import 'package:hn_flutter/sdk/models/hn_item.dart';
+import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/router.dart';
@@ -13,14 +14,9 @@ import 'package:hn_flutter/router.dart';
 class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   final HNStoryService _hnStoryService = new HNStoryService();
 
-  StoriesPage () {
-    // this._hnStoryService.getTopStories().then((stories) {
-    //   print(stories);
-    //   setState(() {
-    //     this._stories = stories;
-    //   });
-    // });
-  }
+  StoriesPage ({
+    Key key
+  }) : super(key: key)
 
   @override
   void initStores(ListenToStore listenToStore) {
@@ -28,7 +24,9 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   }
 
   Future<Null> _refresh () async {
-    this._hnStoryService.getTopStories();
+    final stories = await this._hnStoryService.getTopStories();
+    final List<int> storyIds = stories.where((item) => item != null).map((item) => item.id).toList();
+    sortItems(storyIds);
   }
 
   void _changeSortMode (SortModes sortModes) {
