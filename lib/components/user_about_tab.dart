@@ -101,7 +101,7 @@ class UserAboutTab extends StatelessWidget {
 
     return new Padding(
       padding: const EdgeInsets.all(4.0),
-      child: new Column(
+      child: new ListView(
         children: <Widget>[
           summaryCard,
           aboutCard,
