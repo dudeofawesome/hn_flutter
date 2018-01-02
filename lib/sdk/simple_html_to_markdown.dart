@@ -1,21 +1,21 @@
-import 'package:html/dom.dart' as Dom;
-import 'package:html/parser.dart' show parse;
+
 import 'package:html_unescape/html_unescape_small.dart' show HtmlUnescape;
 
+import 'package:hn_flutter/sdk/regexes.dart';
+
 class SimpleHTMLtoMarkdown {
-  final Dom.Document doc;
+  String body;
 
   SimpleHTMLtoMarkdown (
     String body,
-  ) : doc = parse(body);
+  ) {
+    this.body = new HtmlUnescape().convert(body);
+  }
 
   String transform () {
-    String body = new HtmlUnescape()
-      .convert(this.doc.body.innerHtml);
-
-    return body
+    return this.body
       .replaceAllMapped(
-        new RegExp(r'\<a.*?href\=\\?"([a-z0-9\/\-_\.:\&\?\=\#]*)\\?".*?\>(.*?)\<\/a\>', caseSensitive: false),
+        htmlTagA,
         (match) => '[${match[2]}](${match[1]})'
       )
       .replaceAll(new RegExp(r'\<\/?a\>', caseSensitive: false), '')
@@ -27,6 +27,14 @@ class SimpleHTMLtoMarkdown {
       .replaceAllMapped(
         new RegExp(r'^([0-9]+)\.', caseSensitive: false),
         (match) => '${match[1]}\\.'
-      );
+      )
+      .replaceAllMapped(looseUrl, (match) {
+        try {
+          Uri.parse(match[0]);
+          return '[${match[0]}](${match[0]})';
+        } catch (e) {
+          return match[0];
+        }
+      });
   }
 }
