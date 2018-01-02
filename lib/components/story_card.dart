@@ -1,28 +1,37 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
+import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+
 import 'package:hn_flutter/components/simple_markdown.dart';
 
-class StoryCard extends StatelessWidget {
-  final HNItem story;
+class StoryCard extends StoreWatcher {
+  final int storyId;
 
   StoryCard ({
     Key key,
-    @required this.story
+    @required this.storyId
   }) : super(key: key);
 
-  _openStoryUrl () async {
-    if (await UrlLauncher.canLaunch(this.story.url)) {
-      await UrlLauncher.launch(this.story.url, forceWebView: true);
+  @override
+  void initStores(ListenToStore listenToStore) {
+    listenToStore(itemStoreToken);
+  }
+
+  _openStoryUrl (String url) async {
+    if (await UrlLauncher.canLaunch(url)) {
+      await UrlLauncher.launch(url, forceWebView: true);
     }
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.story.id}');
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
   }
 
   void _upvoteStory () {
@@ -40,12 +49,35 @@ class StoryCard extends StatelessWidget {
   void _hideStory () {
   }
 
-  void _viewProfile (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:${this.story.by}');
+  void _viewProfile (BuildContext ctx, String by) {
+    Navigator.pushNamed(ctx, '/${Routes.USERS}:$by');
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+    final HNItemStore itemStore = stores[itemStoreToken];
+    final story = itemStore.items.firstWhere((item) => item.id == this.storyId, orElse: () {});
+
+    if (story == null || story.computed.loading) {
+      if (story == null) {
+        print('getting item $storyId');
+        final HNStoryService _hnStoryService = new HNStoryService();
+        _hnStoryService.getItemByID(storyId);
+      }
+
+      return new Card(
+        child: new Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+          child: const Text('Loading…'),
+        ),
+      );
+    }
+
+    if (story.type != 'story' && story.type != 'job' && story.type != 'poll') {
+      return new Container();
+    }
+
+
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
     final titleColumn = new GestureDetector(
@@ -56,7 +88,7 @@ class StoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             new Text(
-              this.story.title,
+              story.title,
               style: Theme.of(context).textTheme.title.copyWith(
                 fontSize: 18.0,
               ),
@@ -64,9 +96,9 @@ class StoryCard extends StatelessWidget {
             new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(this.story.by),
+                new Text(story.by),
                 new Text(' • '),
-                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(this.story.time * 1000))),
+                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
               ],
             ),
           ],
@@ -74,9 +106,9 @@ class StoryCard extends StatelessWidget {
       ),
     );
 
-    final preview = this.story.text == null ?
+    final preview = story.text == null ?
       new GestureDetector(
-        onTap: this._openStoryUrl,
+        onTap: () => this._openStoryUrl(story.url),
         child: new Stack(
           alignment: AlignmentDirectional.bottomStart,
           children: <Widget>[
@@ -95,12 +127,12 @@ class StoryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     new Text(
-                      this.story.computed.urlHostname,
+                      story.computed.urlHostname,
                       style: linkOverlayText,
                       overflow: TextOverflow.ellipsis,
                     ),
                     new Text(
-                      this.story.url,
+                      story.url,
                       style: linkOverlayText,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -115,7 +147,7 @@ class StoryCard extends StatelessWidget {
         onTap: () => this._openStory(context),
         child: new Padding(
           padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new SimpleMarkdown(this.story.computed.markdown),
+          child: new SimpleMarkdown(story.computed.markdown),
         ),
       );
 
@@ -129,8 +161,8 @@ class StoryCard extends StatelessWidget {
               child: new Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  new Text('${this.story.score} points'),
-                  new Text('${this.story.descendants} comments'),
+                  new Text('${story.score} points'),
+                  new Text('${story.descendants} comments'),
                 ],
               ),
             ),
@@ -145,7 +177,7 @@ class StoryCard extends StatelessWidget {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               onPressed: () => _upvoteStory(),
-              color: this.story.computed.upvoted ? Colors.orange : Colors.black,
+              color: story.computed.upvoted ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
@@ -157,7 +189,7 @@ class StoryCard extends StatelessWidget {
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               onPressed: () => _saveStory(),
-              color: this.story.computed.saved ? Colors.amber : Colors.black,
+              color: story.computed.saved ? Colors.amber : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.more_vert),
@@ -185,7 +217,7 @@ class StoryCard extends StatelessWidget {
                   case OverflowMenuItems.SHARE:
                     return this._shareStory();
                   case OverflowMenuItems.VIEW_PROFILE:
-                    return this._viewProfile(context);
+                    return this._viewProfile(context, story.by);
                 }
               },
             ),
@@ -198,7 +230,7 @@ class StoryCard extends StatelessWidget {
       child: new Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: this.story.text == null ?
+        children: story.text == null ?
           <Widget>[
             preview,
             titleColumn,

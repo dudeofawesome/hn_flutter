@@ -130,12 +130,12 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     final HNItemStore itemStore = stores[itemStoreToken];
 
     final stories = itemStore.items
-      .where((item) => item.type == 'story' || item.type == 'job');
+      .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
 
     final storyCards = new ListView(
       children: stories
         .map<Widget>((story) => new StoryCard(
-          story: story,
+          storyId: story.id,
         )).toList()..addAll([
           new Padding(
             padding: const EdgeInsets.only(top: 12.0),
