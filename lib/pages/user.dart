@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
-import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
@@ -22,18 +21,6 @@ class UserPage extends StoreWatcher {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(userStoreToken);
-  }
-
-  void _saveStory () {
-  }
-
-  void _shareStory () {
-  }
-
-  _openStoryUrl (String url) async {
-    if (await UrlLauncher.canLaunch(url)) {
-      await UrlLauncher.launch(url, forceWebView: true);
-    }
   }
 
   @override

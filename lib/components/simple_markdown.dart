@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody, MarkdownStyleSheet;
 
 class SimpleMarkdown extends StatelessWidget {
@@ -13,9 +14,9 @@ class SimpleMarkdown extends StatelessWidget {
     }
   ) : super(key: key);
 
-  _openLink (String url) async {
+  _openLink (BuildContext ctx, String url) async {
     if (await UrlLauncher.canLaunch(url)) {
-      await UrlLauncher.launch(url, forceWebView: true);
+      await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
     }
   }
 
@@ -35,7 +36,9 @@ class SimpleMarkdown extends StatelessWidget {
     return new MarkdownBody(
       data: this.data,
       styleSheet: styleSheet,
-      onTapLink: this._openLink,
+      onTapLink: (url) {
+        this._openLink(context, url);
+      },
     );
   }
 }

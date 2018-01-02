@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
@@ -55,9 +56,9 @@ class StoryPage extends StoreWatcher {
     await hnStoryService.getItemByID(this.itemId);
   }
 
-  _openStoryUrl (String url) async {
+  _openStoryUrl (BuildContext ctx, String url) async {
     if (await UrlLauncher.canLaunch(url)) {
-      await UrlLauncher.launch(url, forceWebView: true);
+      await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
     }
   }
 
@@ -107,7 +108,7 @@ class StoryPage extends StoreWatcher {
 
     final preview = item.text == null ?
       new GestureDetector(
-        onTap: () => this._openStoryUrl(item.url),
+        onTap: () => this._openStoryUrl(context, item.url),
         child: new Stack(
           alignment: AlignmentDirectional.bottomStart,
           children: <Widget>[
