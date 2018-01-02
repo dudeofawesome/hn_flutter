@@ -9,6 +9,7 @@ import 'package:hn_flutter/sdk/hn_user_service.dart';
 
 import 'package:hn_flutter/components/user_about_tab.dart';
 import 'package:hn_flutter/components/user_comments_tab.dart';
+import 'package:hn_flutter/components/user_submitted_tab.dart';
 
 class UserPage extends StoreWatcher {
   final String userId;
@@ -95,7 +96,7 @@ class UserPage extends StoreWatcher {
         body: new TabBarView(
           children: <Widget>[
             new UserAboutTab(user),
-            const Text('B'),
+            new UserSubmittedTab(user),
             new UserCommentsTab(user),
           ],
         ),
