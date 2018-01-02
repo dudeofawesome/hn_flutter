@@ -10,6 +10,8 @@ dependencies:
   cupertino_icons: ^0.1.0
   flutter_flux: ^4.0.1
   flutter_markdown: ^0.1.0
+  flutter_web_browser:
+    git: git@github.com:victorbonnet/flutter_web_browser.git
   html_unescape: ^0.1.5
   intl: ^0.15.2
   timeago: ^1.2.0
