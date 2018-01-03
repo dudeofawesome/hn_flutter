@@ -36,6 +36,8 @@ class HNItem {
 
   HNItem ({
     this.id,
+    this.deleted,
+    this.dead,
     this.type,
     this.title,
     this.url,
@@ -45,10 +47,13 @@ class HNItem {
     this.score,
     this.descendants,
     this.kids,
+    this.parent,
+    this.poll,
+    this.parts,
     this.computed,
   }) {
     if (this.computed == null) {
-      this.computed = new HNItemComputed();
+      this.computed = new HNItemComputed.fromItem(this);
     }
   }
 
@@ -66,6 +71,24 @@ class HNItem {
 
     this.computed = new HNItemComputed.fromItem(this);
   }
+
+  String toString() {
+    return
+'''HNItem:
+  id: $id
+  type: $type
+  title: $title
+  text: $text
+  by: $by
+  score: $score
+  time: $time
+  descendants: $descendants
+  computed:
+    loading: ${computed.loading}
+    markdown: ${computed.markdown}
+    urlHostname: ${computed.urlHostname}
+    seen: ${computed.seen}''';
+  }
 }
 
 class HNItemComputed {
@@ -81,8 +104,8 @@ class HNItemComputed {
 
   HNItemComputed ({
     this.loading = false,
-    this.urlHostname = 'medium.com',
-    this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg',
+    this.urlHostname,
+    this.imageUrl,
     this.upvoted = false,
     this.downvoted = false,
     this.saved = false,
@@ -93,7 +116,7 @@ class HNItemComputed {
   HNItemComputed.fromItem (HNItem item) {
     if (item.url != null) {
       this.urlHostname = Uri.parse(item.url).host;
-      this.imageUrl = 'https://cdn-images-1.medium.com/max/1600/1*jhDkbyL5Z31Ev7imhuOCgw.jpeg';
+      this.imageUrl;
     }
 
     if (item.text != null) {
