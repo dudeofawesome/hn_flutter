@@ -59,6 +59,8 @@ class StoryCard extends StoreWatcher {
     final HNItemStore itemStore = stores[itemStoreToken];
     final story = itemStore.items.firstWhere((item) => item.id == this.storyId, orElse: () {});
 
+    final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
+
     if (story == null || story.computed.loading) {
       if (story == null) {
         print('getting item $storyId');
@@ -66,10 +68,13 @@ class StoryCard extends StoreWatcher {
         _hnStoryService.getItemByID(storyId);
       }
 
-      return new Card(
-        child: new Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: const Text('Loading…'),
+      return new Padding(
+        padding: cardOuterPadding,
+        child: new Card(
+          child: new Padding(
+            padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+            child: const Text('Loading…'),
+          ),
         ),
       );
     }
@@ -81,20 +86,20 @@ class StoryCard extends StoreWatcher {
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
-    final titleColumn = new GestureDetector(
-      onTap: () => this._openStory(context),
-      child: new Padding(
-        padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Text(
-              story.title,
-              style: Theme.of(context).textTheme.title.copyWith(
-                fontSize: 18.0,
-              ),
+    final titleColumn = new Padding(
+      padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Text(
+            story.title,
+            style: Theme.of(context).textTheme.title.copyWith(
+              fontSize: 18.0,
             ),
-            new Row(
+          ),
+          new Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 new Text(story.by),
@@ -102,8 +107,8 @@ class StoryCard extends StoreWatcher {
                 new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
 
@@ -123,7 +128,7 @@ class StoryCard extends StoreWatcher {
               ),
               width: double.INFINITY,
               child: new Padding(
-                padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                padding: new EdgeInsets.all(8.0),
                 child: new Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -144,28 +149,19 @@ class StoryCard extends StoreWatcher {
           ],
         ),
       ) :
-      new GestureDetector(
-        onTap: () => this._openStory(context),
-        child: new Padding(
-          padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new SimpleMarkdown(story.computed.markdown),
-        ),
-      );
+      new SimpleMarkdown(story.computed.markdown);
 
     final bottomRow = new Row(
       children: <Widget>[
         new Expanded(
-          child: new GestureDetector(
-            onTap: () => this._openStory(context),
-            child: new Padding(
-              padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Text('${story.score} points'),
-                  new Text('${story.descendants} comments'),
-                ],
-              ),
+          child: new Padding(
+            padding: new EdgeInsets.all(8.0),
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                new Text('${story.score} points'),
+                new Text('${story.descendants} comments'),
+              ],
             ),
           ),
         ),
@@ -227,21 +223,27 @@ class StoryCard extends StoreWatcher {
       ],
     );
 
-    return new Card(
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: story.text == null ?
-          <Widget>[
-            preview,
-            titleColumn,
-            bottomRow,
-          ] :
-          <Widget>[
-            titleColumn,
-            preview,
-            bottomRow,
-          ],
+    return new Padding(
+      padding: cardOuterPadding,
+      child: new Card(
+        child: new GestureDetector(
+          onTap: () => this._openStory(context),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: story.text == null ?
+              <Widget>[
+                preview,
+                titleColumn,
+                bottomRow,
+              ] :
+              <Widget>[
+                titleColumn,
+                preview,
+                bottomRow,
+              ],
+          ),
+        ),
       ),
     );
   }
