@@ -173,6 +173,7 @@ class StoryCard extends StoreWatcher {
             new IconButton(
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
+              iconSize: 20.0,
               onPressed: () => _upvoteStory(),
               color: story.computed.upvoted ? Colors.orange : Colors.black,
             ),
@@ -185,6 +186,7 @@ class StoryCard extends StoreWatcher {
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
+              iconSize: 20.0,
               onPressed: () => _saveStory(),
               color: story.computed.saved ? Colors.amber : Colors.black,
             ),
@@ -192,7 +194,10 @@ class StoryCard extends StoreWatcher {
             //   icon: const Icon(Icons.more_vert),
             // ),
             new PopupMenuButton<OverflowMenuItems>(
-              icon: const Icon(Icons.more_horiz),
+              icon: const Icon(
+                Icons.more_horiz,
+                size: 20.0
+              ),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
                 const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.SHARE,
