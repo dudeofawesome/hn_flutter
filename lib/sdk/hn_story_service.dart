@@ -14,7 +14,7 @@ class HNStoryService {
   }) {
     return http.get('${this._config.url}/topstories.json')
       .then((res) => JSON.decode(res.body))
-      .then((List<int> body) => body.sublist(skip, skip + 5))
+      .then((List<int> body) => body.sublist(skip, skip + 10))
       .then((List<int> body) => Future.wait(body.map((itemId) => this.getItemByID(itemId)).toList()));
   }
 
