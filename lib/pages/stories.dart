@@ -180,6 +180,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
 
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
+            initialValue: SortModes.TOP,
             itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
               const PopupMenuItem<SortModes>(
                 value: SortModes.TOP,
