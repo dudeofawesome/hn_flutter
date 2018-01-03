@@ -315,7 +315,7 @@ class Comment extends StoreWatcher {
       Color commentColor;
       if (this.depth > 0) {
         int index = this.depth - 1;
-        while (index > commentColors.length) {
+        while (index >= commentColors.length) {
           index -= commentColors.length;
         }
         commentColor = commentColors[index];
