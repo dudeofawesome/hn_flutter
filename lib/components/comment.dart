@@ -92,7 +92,7 @@ class Comment extends StoreWatcher {
     // );
 
     if (item != null) {
-      if (item.type != 'comment') {
+      if (item.type != null && item.type != 'comment') {
         return new Container();
       }
 
@@ -124,7 +124,9 @@ class Comment extends StoreWatcher {
         topRow = new Container();
       }
 
-      final content = new SimpleMarkdown(item.computed.markdown ?? (item.computed.loading ? 'Loading…' : 'Error'));
+      final content = item.computed.markdown != null ?
+        new SimpleMarkdown(item.computed.markdown) :
+        item.computed.loading ? const Text('Loading…') : const Text('Error');
 
       final List<Widget> buttons = this.buttons.map<Widget>((button) {
         switch (button) {
@@ -379,7 +381,7 @@ class Comment extends StoreWatcher {
 
       return new Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        child: new Text('$itemId Load more'),
+        child: new Text('Load more'),
       );
     }
   }
