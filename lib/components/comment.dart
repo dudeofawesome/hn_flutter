@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 // import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:timeago/timeago.dart' show timeAgo;
@@ -327,8 +328,9 @@ class Comment extends StoreWatcher {
               print('comment ${item.id} touched');
               selectItem(item.id);
             },
-            onLongPress: () {
+            onLongPress: () async {
               print('comment ${item.id} pressed');
+              await SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
               showHideItem(item.id);
             },
             child: new Padding(
