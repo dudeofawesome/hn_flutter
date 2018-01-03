@@ -133,8 +133,12 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
       .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
 
     final storyCards = new ListView(
-      children: stories
-        .map<Widget>((story) => new StoryCard(
+      children: <Widget>[
+        const Padding(
+          padding: const EdgeInsets.only(top: 5.0),
+        )
+      ]..addAll(
+        stories.map<Widget>((story) => new StoryCard(
           storyId: story.id,
         )).toList()..addAll([
           new Padding(
@@ -155,6 +159,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
           // Bottom padding for FAB and home gesture bar
           const FABBottomPadding(),
         ]),
+      ),
     );
 
     final loadingStories = const Center(
