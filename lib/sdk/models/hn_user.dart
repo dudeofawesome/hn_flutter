@@ -1,4 +1,4 @@
-import 'package:hn_flutter/sdk/simple_html_to_markdown.dart';
+import 'package:hn_flutter/utils/simple_html_to_markdown.dart';
 
 class HNUser {
   /// The user's unique username. Case-sensitive. Required.

@@ -1,7 +1,7 @@
 
 import 'package:html_unescape/html_unescape_small.dart' show HtmlUnescape;
 
-import 'package:hn_flutter/sdk/regexes.dart';
+import 'package:hn_flutter/utils/regexes.dart';
 
 class SimpleHTMLtoMarkdown {
   String body;
