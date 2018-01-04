@@ -17,10 +17,12 @@ class UserSubmittedTab extends StatelessWidget {
 
   @override
   Widget build (BuildContext context) {
-    return new ListView(
-      children: this.user.submitted.map((itemId) => new StoryCard(
-        storyId: itemId,
-      )).toList(),
+    return new Scrollbar(
+      child: new ListView(
+        children: this.user.submitted.map((itemId) => new StoryCard(
+          storyId: itemId,
+        )).toList(),
+      ),
     );
   }
 }

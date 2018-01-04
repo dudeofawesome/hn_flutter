@@ -17,18 +17,20 @@ class UserCommentsTab extends StatelessWidget {
 
   @override
   Widget build (BuildContext context) {
-    return new ListView(
-      children: this.user.submitted.map((itemId) => new Comment(
-        itemId: itemId,
-        loadChildren: false,
-        buttons: <BarButtons>[
-          BarButtons.VIEW_CONTEXT,
-          BarButtons.SAVE,
-          BarButtons.SHARE,
-          BarButtons.COPY_TEXT,
-        ],
-        overflowButtons: <BarButtons>[],
-      )).toList(),
+    return new Scrollbar(
+      child: new ListView(
+        children: this.user.submitted.map((itemId) => new Comment(
+          itemId: itemId,
+          loadChildren: false,
+          buttons: <BarButtons>[
+            BarButtons.VIEW_CONTEXT,
+            BarButtons.SAVE,
+            BarButtons.SHARE,
+            BarButtons.COPY_TEXT,
+          ],
+          overflowButtons: <BarButtons>[],
+        )).toList(),
+      ),
     );
   }
 }

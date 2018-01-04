@@ -303,12 +303,14 @@ class StoryPage extends StoreWatcher {
       ),
       body: new RefreshIndicator(
         onRefresh: this.refreshStory,
-        child: new ListView(
-          children: <Widget>[
-            storyCard,
-            comments,
-            const FABBottomPadding(),
-          ],
+        child: new Scrollbar(
+          child: new ListView(
+            children: <Widget>[
+              storyCard,
+              comments,
+              const FABBottomPadding(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: new FloatingActionButton(

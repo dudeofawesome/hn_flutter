@@ -101,11 +101,13 @@ class UserAboutTab extends StatelessWidget {
 
     return new Padding(
       padding: const EdgeInsets.all(4.0),
-      child: new ListView(
-        children: <Widget>[
-          summaryCard,
-          aboutCard,
-        ],
+      child: new Scrollbar(
+        child: new ListView(
+          children: <Widget>[
+            summaryCard,
+            aboutCard,
+          ],
+        ),
       ),
     );
   }

@@ -132,33 +132,35 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     final stories = itemStore.items
       .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
 
-    final storyCards = new ListView(
-      children: <Widget>[
-        const Padding(
-          padding: const EdgeInsets.only(top: 5.0),
-        )
-      ]..addAll(
-        stories.map<Widget>((story) => new StoryCard(
-          storyId: story.id,
-        )).toList()..addAll([
-          new Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: new FlatButton(
-              child: new Column(
-                children: <Widget>[
-                  const Padding(
-                    padding: const EdgeInsets.only(bottom: 6.0),
-                    child: const Icon(Icons.replay),
-                  ),
-                  const Text('Load more'),
-                ],
+    final storyCards = new Scrollbar(
+      child: new ListView(
+        children: <Widget>[
+          const Padding(
+            padding: const EdgeInsets.only(top: 5.0),
+          )
+        ]..addAll(
+          stories.map<Widget>((story) => new StoryCard(
+            storyId: story.id,
+          )).toList()..addAll([
+            new Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: new FlatButton(
+                child: new Column(
+                  children: <Widget>[
+                    const Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: const Icon(Icons.replay),
+                    ),
+                    const Text('Load more'),
+                  ],
+                ),
+                onPressed: () => this._hnStoryService.getTopStories(skip: stories.length),
               ),
-              onPressed: () => this._hnStoryService.getTopStories(skip: stories.length),
             ),
-          ),
-          // Bottom padding for FAB and home gesture bar
-          const FABBottomPadding(),
-        ]),
+            // Bottom padding for FAB and home gesture bar
+            const FABBottomPadding(),
+          ]),
+        ),
       ),
     );
 
