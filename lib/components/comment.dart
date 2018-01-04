@@ -117,7 +117,7 @@ class Comment extends StoreWatcher {
             ) : new Container(),
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
-              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))} ${'*'}'),
+              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))}'),
             ),
           ],
         );
