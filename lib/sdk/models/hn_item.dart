@@ -59,6 +59,8 @@ class HNItem {
 
   HNItem.fromMap (Map map) {
     this.id = map['id'];
+    this.deleted = map['deleted'];
+    this.dead = map['dead'];
     this.type = map['type'];
     this.title = map['title'];
     this.url = map['url'];
@@ -68,6 +70,9 @@ class HNItem {
     this.score = map['score'];
     this.descendants = map['descendants'];
     this.kids = map['kids'];
+    this.parent = map['parent'];
+    this.poll = map['poll'];
+    this.parts = map['parts'];
 
     this.computed = new HNItemComputed.fromItem(this);
   }
