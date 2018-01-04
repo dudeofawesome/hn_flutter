@@ -1,4 +1,5 @@
-import 'package:hn_flutter/sdk/simple_html_to_markdown.dart';
+import 'package:hn_flutter/utils/simple_html_to_markdown.dart';
+import 'package:hn_flutter/utils/dedent.dart';
 
 class HNItem {
   /// The item's unique id.
@@ -77,23 +78,22 @@ class HNItem {
     this.computed = new HNItemComputed.fromItem(this);
   }
 
-  String toString() {
-    return
-'''HNItem:
-  id: $id
-  type: $type
-  title: $title
-  text: $text
-  by: $by
-  score: $score
-  time: $time
-  descendants: $descendants
-  computed:
-    loading: ${computed.loading}
-    markdown: ${computed.markdown}
-    urlHostname: ${computed.urlHostname}
-    seen: ${computed.seen}''';
-  }
+  String toString() => dedent('''
+    HNItem:
+      id: $id
+      type: $type
+      title: $title
+      text: $text
+      by: $by
+      score: $score
+      time: $time
+      descendants: $descendants
+      computed:
+        loading: ${computed.loading}
+        markdown: ${computed.markdown}
+        urlHostname: ${computed.urlHostname}
+        seen: ${computed.seen}
+  ''');
 }
 
 class HNItemComputed {
