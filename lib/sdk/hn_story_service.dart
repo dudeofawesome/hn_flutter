@@ -14,8 +14,11 @@ class HNStoryService {
   }) {
     return http.get('${this._config.url}/topstories.json')
       .then((res) => JSON.decode(res.body))
-      .then((List<int> body) => body.sublist(skip, skip + 10))
-      .then((List<int> body) => Future.wait(body.map((itemId) => this.getItemByID(itemId)).toList()));
+      .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
+      .then((List<List<int>> body) => [body[0], Future.wait(body[1].map((itemId) => this.getItemByID(itemId)).toList())])
+      .then((stories) {
+        setStorySort(stories[0]);
+      });
   }
 
   Future<HNItem> getItemByID (int id) {
@@ -26,6 +29,7 @@ class HNStoryService {
       .then((item) => new HNItem.fromMap(item))
       .then((item) {
         addHNItem(item);
+        return item;
       });
   }
 }

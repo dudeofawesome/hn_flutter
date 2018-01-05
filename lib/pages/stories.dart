@@ -27,7 +27,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   Future<Null> _refresh () async {
     final stories = await this._hnStoryService.getTopStories();
     final List<int> storyIds = stories.where((item) => item != null).map((item) => item.id).toList();
-    sortItems(storyIds);
+    setStorySort(storyIds);
   }
 
   void _changeSortMode (SortModes sortModes) {
@@ -129,8 +129,11 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     // than having to individually change instances of widgets.
     final HNItemStore itemStore = stores[itemStoreToken];
 
-    final stories = itemStore.items
-      .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
+    // final stories = itemStore.items
+    //   .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
+    final stories = itemStore.sortedStoryIds.map((itemId) =>
+        itemStore.items.firstWhere((item) => item.id == itemId, orElse: () {}))
+        .where((story) => story != null);
 
     final storyCards = new Scrollbar(
       child: new ListView(

@@ -21,15 +21,16 @@ class HNItemStore extends Store {
       item.computed.hidden = !item.computed.hidden;
     });
 
-    triggerOnAction(sortItems, (List<int> sortedItemIds) {
-      this._items.setAll(0, sortedItemIds.map((itemId) => this._items.firstWhere((item) => item.id == itemId)));
+    triggerOnAction(setStorySort, (List<int> sortedItemIds) {
+      this._sortedStoryIds = sortedItemIds;
     });
   }
 
   List<HNItem> _items = <HNItem>[];
+  List<int> _sortedStoryIds = <int>[];
 
   List<HNItem> get items => new List.unmodifiable(_items);
-  // String get currentMessage => _currentMessage;
+  List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
 
   // bool get isComposing => _currentMessage.isNotEmpty;
 }
