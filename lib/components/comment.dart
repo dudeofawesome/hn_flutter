@@ -8,8 +8,8 @@ import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
-import 'package:hn_flutter/sdk/stores/selected_item_store.dart';
-import 'package:hn_flutter/sdk/actions/selected_item_actions.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart';
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
@@ -41,7 +41,7 @@ class Comment extends StoreWatcher {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
-    listenToStore(selectedItemStoreToken);
+    listenToStore(uiStoreToken);
   }
 
   void _upvoteComment () {
@@ -83,7 +83,7 @@ class Comment extends StoreWatcher {
     // than having to individually change instances of widgets.
 
     final HNItemStore itemStore = stores[itemStoreToken];
-    final SelectedItemStore selectedItemStore = stores[selectedItemStoreToken];
+    final UIStore selectedItemStore = stores[uiStoreToken];
 
     final item = itemStore.items.firstWhere((item) => item.id == this.itemId, orElse: () {});
     // final item = new HNItem(

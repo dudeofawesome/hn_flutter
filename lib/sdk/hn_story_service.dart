@@ -9,10 +9,13 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 class HNStoryService {
   HNConfig _config = new HNConfig();
 
-  Future<List<HNItem>> getTopStories ({
-    int skip = 0,
-  }) {
-    return http.get('${this._config.url}/topstories.json')
+  Future<List<HNItem>> _getStories (
+    String sort,
+    {
+      int skip = 0,
+    }
+  ) {
+    return http.get('${this._config.url}/$sort.json')
       .then((res) => JSON.decode(res.body))
       .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
       .then((List<List<int>> body) => [body[0], Future.wait(body[1].map((itemId) => this.getItemByID(itemId)).toList())])
@@ -20,6 +23,18 @@ class HNStoryService {
         setStorySort(stories[0]);
       });
   }
+
+  Future<List<HNItem>> getTopStories ({
+    int skip = 0,
+  }) => this._getStories('topstories', skip: skip);
+
+  Future<List<HNItem>> getNewStories ({
+    int skip = 0,
+  }) => this._getStories('newstories', skip: skip);
+
+  Future<List<HNItem>> getBestStories ({
+    int skip = 0,
+  }) => this._getStories('beststories', skip: skip);
 
   Future<HNItem> getItemByID (int id) {
     addHNItem(new HNItem(id: id, computed: new HNItemComputed(loading: true)));

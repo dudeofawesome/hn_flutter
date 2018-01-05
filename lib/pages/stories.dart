@@ -7,7 +7,8 @@ import 'package:hn_flutter/components/story_card.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 
 import 'package:hn_flutter/sdk/hn_story_service.dart';
-import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/router.dart';
@@ -22,13 +23,42 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
+    listenToStore(uiStoreToken);
   }
 
-  Future<Null> _refresh () async {
-    await this._hnStoryService.getTopStories();
+  Future<Null> _refresh (SortModes sortMode) async {
+    switch (sortMode) {
+      case SortModes.TOP:
+        await this._hnStoryService.getTopStories();
+        break;
+      case SortModes.NEW:
+        await this._hnStoryService.getNewStories();
+        break;
+      case SortModes.BEST:
+        await this._hnStoryService.getBestStories();
+        break;
+      default:
+    }
   }
 
-  void _changeSortMode (SortModes sortModes) {
+  Future<Null> _loadMore (int skip, SortModes sortMode) async {
+    switch (sortMode) {
+      case SortModes.TOP:
+        await this._hnStoryService.getTopStories(skip: skip);
+        break;
+      case SortModes.NEW:
+        await this._hnStoryService.getNewStories(skip: skip);
+        break;
+      case SortModes.BEST:
+        await this._hnStoryService.getBestStories(skip: skip);
+        break;
+      default:
+    }
+  }
+
+  Future<Null> _changeSortMode (SortModes sortMode) async {
+    setStorySortMode(sortMode);
+    await this._refresh(sortMode);
   }
 
   _openStoryDialog (BuildContext ctx) async {
@@ -126,12 +156,13 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     final HNItemStore itemStore = stores[itemStoreToken];
+    final UIStore uiStore = stores[uiStoreToken];
 
-    // final stories = itemStore.items
-    //   .where((item) => item.type == 'story' || item.type == 'job' || item.type == 'poll');
     final stories = itemStore.sortedStoryIds.map((itemId) =>
         itemStore.items.firstWhere((item) => item.id == itemId, orElse: () {}))
         .where((story) => story != null);
+
+    final sortMode = uiStore.sortMode;
 
     final storyCards = new Scrollbar(
       child: new ListView(
@@ -155,7 +186,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
                     const Text('Load more'),
                   ],
                 ),
-                onPressed: () => this._hnStoryService.getTopStories(skip: stories.length),
+                onPressed: () => this._loadMore(stories.length, sortMode),
               ),
             ),
             // Bottom padding for FAB and home gesture bar
@@ -183,7 +214,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
 
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
-            initialValue: SortModes.TOP,
+            initialValue: sortMode,
             itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
               const PopupMenuItem<SortModes>(
                 value: SortModes.TOP,
@@ -210,7 +241,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
                 child: const Text('Jobs'),
               ),
             ],
-            onSelected: (SortModes selection) => this._changeSortMode(selection),
+            onSelected: this._changeSortMode,
           ),
         ],
       ),
@@ -255,7 +286,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
       ),
       body: itemStore.items.length > 0 ?
         new RefreshIndicator(
-          onRefresh: this._refresh,
+          onRefresh: () => this._refresh(sortMode),
           child: storyCards,
         ) :
         loadingStories,
@@ -266,13 +297,4 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
       ),
     );
   }
-}
-
-enum SortModes {
-  TOP,
-  NEW,
-  BEST,
-  ASK_HN,
-  SHOW_HN,
-  JOB,
 }
