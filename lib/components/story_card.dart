@@ -112,45 +112,6 @@ class StoryCard extends StoreWatcher {
       ),
     );
 
-    final preview = story.text == null ?
-      new GestureDetector(
-        onTap: () => this._openStoryUrl(context, story.url),
-        child: new Stack(
-          alignment: AlignmentDirectional.bottomStart,
-          children: <Widget>[
-            // new Image.network(
-            //   this.story.computed.imageUrl,
-            //   fit: BoxFit.cover,
-            // ),
-            new Container(
-              decoration: new BoxDecoration(
-                color: const Color.fromRGBO(0, 0, 0, 0.5),
-              ),
-              width: double.INFINITY,
-              child: new Padding(
-                padding: new EdgeInsets.all(8.0),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Text(
-                      story.computed.urlHostname,
-                      style: linkOverlayText,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    new Text(
-                      story.url,
-                      style: linkOverlayText,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ) :
-      new SimpleMarkdown(story.computed.markdown);
-
     final bottomRow = new Row(
       children: <Widget>[
         new Expanded(
@@ -228,6 +189,64 @@ class StoryCard extends StoreWatcher {
       ],
     );
 
+    List<Widget> cardContent;
+    if (story.url != null) {
+      cardContent = <Widget>[
+        new GestureDetector(
+          onTap: () => this._openStoryUrl(context, story.url),
+          child: new Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: <Widget>[
+              // new Image.network(
+              //   this.story.computed.imageUrl,
+              //   fit: BoxFit.cover,
+              // ),
+              new Container(
+                decoration: new BoxDecoration(
+                  color: const Color.fromRGBO(0, 0, 0, 0.5),
+                ),
+                width: double.INFINITY,
+                child: new Padding(
+                  padding: new EdgeInsets.all(8.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Text(
+                        story.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      new Text(
+                        story.url ?? 'NO story.url FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        titleColumn,
+        bottomRow,
+      ];
+    } else if (story.text != null) {
+      cardContent = <Widget>[
+        titleColumn,
+        new Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+          child: new SimpleMarkdown(story.computed.markdown),
+        ),
+        bottomRow,
+      ];
+    } else {
+      cardContent = <Widget>[
+        titleColumn,
+        bottomRow,
+      ];
+    }
+
     return new Padding(
       padding: cardOuterPadding,
       child: new Card(
@@ -236,17 +255,7 @@ class StoryCard extends StoreWatcher {
           child: new Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: story.text == null ?
-              <Widget>[
-                preview,
-                titleColumn,
-                bottomRow,
-              ] :
-              <Widget>[
-                titleColumn,
-                preview,
-                bottomRow,
-              ],
+            children: cardContent
           ),
         ),
       ),
