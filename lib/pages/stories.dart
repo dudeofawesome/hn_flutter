@@ -25,7 +25,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   }
 
   Future<Null> _refresh () async {
-    final stories = await this._hnStoryService.getTopStories();
+    await this._hnStoryService.getTopStories();
   }
 
   void _changeSortMode (SortModes sortModes) {
