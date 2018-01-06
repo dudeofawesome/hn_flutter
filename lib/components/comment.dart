@@ -66,9 +66,6 @@ class Comment extends StoreWatcher {
     await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
-  void _highlightComment () {
-  }
-
   void _reply (int itemId) {
   }
 
@@ -80,7 +77,8 @@ class Comment extends StoreWatcher {
     // Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
   }
 
-  void _copyText (String text) {
+  Future<Null> _copyText (String text) async {
+    await Clipboard.setData(new ClipboardData(text: text));
   }
 
   @override
@@ -208,7 +206,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Copy Text',
               onPressed: () {
                 selectItem(comment.id);
-                this._copyText(comment.text);
+                this._copyText(comment.computed.simple_text);
               },
             );
           case BarButtons.SHARE:
@@ -291,7 +289,7 @@ class Comment extends StoreWatcher {
                 case BarButtons.VIEW_CONTEXT:
                   return this._viewContext(context, comment.parent);
                 case BarButtons.COPY_TEXT:
-                  return this._copyText(comment.text);
+                  return this._copyText(comment.computed.simple_text);
                 case BarButtons.SHARE:
                   return await this._shareComment(comment, itemStore.items);
               }

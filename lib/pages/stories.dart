@@ -13,7 +13,7 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/router.dart';
 
-class StoriesPage extends StoreWatcher { // State<StoriesPage> {
+class StoriesPage extends StoreWatcher {
   final HNStoryService _hnStoryService = new HNStoryService();
 
   StoriesPage ({
