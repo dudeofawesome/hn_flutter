@@ -14,6 +14,7 @@ dependencies:
     git: git@github.com:victorbonnet/flutter_web_browser.git
   html_unescape: ^0.1.5
   intl: ^0.15.2
+  share: ^0.3.0
   timeago: ^1.2.0
   url_launcher: ^1.0.1
 
