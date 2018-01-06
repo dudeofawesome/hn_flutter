@@ -80,20 +80,20 @@ class StoryPage extends StoreWatcher {
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
-    final titleColumn = new GestureDetector(
-      // onTap: () => this._openStory(context),
-      child: new Padding(
-        padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Text(
-              item.title,
-              style: Theme.of(context).textTheme.title.copyWith(
-                fontSize: 18.0,
-              ),
+    final titleColumn = new Padding(
+      padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
+      child: new Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Text(
+            item.title,
+            style: Theme.of(context).textTheme.title.copyWith(
+              fontSize: 18.0,
             ),
-            new Row(
+          ),
+          new Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 new Text(item.by),
@@ -101,70 +101,22 @@ class StoryPage extends StoreWatcher {
                 new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
-
-    final preview = item.text == null ?
-      new GestureDetector(
-        onTap: () => this._openStoryUrl(context, item.url),
-        child: new Stack(
-          alignment: AlignmentDirectional.bottomStart,
-          children: <Widget>[
-            // new Image.network(
-            //   this.story.computed.imageUrl,
-            //   fit: BoxFit.cover,
-            // ),
-            new Container(
-              decoration: new BoxDecoration(
-                color: const Color.fromRGBO(0, 0, 0, 0.5),
-              ),
-              width: double.INFINITY,
-              child: new Padding(
-                padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    new Text(
-                      item.computed.urlHostname,
-                      style: linkOverlayText,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    new Text(
-                      item.url,
-                      style: linkOverlayText,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ) :
-      new GestureDetector(
-        // onTap: () => this._openStory(context),
-        child: new Padding(
-          padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-          child: new SimpleMarkdown(item.computed.markdown),
-        ),
-      );
 
     final bottomRow = new Row(
       children: <Widget>[
         new Expanded(
-          child: new GestureDetector(
-            // onTap: () => this._openStory(context),
-            child: new Padding(
-              padding: new EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Text('${item.score} points'),
-                  new Text('${item.descendants} comments'),
-                ],
-              ),
+          child: new Padding(
+            padding: new EdgeInsets.all(8.0),
+            child: new Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                new Text('${item.score} points'),
+                new Text('${item.descendants} comments'),
+              ],
             ),
           ),
         ),
@@ -176,6 +128,7 @@ class StoryPage extends StoreWatcher {
             new IconButton(
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
+              iconSize: 20.0,
               onPressed: () => _upvoteStory(),
               color: item.computed.upvoted ? Colors.orange : Colors.black,
             ),
@@ -188,6 +141,7 @@ class StoryPage extends StoreWatcher {
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
+              iconSize: 20.0,
               onPressed: () => _saveStory(),
               color: item.computed.saved ? Colors.amber : Colors.black,
             ),
@@ -195,7 +149,10 @@ class StoryPage extends StoreWatcher {
             //   icon: const Icon(Icons.more_vert),
             // ),
             new PopupMenuButton<OverflowMenuItems>(
-              icon: const Icon(Icons.more_horiz),
+              icon: const Icon(
+                Icons.more_horiz,
+                size: 20.0
+              ),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
                 const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.SHARE,
@@ -219,6 +176,65 @@ class StoryPage extends StoreWatcher {
         ),
       ],
     );
+
+    List<Widget> cardContent;
+    if (item.url != null) {
+      cardContent = <Widget>[
+        new GestureDetector(
+          onTap: () => this._openStoryUrl(context, item.url),
+          child: new Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: <Widget>[
+              // new Image.network(
+              //   this.story.computed.imageUrl,
+              //   fit: BoxFit.cover,
+              // ),
+              new Container(
+                decoration: new BoxDecoration(
+                  color: const Color.fromRGBO(0, 0, 0, 0.5),
+                ),
+                width: double.INFINITY,
+                child: new Padding(
+                  padding: new EdgeInsets.all(8.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Text(
+                        item.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      new Text(
+                        item.url ?? 'NO story.url FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        titleColumn,
+        bottomRow,
+      ];
+    } else if (item.text != null) {
+      cardContent = <Widget>[
+        titleColumn,
+        new Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+          child: new SimpleMarkdown(item.computed.markdown),
+        ),
+        bottomRow,
+      ];
+    } else {
+      cardContent = <Widget>[
+        titleColumn,
+        bottomRow,
+      ];
+    }
+
 
     final storyCard = new Container(
       width: double.INFINITY,
@@ -250,29 +266,26 @@ class StoryPage extends StoreWatcher {
       child: new Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: item.text == null ?
-          <Widget>[
-            preview,
-            titleColumn,
-            bottomRow,
-          ] :
-          <Widget>[
-            titleColumn,
-            preview,
-            bottomRow,
-          ],
+        children: cardContent,
       ),
     );
 
-    final comments = new Column(
-      // children: new Iterable.generate(5, (i) => new Comment(
-      //     itemId: i,
-      //   ))
-      //   .toList(),
-      children: item.kids.map((kid) => new Comment(
-        itemId: kid,
-      )).toList(),
-    );
+    final comments = item.kids != null ?
+      new Column(
+        // children: new Iterable.generate(5, (i) => new Comment(
+        //     itemId: i,
+        //   ))
+        //   .toList(),
+        children: item.kids.map((kid) => new Comment(
+          itemId: kid,
+        )).toList(),
+      ) :
+      const Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: const Center(
+          child: const Text('No comments'),
+        ),
+      );
 
     return new Scaffold(
       appBar: new AppBar(
