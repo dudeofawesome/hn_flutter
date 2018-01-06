@@ -57,7 +57,7 @@ class HNUserComputed {
     this.imageUrl = 'https://lh3.googleusercontent.com/-XdUIqdMkCWA/AAAAAAAAAAI/AAAAAAAAAAA/4252rscbv5M/photo.jpg?sz=1000';
 
     if (user.about != null) {
-      this.aboutMarkdown = new SimpleHTMLtoMarkdown(user.about).transform();
+      this.aboutMarkdown = SimpleMarkdownConversion.htmlToMD(user.about);
     }
 
     this.loading = false;
