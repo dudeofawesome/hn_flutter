@@ -27,18 +27,7 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
   }
 
   Future<Null> _refresh (SortModes sortMode) async {
-    switch (sortMode) {
-      case SortModes.TOP:
-        await this._hnStoryService.getTopStories();
-        break;
-      case SortModes.NEW:
-        await this._hnStoryService.getNewStories();
-        break;
-      case SortModes.BEST:
-        await this._hnStoryService.getBestStories();
-        break;
-      default:
-    }
+    this._loadMore(0, sortMode);
   }
 
   Future<Null> _loadMore (int skip, SortModes sortMode) async {
