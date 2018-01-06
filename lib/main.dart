@@ -80,7 +80,7 @@ class HNAppState extends State<HNApp> {
     // }());
 
     return new MaterialApp(
-      title: 'Hacker News',
+      title: 'Butterfly Reader',
       theme: this.theme,
       // localizationsDelegates: <LocalizationsDelegate<dynamic>>[
       //   new _StocksLocalizationsDelegate(),

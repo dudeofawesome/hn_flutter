@@ -202,7 +202,7 @@ class StoriesPage extends StoreWatcher {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Text('Hacker News'),
+        title: const Text('Butterfly Reader'),
         actions: <Widget>[
           // const IconButton(
           //   icon: const Icon(Icons.sort),
