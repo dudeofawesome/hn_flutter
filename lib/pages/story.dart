@@ -48,11 +48,7 @@ class StoryPage extends StoreWatcher {
     await share(storyUrl);
   }
 
-  void _changeSortMode (SortModes sortModes) {
-  }
-
-  _reply (int itemId) {
-  }
+  _reply (int itemId) {}
 
   Future<Null> refreshStory () async {
     final HNStoryService hnStoryService = new HNStoryService();
@@ -311,30 +307,7 @@ class StoryPage extends StoreWatcher {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: new Text(item?.title),
-        actions: <Widget>[
-          new PopupMenuButton<SortModes>(
-            icon: const Icon(Icons.sort),
-            tooltip: 'Sort',
-            initialValue: SortModes.TOP,
-            itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
-              const PopupMenuItem<SortModes>(
-                value: SortModes.TOP,
-                child: const Text('Top'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.NEW,
-                child: const Text('New'),
-                enabled: false,
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.BEST,
-                child: const Text('Best'),
-                enabled: false,
-              ),
-            ],
-            onSelected: (SortModes selection) => this._changeSortMode(selection),
-          ),
-        ],
+        actions: <Widget>[],
       ),
       body: new RefreshIndicator(
         onRefresh: this.refreshStory,
@@ -361,10 +334,4 @@ enum OverflowMenuItems {
   SHARE,
   COPY_TEXT,
   VIEW_PROFILE,
-}
-
-enum SortModes {
-  TOP,
-  NEW,
-  BEST,
 }
