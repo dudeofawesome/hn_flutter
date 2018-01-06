@@ -158,9 +158,9 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore uiStore = stores[uiStoreToken];
 
-    final stories = itemStore.sortedStoryIds.map((itemId) =>
+    var stories = itemStore.sortedStoryIds.map((itemId) =>
         itemStore.items.firstWhere((item) => item.id == itemId, orElse: () {}))
-        .where((story) => story != null);
+        .takeWhile((story) => story != null);
 
     final sortMode = uiStore.sortMode;
 
