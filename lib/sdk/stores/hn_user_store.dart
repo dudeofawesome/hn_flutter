@@ -6,18 +6,13 @@ import 'package:hn_flutter/sdk/models/hn_user.dart';
 class HNUserStore extends Store {
   HNUserStore () {
     triggerOnAction(addHNUser, (HNUser user) {
-      final HNUser found = this._users.firstWhere((el) => el.id == user.id, orElse: () {
-        this._users.add(user);
-      });
-      if (found != null) {
-        this._users[this._users.indexOf(found)] = user;
-      }
+      _users[user.id] = user;
     });
   }
 
-  final List<HNUser> _users = <HNUser>[];
+  final Map<String, HNUser> _users = new Map();
 
-  List<HNUser> get users => new List.unmodifiable(this._users);
+  Map<String, HNUser> get users => new Map.unmodifiable(this._users);
 }
 
 final StoreToken userStoreToken = new StoreToken(new HNUserStore());

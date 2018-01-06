@@ -42,7 +42,7 @@ class UserPage extends StoreWatcher {
     // than having to individually change instances of widgets.
 
     final HNUserStore userStore = stores[userStoreToken];
-    final user = userStore?.users?.firstWhere((user) => user.id == this.userId, orElse: () {});
+    final user = userStore.users[this.userId];
 
     if (user == null) {
       print('getting user $userId');
