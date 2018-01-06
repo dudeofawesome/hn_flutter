@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
@@ -155,20 +156,36 @@ class StoryPage extends StoreWatcher {
                 Icons.more_horiz,
                 size: 20.0
               ),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-                const PopupMenuItem<OverflowMenuItems>(
+              itemBuilder: (BuildContext ctx) {
+                const share = const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.SHARE,
                   child: const Text('Share'),
-                ),
-                const PopupMenuItem<OverflowMenuItems>(
+                );
+                const copyText = const PopupMenuItem<OverflowMenuItems>(
+                  value: OverflowMenuItems.COPY_TEXT,
+                  child: const Text('Copy Text'),
+                );
+                const viewProfile = const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.VIEW_PROFILE,
                   child: const Text('View Profile'),
-                ),
-              ],
+                );
+
+                final menu = <PopupMenuEntry<OverflowMenuItems>>[];
+
+                menu.add(share);
+                if (item.text != null) {
+                  menu.add(copyText);
+                }
+                menu.add(viewProfile);
+
+                return menu;
+              },
               onSelected: (OverflowMenuItems selection) async {
                 switch (selection) {
                   case OverflowMenuItems.SHARE:
                     return await this._shareStory('https://news.ycombinator.com/item?id=${item.id}');
+                  case OverflowMenuItems.COPY_TEXT:
+                    return await Clipboard.setData(new ClipboardData(text: item.computed.simple_text));
                   case OverflowMenuItems.VIEW_PROFILE:
                     return this._viewProfile(context, item.by);
                 }
@@ -342,6 +359,7 @@ class StoryPage extends StoreWatcher {
 
 enum OverflowMenuItems {
   SHARE,
+  COPY_TEXT,
   VIEW_PROFILE,
 }
 
