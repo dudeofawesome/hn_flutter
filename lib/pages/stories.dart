@@ -41,6 +41,15 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
       case SortModes.BEST:
         await this._hnStoryService.getBestStories(skip: skip);
         break;
+      case SortModes.ASK_HN:
+        await this._hnStoryService.getAskStories(skip: skip);
+        break;
+      case SortModes.SHOW_HN:
+        await this._hnStoryService.getShowStories(skip: skip);
+        break;
+      case SortModes.JOB:
+        await this._hnStoryService.getJobStories(skip: skip);
+        break;
       default:
     }
   }
@@ -199,8 +208,6 @@ class StoriesPage extends StoreWatcher { // State<StoriesPage> {
           //   icon: const Icon(Icons.sort),
           //   tooltip: 'Sort',
           // ),
-
-
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
             initialValue: sortMode,

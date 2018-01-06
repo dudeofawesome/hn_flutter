@@ -36,6 +36,18 @@ class HNStoryService {
     int skip = 0,
   }) => this._getStories('beststories', skip: skip);
 
+  Future<List<HNItem>> getAskStories ({
+    int skip = 0,
+  }) => this._getStories('askstories', skip: skip);
+
+  Future<List<HNItem>> getShowStories ({
+    int skip = 0,
+  }) => this._getStories('showstories', skip: skip);
+
+  Future<List<HNItem>> getJobStories ({
+    int skip = 0,
+  }) => this._getStories('jobstories', skip: skip);
+
   Future<HNItem> getItemByID (int id) {
     addHNItem(new HNItem(id: id, computed: new HNItemComputed(loading: true)));
 
