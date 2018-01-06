@@ -61,7 +61,7 @@ class StoryCard extends StoreWatcher {
   @override
   Widget build (BuildContext context, Map<StoreToken, Store> stores) {
     final HNItemStore itemStore = stores[itemStoreToken];
-    final story = itemStore.items.firstWhere((item) => item.id == this.storyId, orElse: () {});
+    final story = itemStore.items[this.storyId];
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
@@ -95,7 +95,7 @@ class StoryCard extends StoreWatcher {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            story.title,
+            story.title ?? 'NO story.title FOUND!',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
             ),

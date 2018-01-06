@@ -57,11 +57,11 @@ class Comment extends StoreWatcher {
   void _saveComment () {
   }
 
-  Future<Null> _shareComment (final HNItem comment, final List<HNItem> items) async {
-    HNItem parentStory = items.firstWhere((item) => item.id == comment.parent);
+  Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
+    HNItem parentStory = items[comment.parent];
     while (parentStory.type == 'comment') {
       print(parentStory.id);
-      parentStory = items.firstWhere((item) => item.id == parentStory.parent);
+      parentStory = items[parentStory.parent];
     }
     await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
@@ -93,7 +93,7 @@ class Comment extends StoreWatcher {
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore selectedItemStore = stores[uiStoreToken];
 
-    final comment = itemStore.items.firstWhere((item) => item.id == this.itemId, orElse: () {});
+    final comment = itemStore.items[this.itemId];
     // final item = new HNItem(
     //   id: itemId,
     //   by: 'dudeofawesome',
@@ -206,7 +206,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Copy Text',
               onPressed: () {
                 selectItem(comment.id);
-                this._copyText(comment.computed.simple_text);
+                this._copyText(comment.computed.simpleText);
               },
             );
           case BarButtons.SHARE:
@@ -289,7 +289,7 @@ class Comment extends StoreWatcher {
                 case BarButtons.VIEW_CONTEXT:
                   return this._viewContext(context, comment.parent);
                 case BarButtons.COPY_TEXT:
-                  return this._copyText(comment.computed.simple_text);
+                  return this._copyText(comment.computed.simpleText);
                 case BarButtons.SHARE:
                   return await this._shareComment(comment, itemStore.items);
               }

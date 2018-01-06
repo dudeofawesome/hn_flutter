@@ -6,16 +6,11 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   HNItemStore () {
     triggerOnAction(addHNItem, (HNItem item) {
-      final HNItem found = this._items.firstWhere((el) => el.id == item.id, orElse: () {
-        this._items.add(item);
-      });
-      if (found != null) {
-        this._items[this._items.indexOf(found)] = item;
-      }
+      this._items[item.id] = item;
     });
 
     triggerOnAction(showHideItem, (int itemId) {
-      final HNItem item = this._items.firstWhere((el) => el.id == itemId);
+      final HNItem item = this._items[itemId];
 
       // TODO: don't mutate the old state but rather make a clone
       item.computed.hidden = !item.computed.hidden;
@@ -26,10 +21,10 @@ class HNItemStore extends Store {
     });
   }
 
-  List<HNItem> _items = <HNItem>[];
+  Map<int, HNItem> _items = new Map();
   List<int> _sortedStoryIds = <int>[];
 
-  List<HNItem> get items => new List.unmodifiable(_items);
+  Map<int, HNItem> get items => new Map.unmodifiable(_items);
   List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
 
   // bool get isComposing => _currentMessage.isNotEmpty;

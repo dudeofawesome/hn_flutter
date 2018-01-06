@@ -79,7 +79,7 @@ class StoryPage extends StoreWatcher {
     // than having to individually change instances of widgets.
 
     final HNItemStore itemStore = stores[itemStoreToken];
-    final item = itemStore.items.firstWhere((item) => item.id == this.itemId);
+    final item = itemStore.items[this.itemId];
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
@@ -185,7 +185,7 @@ class StoryPage extends StoreWatcher {
                   case OverflowMenuItems.SHARE:
                     return await this._shareStory('https://news.ycombinator.com/item?id=${item.id}');
                   case OverflowMenuItems.COPY_TEXT:
-                    return await Clipboard.setData(new ClipboardData(text: item.computed.simple_text));
+                    return await Clipboard.setData(new ClipboardData(text: item.computed.simpleText));
                   case OverflowMenuItems.VIEW_PROFILE:
                     return this._viewProfile(context, item.by);
                 }

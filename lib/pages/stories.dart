@@ -156,9 +156,9 @@ class StoriesPage extends StoreWatcher {
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore uiStore = stores[uiStoreToken];
 
-    var stories = itemStore.sortedStoryIds.map((itemId) =>
-        itemStore.items.firstWhere((item) => item.id == itemId, orElse: () {}))
-        .takeWhile((story) => story != null);
+    var stories = itemStore.sortedStoryIds
+      .map((itemId) => itemStore.items[itemId])
+      .takeWhile((story) => story != null);
 
     final sortMode = uiStore.sortMode;
 
