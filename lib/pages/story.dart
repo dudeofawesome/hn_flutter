@@ -298,6 +298,7 @@ class StoryPage extends StoreWatcher {
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
             tooltip: 'Sort',
+            initialValue: SortModes.TOP,
             itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
               const PopupMenuItem<SortModes>(
                 value: SortModes.TOP,
@@ -306,10 +307,12 @@ class StoryPage extends StoreWatcher {
               const PopupMenuItem<SortModes>(
                 value: SortModes.NEW,
                 child: const Text('New'),
+                enabled: false,
               ),
               const PopupMenuItem<SortModes>(
                 value: SortModes.BEST,
                 child: const Text('Best'),
+                enabled: false,
               ),
             ],
             onSelected: (SortModes selection) => this._changeSortMode(selection),
