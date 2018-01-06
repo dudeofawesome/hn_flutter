@@ -99,6 +99,7 @@ class HNItem {
 class HNItemComputed {
   bool loading;
   String markdown;
+  String simple_text;
   String urlHostname;
   String imageUrl;
   bool upvoted;
@@ -109,6 +110,8 @@ class HNItemComputed {
 
   HNItemComputed ({
     this.loading = false,
+    this.markdown,
+    this.simple_text,
     this.urlHostname,
     this.imageUrl,
     this.upvoted = false,
@@ -125,7 +128,8 @@ class HNItemComputed {
     }
 
     if (item.text != null) {
-      this.markdown = new SimpleHTMLtoMarkdown(item.text).transform();
+      this.markdown = SimpleMarkdownConversion.htmlToMD(item.text);
+      this.simple_text = this.markdown;
     }
 
     this.loading = false;

@@ -3,17 +3,9 @@ import 'package:html_unescape/html_unescape_small.dart' show HtmlUnescape;
 
 import 'package:hn_flutter/utils/regexes.dart';
 
-class SimpleHTMLtoMarkdown {
-  String body;
-
-  SimpleHTMLtoMarkdown (
-    String body,
-  ) {
-    this.body = new HtmlUnescape().convert(body);
-  }
-
-  String transform () {
-    return this.body
+class SimpleMarkdownConversion {
+  static String htmlToMD (String html) {
+    return new HtmlUnescape().convert(html)
       .replaceAllMapped(
         htmlTagA,
         (match) => '[${match[2]}](${match[1]})'
