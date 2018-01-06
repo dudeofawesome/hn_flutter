@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
+import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
@@ -44,7 +47,8 @@ class StoryCard extends StoreWatcher {
   void _saveStory () {
   }
 
-  void _shareStory () {
+  Future<Null> _shareStory (String storyUrl) async {
+    await share(storyUrl);
   }
 
   void _hideStory () {
@@ -63,7 +67,6 @@ class StoryCard extends StoreWatcher {
 
     if (story == null || story.computed.loading) {
       if (story == null) {
-        print('getting item $storyId');
         final HNStoryService _hnStoryService = new HNStoryService();
         _hnStoryService.getItemByID(storyId);
       }
@@ -173,12 +176,12 @@ class StoryCard extends StoreWatcher {
                   child: const Text('View Profile'),
                 ),
               ],
-              onSelected: (OverflowMenuItems selection) {
+              onSelected: (OverflowMenuItems selection) async {
                 switch (selection) {
                   case OverflowMenuItems.HIDE:
                     return this._hideStory();
                   case OverflowMenuItems.SHARE:
-                    return this._shareStory();
+                    return await this._shareStory('https://news.ycombinator.com/item?id=${story.id}');
                   case OverflowMenuItems.VIEW_PROFILE:
                     return this._viewProfile(context, story.by);
                 }

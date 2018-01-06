@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 // import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
@@ -10,6 +13,7 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
+import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
@@ -53,7 +57,13 @@ class Comment extends StoreWatcher {
   void _saveComment () {
   }
 
-  void _shareComment () {
+  Future<Null> _shareComment (final HNItem comment, final List<HNItem> items) async {
+    HNItem parentStory = items.firstWhere((item) => item.id == comment.parent);
+    while (parentStory.type == 'comment') {
+      print(parentStory.id);
+      parentStory = items.firstWhere((item) => item.id == parentStory.parent);
+    }
+    await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
   void _highlightComment () {
@@ -85,39 +95,39 @@ class Comment extends StoreWatcher {
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore selectedItemStore = stores[uiStoreToken];
 
-    final item = itemStore.items.firstWhere((item) => item.id == this.itemId, orElse: () {});
+    final comment = itemStore.items.firstWhere((item) => item.id == this.itemId, orElse: () {});
     // final item = new HNItem(
     //   id: itemId,
     //   by: 'dudeofawesome',
     //   text: 'Comment $itemId',
     // );
 
-    if (item != null) {
-      if (item.type != null && item.type != 'comment') {
+    if (comment != null) {
+      if (comment.type != null && comment.type != 'comment') {
         return new Container();
       }
 
       Widget topRow;
 
-      if (!item.computed.loading) {
+      if (!comment.computed.loading) {
         topRow = new Row(
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
               child: new Text(
-                item.by ?? '?',
+                comment.by ?? '?',
                 style: new TextStyle(
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            item.score != null ? new Padding(
+            comment.score != null ? new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-              child: new Text('${item.score} points'),
+              child: new Text('${comment.score} points'),
             ) : new Container(),
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
-              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))}'),
+              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(comment.time * 1000))}'),
             ),
           ],
         );
@@ -125,29 +135,29 @@ class Comment extends StoreWatcher {
         topRow = new Container();
       }
 
-      final content = item.computed.markdown != null ?
-        new SimpleMarkdown(item.computed.markdown) :
-        item.computed.loading ? const Text('Loading…') : const Text('Error');
+      final content = comment.computed.markdown != null ?
+        new SimpleMarkdown(comment.computed.markdown) :
+        comment.computed.loading ? const Text('Loading…') : const Text('Error');
 
       final List<Widget> buttons = this.buttons.map<Widget>((button) {
         switch (button) {
           case BarButtons.UPVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_upward),
-              color: item.computed.upvoted ? Colors.orange : Colors.white,
+              color: comment.computed.upvoted ? Colors.orange : Colors.white,
               tooltip: 'Upvote',
               onPressed: () {
-                selectItem(item.id);
+                selectItem(comment.id);
                 this._upvoteComment();
               },
             );
           case BarButtons.DOWNVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_downward),
-              color: item.computed.downvoted ? Colors.blue : Colors.black,
+              color: comment.computed.downvoted ? Colors.blue : Colors.black,
               tooltip: 'Downvote',
               onPressed: () {
-                selectItem(item.id);
+                selectItem(comment.id);
                 // this._downvoteStory()
               },
             );
@@ -157,17 +167,17 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'Reply',
               onPressed: () {
-                selectItem(item.id);
-                this._reply(item.id);
+                selectItem(comment.id);
+                this._reply(comment.id);
               },
             );
           case BarButtons.SAVE:
             return new IconButton(
               icon: const Icon(Icons.star),
-              color: item.computed.saved ? Colors.amber : Colors.white,
+              color: comment.computed.saved ? Colors.amber : Colors.white,
               tooltip: 'Save',
               onPressed: () {
-                selectItem(item.id);
+                selectItem(comment.id);
                 this._saveComment();
               },
             );
@@ -177,8 +187,8 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'View Profile',
               onPressed: () {
-                selectItem(item.id);
-                this._viewProfile(context, item.by);
+                selectItem(comment.id);
+                this._viewProfile(context, comment.by);
               },
             );
           case BarButtons.VIEW_CONTEXT:
@@ -187,8 +197,8 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'View Profile',
               onPressed: () {
-                selectItem(item.id);
-                this._viewContext(context, item.parent);
+                selectItem(comment.id);
+                this._viewContext(context, comment.parent);
               },
             );
           case BarButtons.COPY_TEXT:
@@ -197,8 +207,8 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'Copy Text',
               onPressed: () {
-                selectItem(item.id);
-                this._copyText(item.text);
+                selectItem(comment.id);
+                this._copyText(comment.text);
               },
             );
           case BarButtons.SHARE:
@@ -207,8 +217,8 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'Share',
               onPressed: () {
-                selectItem(item.id);
-                this._shareComment();
+                selectItem(comment.id);
+                this._shareComment(comment, itemStore.items);
               },
             );
         }
@@ -250,13 +260,13 @@ class Comment extends StoreWatcher {
                   );
                 case BarButtons.VIEW_CONTEXT:
                   return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.SHARE,
-                    child: const Text('Share'),
+                    value: BarButtons.VIEW_CONTEXT,
+                    child: const Text('View Context'),
                   );
                 case BarButtons.COPY_TEXT:
                   return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.SHARE,
-                    child: const Text('Share'),
+                    value: BarButtons.COPY_TEXT,
+                    child: const Text('Copy Text'),
                   );
                 case BarButtons.SHARE:
                   return const PopupMenuItem<BarButtons>(
@@ -265,25 +275,25 @@ class Comment extends StoreWatcher {
                   );
               }
             }).toList(),
-            onSelected: (BarButtons selection) {
-              selectItem(item.id);
+            onSelected: (BarButtons selection) async {
+              selectItem(comment.id);
               switch (selection) {
                 case BarButtons.UPVOTE:
                   return this._upvoteComment();
                 case BarButtons.DOWNVOTE:
                   return this._downvoteComment();
                 case BarButtons.REPLY:
-                  return this._reply(item.id);
+                  return this._reply(comment.id);
                 case BarButtons.SAVE:
                   return this._saveComment();
                 case BarButtons.VIEW_PROFILE:
-                  return this._viewProfile(context, item.by);
+                  return this._viewProfile(context, comment.by);
                 case BarButtons.VIEW_CONTEXT:
-                  return this._viewContext(context, item.parent);
+                  return this._viewContext(context, comment.parent);
                 case BarButtons.COPY_TEXT:
-                  return this._copyText(item.text);
+                  return this._copyText(comment.text);
                 case BarButtons.SHARE:
-                  return this._shareComment();
+                  return await this._shareComment(comment, itemStore.items);
               }
             },
           )
@@ -303,9 +313,9 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      final childComments = item.kids != null && this.loadChildren && !item.computed.hidden ?
+      final childComments = comment.kids != null && this.loadChildren && !comment.computed.hidden ?
         new Column(
-          children: item.kids.map((kid) => new Comment(
+          children: comment.kids.map((kid) => new Comment(
             itemId: kid,
             depth: depth + 1,
           )).toList(),
@@ -325,13 +335,13 @@ class Comment extends StoreWatcher {
         children: <Widget>[
           new GestureDetector(
             onTap: () {
-              print('comment ${item.id} touched');
-              selectItem(item.id);
+              print('comment ${comment.id} touched');
+              selectItem(comment.id);
             },
             onLongPress: () async {
-              print('comment ${item.id} pressed');
+              print('comment ${comment.id} pressed');
               await SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
-              showHideItem(item.id);
+              showHideItem(comment.id);
             },
             child: new Padding(
               padding: new EdgeInsets.only(left: this.depth > 0 ? (this.depth - 1) * 4.0 : 0.0),
@@ -348,7 +358,7 @@ class Comment extends StoreWatcher {
                       color: Colors.black12,
                     ),
                   ),
-                  color: selectedItemStore.item == item.id ?
+                  color: selectedItemStore.item == comment.id ?
                     Theme.of(context).primaryColor.withOpacity(0.3) :
                     Theme.of(context).cardColor,
                 ),
@@ -361,7 +371,7 @@ class Comment extends StoreWatcher {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           topRow,
-                          !item.computed.hidden ? content : new Container(),
+                          !comment.computed.hidden ? content : new Container(),
                         ],
                       ),
                     ),
@@ -370,14 +380,13 @@ class Comment extends StoreWatcher {
               ),
             ),
           ),
-          selectedItemStore.item == item.id ? buttonRow : new Container(),
-          !item.computed.hidden ?
+          selectedItemStore.item == comment.id ? buttonRow : new Container(),
+          !comment.computed.hidden ?
             childComments :
             new Container(),
         ],
       );
     } else {
-      print('getting item $itemId');
       final HNCommentService _hnStoryService = new HNCommentService();
       _hnStoryService.getItemByID(itemId);
 

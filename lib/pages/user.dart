@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
+import 'package:share/share.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
@@ -22,6 +25,12 @@ class UserPage extends StoreWatcher {
   void initStores(ListenToStore listenToStore) {
     listenToStore(userStoreToken);
   }
+
+  Future<Null> _shareUser (String userId) async {
+    await share('https://news.ycombinator.com/user?id=$userId');
+  }
+
+  void _saveUser () {}
 
   @override
   Widget build (BuildContext context, Map<StoreToken, Store> stores) {
@@ -52,7 +61,7 @@ class UserPage extends StoreWatcher {
             new IconButton(
               icon: const Icon(Icons.star_border),
               tooltip: 'Save',
-              onPressed: () => _saveStory(),
+              onPressed: () => _saveUser(),
               // color: user.computed.saved ? Colors.amber : Colors.black,
             ),
             new PopupMenuButton<OverflowMenuItems>(
@@ -63,10 +72,10 @@ class UserPage extends StoreWatcher {
                   child: const Text('Share'),
                 ),
               ],
-              onSelected: (OverflowMenuItems selection) {
+              onSelected: (OverflowMenuItems selection) async {
                 switch (selection) {
                   case OverflowMenuItems.SHARE:
-                    return this._shareStory();
+                    return await this._shareUser(user.id);
                 }
               },
             ),
