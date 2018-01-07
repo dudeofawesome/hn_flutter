@@ -363,7 +363,7 @@ class Comment extends StoreWatcher {
                 child: new Column(
                   children: <Widget>[
                     new Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+                      padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
                       child: new Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
