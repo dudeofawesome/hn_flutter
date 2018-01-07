@@ -163,34 +163,42 @@ class StoriesPage extends StoreWatcher {
     final sortMode = uiStore.sortMode;
 
     final storyCards = new Scrollbar(
-      child: new ListView(
-        children: <Widget>[
-          const Padding(
-            padding: const EdgeInsets.only(top: 5.0),
-          )
-        ]..addAll(
-          stories.map<Widget>((story) => new StoryCard(
-            storyId: story.id,
-          )).toList()..addAll([
-            new Padding(
+      child: new ListView.builder(
+        itemCount: stories.length + 2,
+        // itemExtent: itemExtent,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return const Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+            );
+          } else if (index == stories.length + 1) {
+            return new Padding(
               padding: const EdgeInsets.only(top: 12.0),
-              child: new FlatButton(
-                child: new Column(
-                  children: <Widget>[
-                    const Padding(
-                      padding: const EdgeInsets.only(bottom: 6.0),
-                      child: const Icon(Icons.replay),
+              child: new Column(
+                children: <Widget>[
+                  new FlatButton(
+                    child: new Column(
+                      children: <Widget>[
+                        const Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: const Icon(Icons.replay),
+                        ),
+                        const Text('Load more'),
+                      ],
                     ),
-                    const Text('Load more'),
-                  ],
-                ),
-                onPressed: () => this._loadMore(stories.length, sortMode),
+                    onPressed: () => this._loadMore(stories.length, sortMode),
+                  ),
+                  // Bottom padding for FAB and home gesture bar
+                  const FABBottomPadding(),
+                ],
               ),
-            ),
-            // Bottom padding for FAB and home gesture bar
-            const FABBottomPadding(),
-          ]),
-        ),
+            );
+          } else {
+            return new StoryCard(
+              storyId: stories.elementAt(index - 1).id,
+            );
+          }
+        },
       ),
     );
 
