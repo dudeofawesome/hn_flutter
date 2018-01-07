@@ -70,11 +70,11 @@ class UserAboutTab extends StatelessWidget {
               children: <Widget>[
                 new IconText(
                   icon: const Icon(Icons.thumb_up),
-                  text: new Text('${user?.karma ?? '?'} karma'),
+                  text: new Text('${user?.karma ?? '…'} karma'),
                 ),
                 new IconText(
                   icon: const Icon(Icons.comment),
-                  text: new Text('${user?.submitted?.length ?? '?'} posts'),
+                  text: new Text('${user?.submitted?.length ?? '…'} posts'),
                 ),
               ],
             ),

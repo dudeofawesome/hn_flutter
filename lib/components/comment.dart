@@ -113,7 +113,7 @@ class Comment extends StoreWatcher {
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
               child: new Text(
-                comment.by ?? '?',
+                comment.by ?? '…',
                 style: new TextStyle(
                   fontWeight: FontWeight.w600,
                 ),

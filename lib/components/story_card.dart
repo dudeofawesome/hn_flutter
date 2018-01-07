@@ -75,7 +75,7 @@ class StoryCard extends StoreWatcher {
         padding: cardOuterPadding,
         child: new Card(
           child: new Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+            padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
             child: const Text('Loading…'),
           ),
         ),
@@ -124,7 +124,7 @@ class StoryCard extends StoreWatcher {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 new Text('${story.score} points'),
-                new Text('${story.descendants} comments'),
+                new Text('${story.descendants ?? '0'} comments'),
               ],
             ),
           ),
