@@ -88,6 +88,7 @@ class StoryPage extends StoreWatcher {
             item.title,
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
+              fontWeight: FontWeight.w400,
             ),
           ),
           new Padding(
@@ -263,21 +264,6 @@ class StoryPage extends StoreWatcher {
           ),
         ],
       ),
-      // child: new Column(
-      //   children: [
-      //     new Padding(
-      //       padding: const EdgeInsets.fromLTRB(8.0, 16.0, 16.0, 8.0),
-      //       child: new Column(
-      //         mainAxisSize: MainAxisSize.min,
-      //         crossAxisAlignment: CrossAxisAlignment.start,
-      //         children: <Widget>[
-      //           const Text('test'),
-      //           new Text('ID: ${item.id}'),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // ),
       child: new Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,22 +271,22 @@ class StoryPage extends StoreWatcher {
       ),
     );
 
-    final comments = item.kids != null ?
-      new Column(
-        // children: new Iterable.generate(5, (i) => new Comment(
-        //     itemId: i,
-        //   ))
-        //   .toList(),
-        children: item.kids.map((kid) => new Comment(
-          itemId: kid,
-        )).toList(),
-      ) :
-      const Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: const Center(
-          child: const Text('No comments'),
-        ),
-      );
+    // final comments = item.kids != null ?
+    //   new Column(
+    //     // children: new Iterable.generate(5, (i) => new Comment(
+    //     //     itemId: i,
+    //     //   ))
+    //     //   .toList(),
+    //     children: item.kids.map((kid) => new Comment(
+    //       itemId: kid,
+    //     )).toList(),
+    //   ) :
+    //   const Padding(
+    //     padding: const EdgeInsets.only(top: 8.0),
+    //     child: const Center(
+    //       child: const Text('No comments'),
+    //     ),
+    //   );
 
     return new Scaffold(
       appBar: new AppBar(
