@@ -298,12 +298,28 @@ class StoryPage extends StoreWatcher {
       body: new RefreshIndicator(
         onRefresh: this.refreshStory,
         child: new Scrollbar(
-          child: new ListView(
-            children: <Widget>[
-              storyCard,
-              comments,
-              const FABBottomPadding(),
-            ],
+          child: new ListView.builder(
+            itemCount: (item.kids?.length ?? 1) + 2,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return storyCard;
+              } else if (index == (item.kids?.length ?? 1) + 1) {
+                return const FABBottomPadding();
+              } else {
+                if (item.kids != null && item.kids.length > 0) {
+                  return new Comment(
+                    itemId: item.kids[index - 1],
+                  );
+                } else {
+                  return const Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: const Center(
+                      child: const Text('No comments'),
+                    ),
+                  );
+                }
+              }
+            },
           ),
         ),
       ),
