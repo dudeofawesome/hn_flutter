@@ -115,7 +115,7 @@ class Comment extends StoreWatcher {
               child: new Text(
                 comment.by ?? '…',
                 style: new TextStyle(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -133,9 +133,12 @@ class Comment extends StoreWatcher {
         topRow = new Container();
       }
 
-      final content = comment.computed.markdown != null ?
-        new SimpleMarkdown(comment.computed.markdown) :
-        comment.computed.loading ? const Text('Loading…') : const Text('Error');
+      final content = new Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: comment.computed.markdown != null ?
+          new SimpleMarkdown(comment.computed.markdown) :
+          comment.computed.loading ? const Text('Loading…') : const Text('Error'),
+      );
 
       final List<Widget> buttons = this.buttons.map<Widget>((button) {
         switch (button) {
@@ -363,7 +366,7 @@ class Comment extends StoreWatcher {
                 child: new Column(
                   children: <Widget>[
                     new Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: new Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
