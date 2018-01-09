@@ -12,6 +12,7 @@ import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
 
@@ -52,6 +53,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _hideStory () {
+    showHideItem(storyId);
   }
 
   void _viewProfile (BuildContext ctx, String by) {
@@ -62,10 +64,11 @@ class StoryCard extends StoreWatcher {
   Widget build (BuildContext context, Map<StoreToken, Store> stores) {
     final HNItemStore itemStore = stores[itemStoreToken];
     final story = itemStore.items[this.storyId];
+    final storyStatus = itemStore.itemStatuses[this.storyId];
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
-    if (story == null || story.computed.loading) {
+    if (story == null || storyStatus.loading) {
       if (story == null) {
         final HNStoryService _hnStoryService = new HNStoryService();
         _hnStoryService.getItemByID(storyId);
@@ -139,20 +142,20 @@ class StoryCard extends StoreWatcher {
               tooltip: 'Upvote',
               iconSize: 20.0,
               onPressed: () => _upvoteStory(),
-              color: story.computed.upvoted ? Colors.orange : Colors.black,
+              color: storyStatus.upvoted ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
             //   onPressed: () => _downvoteStory(),
-            //   color: this.story.computed.downvoted ? Colors.blue : Colors.black,
+            //   color: this.storyStatus.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
               onPressed: () => _saveStory(),
-              color: story.computed.saved ? Colors.amber : Colors.black,
+              color: storyStatus.saved ? Colors.amber : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.more_vert),

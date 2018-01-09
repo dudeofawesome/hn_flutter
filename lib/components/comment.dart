@@ -94,6 +94,7 @@ class Comment extends StoreWatcher {
     final UIStore selectedItemStore = stores[uiStoreToken];
 
     final comment = itemStore.items[this.itemId];
+    final commentStatus = itemStore.itemStatuses[this.itemId];
     // final item = new HNItem(
     //   id: itemId,
     //   by: 'dudeofawesome',
@@ -107,7 +108,7 @@ class Comment extends StoreWatcher {
 
       Widget topRow;
 
-      if (!comment.computed.loading) {
+      if (!commentStatus.loading) {
         topRow = new Row(
           children: <Widget>[
             new Padding(
@@ -137,7 +138,7 @@ class Comment extends StoreWatcher {
         padding: const EdgeInsets.only(top: 4.0),
         child: comment.computed.markdown != null ?
           new SimpleMarkdown(comment.computed.markdown) :
-          comment.computed.loading ? const Text('Loading…') : const Text('Error'),
+          commentStatus.loading ? const Text('Loading…') : const Text('Error'),
       );
 
       final List<Widget> buttons = this.buttons.map<Widget>((button) {
@@ -145,7 +146,7 @@ class Comment extends StoreWatcher {
           case BarButtons.UPVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_upward),
-              color: comment.computed.upvoted ? Colors.orange : Colors.white,
+              color: commentStatus.upvoted ? Colors.orange : Colors.white,
               tooltip: 'Upvote',
               onPressed: () {
                 selectItem(comment.id);
@@ -155,7 +156,7 @@ class Comment extends StoreWatcher {
           case BarButtons.DOWNVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_downward),
-              color: comment.computed.downvoted ? Colors.blue : Colors.black,
+              color: commentStatus.downvoted ? Colors.blue : Colors.black,
               tooltip: 'Downvote',
               onPressed: () {
                 selectItem(comment.id);
@@ -175,7 +176,7 @@ class Comment extends StoreWatcher {
           case BarButtons.SAVE:
             return new IconButton(
               icon: const Icon(Icons.star),
-              color: comment.computed.saved ? Colors.amber : Colors.white,
+              color: commentStatus.saved ? Colors.amber : Colors.white,
               tooltip: 'Save',
               onPressed: () {
                 selectItem(comment.id);
@@ -314,7 +315,7 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      final childComments = comment.kids != null && this.loadChildren && !comment.computed.hidden ?
+      final childComments = comment.kids != null && this.loadChildren && !commentStatus.hidden ?
         new Column(
           children: comment.kids.map((kid) => new Comment(
             itemId: kid,
@@ -372,7 +373,7 @@ class Comment extends StoreWatcher {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           topRow,
-                          !comment.computed.hidden ? content : new Container(),
+                          !commentStatus.hidden ? content : new Container(),
                         ],
                       ),
                     ),
@@ -382,7 +383,7 @@ class Comment extends StoreWatcher {
             ),
           ),
           selectedItemStore.item == comment.id ? buttonRow : new Container(),
-          !comment.computed.hidden ?
+          !commentStatus.hidden ?
             childComments :
             new Container(),
         ],

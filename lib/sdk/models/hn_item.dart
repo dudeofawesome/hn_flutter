@@ -89,36 +89,49 @@ class HNItem {
       time: $time
       descendants: $descendants
       computed:
-        loading: ${computed.loading}
         markdown: ${computed.markdown}
         urlHostname: ${computed.urlHostname}
-        seen: ${computed.seen}
   ''');
 }
 
-class HNItemComputed {
+class HNItemStatus {
   bool loading;
-  String markdown;
-  String simpleText;
-  String urlHostname;
-  String imageUrl;
   bool upvoted;
   bool downvoted;
   bool saved;
   bool hidden;
   bool seen;
 
-  HNItemComputed ({
+  HNItemStatus ({
     this.loading = false,
-    this.markdown,
-    this.simpleText,
-    this.urlHostname,
-    this.imageUrl,
     this.upvoted = false,
     this.downvoted = false,
     this.saved = false,
     this.hidden = false,
     this.seen = false,
+  });
+
+  HNItemStatus.fromItem (HNItem item) {
+    this.loading = false;
+    this.upvoted = false;
+    this.downvoted = false;
+    this.saved = false;
+    this.hidden = false;
+    this.seen = false;
+  }
+}
+
+class HNItemComputed {
+  String markdown;
+  String simpleText;
+  String urlHostname;
+  String imageUrl;
+
+  HNItemComputed ({
+    this.markdown,
+    this.simpleText,
+    this.urlHostname,
+    this.imageUrl,
   });
 
   HNItemComputed.fromItem (HNItem item) {
@@ -131,12 +144,5 @@ class HNItemComputed {
       this.markdown = SimpleMarkdownConversion.htmlToMD(item.text);
       this.simpleText = this.markdown;
     }
-
-    this.loading = false;
-    this.upvoted = false;
-    this.downvoted = false;
-    this.saved = false;
-    this.hidden = false;
-    this.seen = false;
   }
 }

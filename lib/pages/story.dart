@@ -11,6 +11,7 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
@@ -20,6 +21,7 @@ import 'package:hn_flutter/components/simple_markdown.dart';
 class StoryPage extends StoreWatcher {
   final int id;
   final int itemId;
+  final HNStoryService _hnStoryService = new HNStoryService();
 
   StoryPage ({
     Key key,
@@ -28,6 +30,7 @@ class StoryPage extends StoreWatcher {
   }) : super(key: key) {
     // final HNCommentService hnCommentService = new HNCommentService();
     // hnCommentService.getItemByID(id)
+    markAsSeen(this.itemId);
   }
 
   @override
@@ -51,8 +54,7 @@ class StoryPage extends StoreWatcher {
   _reply (int itemId) {}
 
   Future<Null> refreshStory () async {
-    final HNStoryService hnStoryService = new HNStoryService();
-    await hnStoryService.getItemByID(this.itemId);
+    await this._hnStoryService.getItemByID(this.itemId);
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
@@ -76,6 +78,7 @@ class StoryPage extends StoreWatcher {
 
     final HNItemStore itemStore = stores[itemStoreToken];
     final item = itemStore.items[this.itemId];
+    final itemStatus = itemStore.itemStatuses[this.itemId];
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
@@ -130,7 +133,7 @@ class StoryPage extends StoreWatcher {
               tooltip: 'Upvote',
               iconSize: 20.0,
               onPressed: () => _upvoteStory(),
-              color: item.computed.upvoted ? Colors.orange : Colors.black,
+              color: itemStatus.upvoted ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
@@ -143,7 +146,7 @@ class StoryPage extends StoreWatcher {
               tooltip: 'Save',
               iconSize: 20.0,
               onPressed: () => _saveStory(),
-              color: item.computed.saved ? Colors.amber : Colors.black,
+              color: itemStatus.saved ? Colors.amber : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.more_vert),

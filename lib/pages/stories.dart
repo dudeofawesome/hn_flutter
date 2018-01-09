@@ -157,6 +157,7 @@ class StoriesPage extends StoreWatcher {
     final UIStore uiStore = stores[uiStoreToken];
 
     var stories = itemStore.sortedStoryIds
+      .where((itemId) => !(itemStore.itemStatuses[itemId]?.hidden ?? false))
       .map((itemId) => itemStore.items[itemId])
       .takeWhile((story) => story != null);
 
@@ -165,7 +166,6 @@ class StoriesPage extends StoreWatcher {
     final storyCards = new Scrollbar(
       child: new ListView.builder(
         itemCount: stories.length + 2,
-        // itemExtent: itemExtent,
         itemBuilder: (context, index) {
           if (index == 0) {
             return const Padding(

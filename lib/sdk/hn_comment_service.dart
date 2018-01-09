@@ -15,19 +15,19 @@ class HNCommentService {
       .then((List<int> body) => body.sublist(0, 5))
       .then((List<int> body) => Future.wait(body.map((itemId) => this.getItemByID(itemId)).toList()))
       .then((List<HNItem> children) {
-        children.forEach((child) => addHNItem(child));
+        children.forEach((child) => addHNItem(new HNItemAction(child)));
       })
     );
   }
 
   Future<HNItem> getItemByID (int id) {
-    addHNItem(new HNItem(id: id, computed: new HNItemComputed(loading: true)));
+    addHNItem(new HNItemAction(new HNItem(id: id), new HNItemStatus(loading: true)));
 
     return http.get('${this._config.url}/item/$id.json')
       .then((res) => JSON.decode(res.body))
       .then((item) => new HNItem.fromMap(item))
       .then((item) {
-        addHNItem(item);
+        addHNItem(new HNItemAction(item));
       });
   }
 }

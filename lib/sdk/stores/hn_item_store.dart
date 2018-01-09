@@ -5,26 +5,38 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 class HNItemStore extends Store {
   HNItemStore () {
-    triggerOnAction(addHNItem, (HNItem item) {
-      this._items[item.id] = item;
+    triggerOnAction(addHNItem, (HNItemAction action) {
+      this._items[action.item.id] = action.item;
+      if (action.status != null) {
+        this._itemStatuses[action.item.id] = action.status;
+      } else {
+        this._itemStatuses[action.item.id] = new HNItemStatus();
+      }
     });
 
-    triggerOnAction(showHideItem, (int itemId) {
-      final HNItem item = this._items[itemId];
-
+    triggerOnAction(markAsSeen, (int itemId) {
       // TODO: don't mutate the old state but rather make a clone
-      item.computed.hidden = !item.computed.hidden;
+      this._itemStatuses[itemId].seen = true;
     });
 
     triggerOnAction(setStorySort, (List<int> sortedItemIds) {
       this._sortedStoryIds = sortedItemIds;
     });
+
+    triggerOnAction(showHideItem, (int itemId) {
+      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+
+      // TODO: don't mutate the old state but rather make a clone
+      itemStatus.hidden = !itemStatus.hidden;
+    });
   }
 
   Map<int, HNItem> _items = new Map();
+  Map<int, HNItemStatus> _itemStatuses = new Map();
   List<int> _sortedStoryIds = <int>[];
 
   Map<int, HNItem> get items => new Map.unmodifiable(_items);
+  Map<int, HNItemStatus> get itemStatuses => new Map.unmodifiable(_itemStatuses);
   List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
 
   // bool get isComposing => _currentMessage.isNotEmpty;
