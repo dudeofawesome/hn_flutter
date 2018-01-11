@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:hn_flutter/utils/simple_html_to_markdown.dart';
 import 'package:hn_flutter/utils/dedent.dart';
 
@@ -95,6 +97,7 @@ class HNItem {
 }
 
 class HNItemStatus {
+  int id;
   bool loading;
   bool upvoted;
   bool downvoted;
@@ -103,6 +106,7 @@ class HNItemStatus {
   bool seen;
 
   HNItemStatus ({
+    @required this.id,
     this.loading = false,
     this.upvoted = false,
     this.downvoted = false,
@@ -112,6 +116,7 @@ class HNItemStatus {
   });
 
   HNItemStatus.fromItem (HNItem item) {
+    this.id = item.id;
     this.loading = false;
     this.upvoted = false;
     this.downvoted = false;
@@ -119,6 +124,16 @@ class HNItemStatus {
     this.hidden = false;
     this.seen = false;
   }
+
+  HNItemStatus.patch ({
+    @required this.id,
+    this.loading,
+    this.upvoted,
+    this.downvoted,
+    this.saved,
+    this.hidden,
+    this.seen,
+  });
 }
 
 class HNItemComputed {

@@ -10,13 +10,20 @@ class HNItemStore extends Store {
       if (action.status != null) {
         this._itemStatuses[action.item.id] = action.status;
       } else {
-        this._itemStatuses[action.item.id] = new HNItemStatus();
+        this._itemStatuses[action.item.id] = new HNItemStatus(id: action.item.id);
       }
     });
 
     triggerOnAction(markAsSeen, (int itemId) {
       // TODO: don't mutate the old state but rather make a clone
       this._itemStatuses[itemId].seen = true;
+    });
+
+    triggerOnAction(toggleSaveItem, (int itemId) {
+      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+
+      // TODO: don't mutate the old state but rather make a clone
+      itemStatus.saved = !(itemStatus?.saved ?? false);
     });
 
     triggerOnAction(setStorySort, (List<int> sortedItemIds) {
@@ -27,7 +34,7 @@ class HNItemStore extends Store {
       final HNItemStatus itemStatus = this._itemStatuses[itemId];
 
       // TODO: don't mutate the old state but rather make a clone
-      itemStatus.hidden = !itemStatus.hidden;
+      itemStatus.hidden = !(itemStatus?.hidden ?? false);
     });
   }
 
