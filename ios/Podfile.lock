@@ -2,15 +2,25 @@ PODS:
   - Flutter (1.0.0)
   - flutter_web_browser (0.0.1):
     - Flutter
+  - FMDB (2.7.2):
+    - FMDB/standard (= 2.7.2)
+  - FMDB/standard (2.7.2)
+  - path_provider (0.0.1):
+    - Flutter
   - share (0.0.1):
     - Flutter
+  - sqflite (0.0.1):
+    - Flutter
+    - FMDB
   - url_launcher (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `/Users/dudeofawesome/Library/Developer/flutter/bin/cache/artifacts/engine/ios`)
   - flutter_web_browser (from `/Users/dudeofawesome/.pub-cache/git/flutter_web_browser-5426c00e32b7566a49b24e38376d77fa6133bfc7/ios`)
+  - path_provider (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/path_provider-0.3.0/ios`)
   - share (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/share-0.3.0/ios`)
+  - sqflite (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/sqflite-0.4.0/ios`)
   - url_launcher (from `/Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.3/ios`)
 
 EXTERNAL SOURCES:
@@ -18,15 +28,22 @@ EXTERNAL SOURCES:
     :path: /Users/dudeofawesome/Library/Developer/flutter/bin/cache/artifacts/engine/ios
   flutter_web_browser:
     :path: /Users/dudeofawesome/.pub-cache/git/flutter_web_browser-5426c00e32b7566a49b24e38376d77fa6133bfc7/ios
+  path_provider:
+    :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/path_provider-0.3.0/ios
   share:
     :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/share-0.3.0/ios
+  sqflite:
+    :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/sqflite-0.4.0/ios
   url_launcher:
     :path: /Users/dudeofawesome/.pub-cache/hosted/pub.dartlang.org/url_launcher-1.0.3/ios
 
 SPEC CHECKSUMS:
   Flutter: d674e78c937094a75ac71dd77e921e840bea3dbf
   flutter_web_browser: ce28a681222b9f336dbb02cd3b1f885dc007f73c
+  FMDB: 6198a90e7b6900cfc046e6bc0ef6ebb7be9236aa
+  path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   share: ee3d34d3969ad17fc3043eab552e4f082aacfed1
+  sqflite: 8e2d9fe1e7cdc95d4d537fc7eb2d23c8dc428e3c
   url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
 
 PODFILE CHECKSUM: 351e02e34b831289961ec3558a535cbd2c4965d2
