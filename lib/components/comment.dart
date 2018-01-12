@@ -55,6 +55,7 @@ class Comment extends StoreWatcher {
   }
 
   void _saveComment () {
+    toggleSaveItem(this.itemId);
   }
 
   Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {

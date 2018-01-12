@@ -11,6 +11,7 @@ import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/hn_item_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
@@ -46,6 +47,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _saveStory () {
+    toggleSaveItem(this.storyId);
   }
 
   Future<Null> _shareStory (String storyUrl) async {
@@ -70,8 +72,8 @@ class StoryCard extends StoreWatcher {
 
     if (story == null || storyStatus.loading) {
       if (story == null) {
-        final HNStoryService _hnStoryService = new HNStoryService();
-        _hnStoryService.getItemByID(storyId);
+        final HNItemService _hnItemService = new HNItemService();
+        _hnItemService.getItemByID(storyId);
       }
 
       return new Padding(

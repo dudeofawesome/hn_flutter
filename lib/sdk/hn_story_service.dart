@@ -5,9 +5,11 @@ import 'dart:convert' show JSON;
 import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/hn_item_service.dart';
 
 class HNStoryService {
   HNConfig _config = new HNConfig();
+  HNItemService _hnItemService = new HNItemService();
 
   Future<List<HNItem>> _getStories (
     String sort,
@@ -18,7 +20,7 @@ class HNStoryService {
     return http.get('${this._config.url}/$sort.json')
       .then((res) => JSON.decode(res.body))
       .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
-      .then((List<List<int>> body) => [body[0], Future.wait(body[1].map((itemId) => this.getItemByID(itemId)).toList())])
+      .then((List<List<int>> body) => [body[0], Future.wait(body[1].map((itemId) => _hnItemService.getItemByID(itemId)).toList())])
       .then((stories) {
         setStorySort(stories[0]);
       });
@@ -47,16 +49,4 @@ class HNStoryService {
   Future<List<HNItem>> getJobStories ({
     int skip = 0,
   }) => this._getStories('jobstories', skip: skip);
-
-  Future<HNItem> getItemByID (int id) {
-    addHNItem(new HNItemAction(new HNItem(id: id), new HNItemStatus()));
-
-    return http.get('${this._config.url}/item/$id.json')
-      .then((res) => JSON.decode(res.body))
-      .then((item) => new HNItem.fromMap(item))
-      .then((item) {
-        addHNItem(new HNItemAction(item, new HNItemStatus()));
-        return item;
-      });
-  }
 }
