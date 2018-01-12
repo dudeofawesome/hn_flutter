@@ -12,7 +12,7 @@ import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
-import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/hn_item_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
@@ -21,7 +21,7 @@ import 'package:hn_flutter/components/simple_markdown.dart';
 class StoryPage extends StoreWatcher {
   final int id;
   final int itemId;
-  final HNStoryService _hnStoryService = new HNStoryService();
+  final HNItemService _hnItemService = new HNItemService();
 
   StoryPage ({
     Key key,
@@ -45,6 +45,7 @@ class StoryPage extends StoreWatcher {
   }
 
   void _saveStory () {
+    toggleSaveItem(this.itemId);
   }
 
   Future<Null> _shareStory (String storyUrl) async {
@@ -54,7 +55,7 @@ class StoryPage extends StoreWatcher {
   _reply (int itemId) {}
 
   Future<Null> refreshStory () async {
-    await this._hnStoryService.getItemByID(this.itemId);
+    await this._hnItemService.getItemByID(this.itemId);
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
