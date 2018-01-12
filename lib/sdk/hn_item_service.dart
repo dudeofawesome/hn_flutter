@@ -26,14 +26,15 @@ class HNItemService {
       });
   }
 
-  Future<HNItem> faveItem (HNItemStatus item, HNAccount account) {
-    final save = !(item?.saved ?? false);
+  Future<Null> faveItem (HNItemStatus item, HNAccount account) {
+    final bool save = !(item?.saved ?? false);
     toggleSaveItem(item.id);
 
     return http.post(
         '${this._config.apiHost}/fave',
         body: {
           'id': '${item.id}',
+          'un': save ? 'f' : 't',
           'acct': account.id,
           'pw': account.password,
         },
@@ -41,7 +42,14 @@ class HNItemService {
       .then((res) {
         print('FAVE RES:');
         print(res);
-        // toggleSaveItem(item.id);
+        print(res.body);
+        if (!res.body.contains('Bad login.')) {
+          // undo action
+          toggleSaveItem(item.id);
+          throw 'Bad login.';
+        } else {
+          return;
+        }
       });
   }
 }
