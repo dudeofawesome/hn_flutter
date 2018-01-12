@@ -43,9 +43,55 @@ class HNItemService {
         print('FAVE RES:');
         print(res);
         print(res.body);
-        if (!res.body.contains('Bad login.')) {
+        if (res.body.contains('Bad login.')) {
           // undo action
           toggleSaveItem(item.id);
+          throw 'Bad login.';
+        } else {
+          return;
+        }
+      });
+  }
+
+  Future<Null> voteItem (bool up, HNItemStatus status, HNAccount account) {
+    if (up) {
+      toggleUpvoteItem(status.id);
+    } else {
+      toggleDownvoteItem(status.id);
+    }
+
+    String how;
+    if (up && !status.upvoted) {
+      how = 'up';
+    } else if (!up && !status.downvoted) {
+      how = 'down';
+    } else if (
+      (up && status.upvoted) ||
+      (!up && status.downvoted)
+    ) {
+      how = 'un';
+    }
+
+    return http.post(
+        '${this._config.apiHost}/vote',
+        body: {
+          'id': '${status.id}',
+          'how': how,
+          'acct': account.id,
+          'pw': account.password,
+        },
+      )
+      .then((res) {
+        print('VOTE RES:');
+        print(res);
+        print(res.body);
+        if (res.body.contains('Bad login.')) {
+          // undo action
+          if (up) {
+            toggleUpvoteItem(status.id);
+          } else {
+            toggleDownvoteItem(status.id);
+          }
           throw 'Bad login.';
         } else {
           return;

@@ -45,14 +45,31 @@ class StoryCard extends StoreWatcher {
     Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
   }
 
-  void _upvoteStory () {
+  void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(true, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _downvoteStory () {
+  void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(false, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _saveStory (HNItemStatus storyStatus, HNAccount account) {
-    this._hnItemService.faveItem(storyStatus, account);
+  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
+    this._hnItemService.faveItem(storyStatus, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
     // toggleSaveItem(this.storyId);
   }
 
@@ -98,7 +115,6 @@ class StoryCard extends StoreWatcher {
     if (story.type != 'story' && story.type != 'job' && story.type != 'poll') {
       return new Container();
     }
-
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
@@ -151,7 +167,7 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: () => _upvoteStory(),
+              onPressed: () => _upvoteStory(context, storyStatus, account),
               color: (storyStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
@@ -164,7 +180,7 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(storyStatus, account),
+              onPressed: () => _saveStory(context, storyStatus, account),
               color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(

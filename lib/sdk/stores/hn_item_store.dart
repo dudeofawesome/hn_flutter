@@ -6,6 +6,8 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   HNItemStore () {
     triggerOnAction(addHNItem, (HNItemAction action) {
+      _setStatusDefaults(action.status);
+
       this._items[action.item.id] = action.item;
       if (action.status != null) {
         this._itemStatuses[action.item.id] = action.status;
@@ -24,6 +26,20 @@ class HNItemStore extends Store {
 
       // TODO: don't mutate the old state but rather make a clone
       itemStatus.saved = !(itemStatus?.saved ?? false);
+    });
+
+    triggerOnAction(toggleUpvoteItem, (int itemId) {
+      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+
+      // TODO: don't mutate the old state but rather make a clone
+      itemStatus.upvoted = !(itemStatus?.upvoted ?? false);
+    });
+
+    triggerOnAction(toggleDownvoteItem, (int itemId) {
+      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+
+      // TODO: don't mutate the old state but rather make a clone
+      itemStatus.downvoted = !(itemStatus?.downvoted ?? false);
     });
 
     triggerOnAction(setStorySort, (List<int> sortedItemIds) {
@@ -47,6 +63,27 @@ class HNItemStore extends Store {
   List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
 
   // bool get isComposing => _currentMessage.isNotEmpty;
+
+  _setStatusDefaults (HNItemStatus status) {
+    if (status.downvoted == null) {
+      status.downvoted = false;
+    }
+    if (status.hidden == null) {
+      status.hidden = false;
+    }
+    if (status.loading == null) {
+      status.loading = false;
+    }
+    if (status.saved == null) {
+      status.saved = false;
+    }
+    if (status.seen == null) {
+      status.seen = false;
+    }
+    if (status.upvoted == null) {
+      status.upvoted = false;
+    }
+  }
 }
 
 final StoreToken itemStoreToken = new StoreToken(new HNItemStore());
