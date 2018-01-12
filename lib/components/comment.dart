@@ -136,7 +136,7 @@ class Comment extends StoreWatcher {
       }
 
       final content = new Padding(
-        padding: const EdgeInsets.only(top: 4.0),
+        padding: new EdgeInsets.only(top: comment.computed.markdown == null ? 0.0 : 4.0),
         child: comment.computed.markdown != null ?
           new SimpleMarkdown(comment.computed.markdown) :
           commentStatus.loading ? const Text('Loading…') : const Text('Error'),
