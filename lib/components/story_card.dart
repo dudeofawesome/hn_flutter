@@ -10,14 +10,18 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
+import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryCard extends StoreWatcher {
+  final _hnItemService = new HNItemService();
+
   final int storyId;
 
   StoryCard ({
@@ -28,6 +32,7 @@ class StoryCard extends StoreWatcher {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
+    listenToStore(accountStoreToken);
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
@@ -46,8 +51,9 @@ class StoryCard extends StoreWatcher {
   void _downvoteStory () {
   }
 
-  void _saveStory () {
-    toggleSaveItem(this.storyId);
+  void _saveStory (HNItemStatus storyStatus, HNAccount account) {
+    this._hnItemService.faveItem(storyStatus, account);
+    // toggleSaveItem(this.storyId);
   }
 
   Future<Null> _shareStory (String storyUrl) async {
@@ -65,8 +71,10 @@ class StoryCard extends StoreWatcher {
   @override
   Widget build (BuildContext context, Map<StoreToken, Store> stores) {
     final HNItemStore itemStore = stores[itemStoreToken];
+    final HNAccountStore accountStore = stores[accountStoreToken];
     final story = itemStore.items[this.storyId];
     final storyStatus = itemStore.itemStatuses[this.storyId];
+    final account = accountStore.primaryAccount;
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
@@ -156,7 +164,7 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(),
+              onPressed: () => _saveStory(storyStatus, account),
               color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
