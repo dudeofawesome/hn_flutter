@@ -61,13 +61,13 @@ class HNItemService {
     }
 
     String how;
-    if (up && !status.upvoted) {
+    if (up && !(status.upvoted ?? false)) {
       how = 'up';
-    } else if (!up && !status.downvoted) {
+    } else if (!up && !(status.downvoted ?? false)) {
       how = 'down';
     } else if (
-      (up && status.upvoted) ||
-      (!up && status.downvoted)
+      (up && (status.upvoted ?? false)) ||
+      (!up && (status.downvoted ?? false))
     ) {
       how = 'un';
     }

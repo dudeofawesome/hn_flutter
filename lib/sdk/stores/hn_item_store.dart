@@ -6,7 +6,9 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   HNItemStore () {
     triggerOnAction(addHNItem, (HNItemAction action) {
-      _setStatusDefaults(action.status);
+      // if (action.status != null) {
+      //   _setStatusDefaults(action.status);
+      // }
 
       this._items[action.item.id] = action.item;
       if (action.status != null) {
