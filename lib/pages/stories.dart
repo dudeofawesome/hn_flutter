@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
-import 'package:hn_flutter/components/story_card.dart';
+import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
+import 'package:hn_flutter/components/story_card.dart';
 
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
@@ -57,92 +58,6 @@ class StoriesPage extends StoreWatcher {
   Future<Null> _changeSortMode (SortModes sortMode) async {
     setStorySortMode(sortMode);
     await this._refresh(sortMode);
-  }
-
-  _openStoryDialog (BuildContext ctx) async {
-    String storyId;
-
-    storyId = await showDialog(
-      context: ctx,
-      child: new SimpleDialog(
-        title: const Text('Enter story ID'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        children: <Widget>[
-          new TextField(
-            autofocus: true,
-            decoration: new InputDecoration(
-              labelText: 'Story ID',
-            ),
-            keyboardType: TextInputType.number,
-            onChanged: (String val) => storyId = val,
-          ),
-          new ButtonTheme.bar( // make buttons use the appropriate styles for cards
-            child: new ButtonBar(
-              children: <Widget>[
-                new FlatButton(
-                  child: new Text('Cancel'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-                new FlatButton(
-                  child: new Text('View'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx, storyId),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
-    );
-
-    if (storyId != null) {
-      print(storyId);
-      Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
-    }
-  }
-
-  _openUserDialog (BuildContext ctx) async {
-    String userId;
-
-    userId = await showDialog(
-      context: ctx,
-      child: new SimpleDialog(
-        title: const Text('Enter user ID'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        children: <Widget>[
-          new TextField(
-            autofocus: true,
-            autocorrect: false,
-            keyboardType: TextInputType.text,
-            decoration: new InputDecoration(
-              labelText: 'User ID',
-            ),
-            onChanged: (String val) => userId = val,
-          ),
-          new Container(
-            height: 8.0,
-          ),
-          new ButtonTheme.bar( // make buttons use the appropriate styles for cards
-            child: new ButtonBar(
-              children: <Widget>[
-                new FlatButton(
-                  child: new Text('Cancel'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-                new FlatButton(
-                  child: new Text('View'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx, userId),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
-    );
-
-    if (userId != null) {
-      print(userId);
-      Navigator.pushNamed(ctx, '/${Routes.USERS}:$userId');
-    }
   }
 
   @override
@@ -250,43 +165,7 @@ class StoriesPage extends StoreWatcher {
         ],
       ),
       drawer: new Drawer(
-        child: new ListView(
-          children: <Widget>[
-            new UserAccountsDrawerHeader(
-              accountEmail: const Text('louis@orleans.io'),
-              accountName: const Text('Louis Orleans'),
-            ),
-            new MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: new Column(
-                children: <Widget>[
-                  new ListTile(
-                    leading: const Icon(Icons.book),
-                    title: const Text('Open Story'),
-                    onTap: () {
-                      this._openStoryDialog(context);
-                    },
-                  ),
-                  new ListTile(
-                    leading: const Icon(Icons.account_circle),
-                    title: const Text('Open User'),
-                    onTap: () {
-                      this._openUserDialog(context);
-                    },
-                  ),
-                  const Divider(),
-                  new ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text('Settings'),
-                    onTap: () {
-                    }
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+        child: new MainDrawer(),
       ),
       body: itemStore.items.length > 0 ?
         new RefreshIndicator(
