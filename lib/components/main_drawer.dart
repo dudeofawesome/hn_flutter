@@ -1,21 +1,32 @@
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/hn_auth_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 class MainDrawer extends StatefulWidget {
+  MainDrawer ({Key key}) : super(key: key);
+
+  @override
   _MainDrawerState createState () => new _MainDrawerState();
 }
 
-class _MainDrawerState extends State<MainDrawer> with SingleTickerProviderStateMixin {
+class _MainDrawerState extends State<MainDrawer>
+  with SingleTickerProviderStateMixin, StoreWatcherMixin<MainDrawer> {
+
   Animation<double> _animation;
   AnimationController _controller;
 
   final HNAuthService _hnAuthService = new HNAuthService();
+  HNAccountStore _accountStore;
 
   void initState () {
     super.initState();
+
+    this._accountStore = listenToStore(accountStoreToken);
+
     _controller = new AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -44,8 +55,8 @@ class _MainDrawerState extends State<MainDrawer> with SingleTickerProviderStateM
     return new ListView(
       children: <Widget>[
         new UserAccountsDrawerHeader(
-          accountEmail: const Text('dudeofawesome'),
-          accountName: const Text('Louis Orleans'),
+          accountEmail: this._accountStore.primaryAccount != null ? new Text(this._accountStore.primaryAccount.email ?? '...') : null,
+          accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
           onDetailsPressed: this._toggleAccounts,
         ),
         new ClipRect(
@@ -54,14 +65,18 @@ class _MainDrawerState extends State<MainDrawer> with SingleTickerProviderStateM
             child: new Container(
               // color: Colors.grey[700],
               child: new Column(
-                children: ['throwaway2483']
-                  .map<Widget>((userId) =>
+                children: this._accountStore.accounts.values
+                  // .where((account) => account.id != this._accountStore.primaryAccountId)
+                  .map<Widget>((account) =>
                     new ListTile(
-                      title: new Text(userId),
+                      title: new Text(account.id),
                       trailing: new IconButton(
                         icon: const Icon(Icons.close),
-                        onPressed: () => _showRemoveAccountDialog(context, userId),
+                        onPressed: () => _showRemoveAccountDialog(context, account.id),
                       ),
+                      onTap: () async {
+                        this._toggleAccounts();
+                      },
                     )).toList()
                     ..addAll([
                       new ListTile(
@@ -326,9 +341,9 @@ class _MainDrawerState extends State<MainDrawer> with SingleTickerProviderStateM
   }
 
   _removeAccount (String userId) async {
-    // if (await this._hnAuthService.removeAccount(userId)) {
-    // } else {
-    // }
+    if (await this._hnAuthService.removeAccount(userId)) {
+    } else {
+    }
   }
 
   _openSettings () async {}
