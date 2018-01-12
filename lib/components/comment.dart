@@ -176,7 +176,7 @@ class Comment extends StoreWatcher {
           case BarButtons.SAVE:
             return new IconButton(
               icon: const Icon(Icons.star),
-              color: commentStatus.saved ? Colors.amber : Colors.white,
+              color: (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
               tooltip: 'Save',
               onPressed: () {
                 selectItem(comment.id);
