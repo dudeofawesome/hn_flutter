@@ -40,11 +40,14 @@ void main() {
     // await tester.pump();
 
     // Insert loading HN item with ID 1
-    await addHNItem(new HNItem(
-      id: 1,
-      computed: new HNItemComputed(
-        loading: true,
+    await addHNItem(new HNItemAction(
+      new HNItem(
+        id: 1,
       ),
+      new HNItemStatus(
+        id: 1,
+        loading: true,
+      )
     ));
     // Trigger a frame.
     await tester.pump();
@@ -55,16 +58,22 @@ void main() {
     expect(find.text('Load more'), findsNothing);
 
     // update HN item with ID 1
-    await addHNItem(new HNItem(
-      id: 1,
-      by: 'pg',
-      descendants: 15,
-      kids: [487171, 15, 234509, 454410, 82729],
-      score: 61,
-      time: 1160418111,
-      title: 'Y Combinator',
-      type: 'story',
-      url: 'http://ycombinator.com',
+    await addHNItem(new HNItemAction(
+      new HNItem(
+        id: 1,
+        by: 'pg',
+        descendants: 15,
+        kids: [487171, 15, 234509, 454410, 82729],
+        score: 61,
+        time: 1160418111,
+        title: 'Y Combinator',
+        type: 'story',
+        url: 'http://ycombinator.com',
+      ),
+      new HNItemStatus.patch(
+        id: 1,
+        loading: false,
+      )
     ));
     // Trigger a frame.
     await tester.pump();
@@ -75,14 +84,20 @@ void main() {
     expect(find.byType(Container), findsOneWidget);
 
     // update HN item with ID 1
-    await addHNItem(new HNItem(
-      id: 1,
-      by: 'sama',
-      kids: [17, 454424],
-      parent: 1,
-      text: '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
-      time: 1160423461,
-      type: 'comment',
+    await addHNItem(new HNItemAction(
+      new HNItem(
+        id: 1,
+        by: 'sama',
+        kids: [17, 454424],
+        parent: 1,
+        text: '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
+        time: 1160423461,
+        type: 'comment',
+      ),
+      new HNItemStatus(
+        id: 1,
+        loading: false,
+      )
     ));
     // Trigger a frame.
     await tester.pump();
