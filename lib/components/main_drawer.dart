@@ -56,7 +56,8 @@ class _MainDrawerState extends State<MainDrawer>
     return new ListView(
       children: <Widget>[
         new UserAccountsDrawerHeader(
-          accountEmail: this._accountStore.primaryAccount != null ? new Text(this._accountStore.primaryAccount.email ?? '...') : null,
+          accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
+            new Text(this._accountStore.primaryAccount.email) : null,
           accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
           onDetailsPressed: this._toggleAccounts,
         ),
