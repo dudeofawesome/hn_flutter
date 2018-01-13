@@ -135,7 +135,7 @@ class Comment extends StoreWatcher {
                   ),
                 ) :
                 new Text(
-                  comment.by ?? '…',
+                  comment.by ?? (comment.computed.markdown != null ? '…' : '[deleted]'),
                   style: bylineStyle,
                 ),
             ),
@@ -157,7 +157,7 @@ class Comment extends StoreWatcher {
         padding: new EdgeInsets.only(top: comment.computed.markdown == null ? 0.0 : 4.0),
         child: comment.computed.markdown != null ?
           new SimpleMarkdown(comment.computed.markdown) :
-          commentStatus.loading ? const Text('Loading…') : const Text('Error'),
+          commentStatus.loading ? const Text('Loading…') : const Text('[deleted]'),
       );
 
       final List<Widget> buttons = this.buttons.map<Widget>((button) {
