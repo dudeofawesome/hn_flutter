@@ -113,7 +113,7 @@ class HNAppState extends State<HNApp> {
       // "hot reload" (press "r" in the console where you ran "flutter run",
       // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
       // counter didn't reset back to zero; the application is not restarted.
-      primarySwatch: Colors.orange,
+      primarySwatch: Colors.deepOrange,
       accentColor: Colors.blueAccent,
       scaffoldBackgroundColor: Colors.grey[300],
     );
