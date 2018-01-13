@@ -10,15 +10,20 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
-import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
+import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/hn_comment_service.dart';
+import 'package:hn_flutter/sdk/hn_item_service.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class Comment extends StoreWatcher {
+  final _hnItemService = new HNItemService();
+
   final int itemId;
   final int depth;
   final bool loadChildren;
@@ -48,16 +53,34 @@ class Comment extends StoreWatcher {
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
     listenToStore(uiStoreToken);
+    listenToStore(accountStoreToken);
   }
 
-  void _upvoteComment () {
+  void _upvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(true, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _downvoteComment () {
+  void _downvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(false, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _saveComment () {
-    toggleSaveItem(this.itemId);
+  void _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.faveItem(status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
   Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
@@ -95,14 +118,11 @@ class Comment extends StoreWatcher {
 
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore selectedItemStore = stores[uiStoreToken];
+    final HNAccountStore accountStore = stores[accountStoreToken];
 
     final comment = itemStore.items[this.itemId];
     final commentStatus = itemStore.itemStatuses[this.itemId];
-    // final item = new HNItem(
-    //   id: itemId,
-    //   by: 'dudeofawesome',
-    //   text: 'Comment $itemId',
-    // );
+    final account = accountStore.primaryAccount;
 
     if (comment != null) {
       if (comment.type != null && comment.type != 'comment') {
@@ -169,7 +189,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Upvote',
               onPressed: () {
                 selectItem(comment.id);
-                this._upvoteComment();
+                this._upvoteComment(context, commentStatus, account);
               },
             );
           case BarButtons.DOWNVOTE:
@@ -199,7 +219,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Save',
               onPressed: () {
                 selectItem(comment.id);
-                this._saveComment();
+                this._saveComment(context, commentStatus, account);
               },
             );
           case BarButtons.VIEW_PROFILE:
@@ -300,13 +320,13 @@ class Comment extends StoreWatcher {
               selectItem(comment.id);
               switch (selection) {
                 case BarButtons.UPVOTE:
-                  return this._upvoteComment();
+                  return this._upvoteComment(context, commentStatus, account);
                 case BarButtons.DOWNVOTE:
-                  return this._downvoteComment();
+                  return this._downvoteComment(context, commentStatus, account);
                 case BarButtons.REPLY:
                   return this._reply(comment.id);
                 case BarButtons.SAVE:
-                  return this._saveComment();
+                  return this._saveComment(context, commentStatus, account);
                 case BarButtons.VIEW_PROFILE:
                   return this._viewProfile(context, comment.by);
                 case BarButtons.VIEW_CONTEXT:

@@ -11,7 +11,10 @@ import 'package:timeago/timeago.dart' show timeAgo;
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/models/hn_account.dart';
+import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
@@ -36,16 +39,35 @@ class StoryPage extends StoreWatcher {
   @override
   void initStores(ListenToStore listenToStore) {
     listenToStore(itemStoreToken);
+    listenToStore(accountStoreToken);
   }
 
-  void _upvoteStory () {
+  void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(true, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _downvoteStory () {
+  void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(false, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
   }
 
-  void _saveStory () {
-    toggleSaveItem(this.itemId);
+  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
+    this._hnItemService.faveItem(storyStatus, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
+    // toggleSaveItem(this.storyId);
   }
 
   Future<Null> _shareStory (String storyUrl) async {
@@ -78,8 +100,12 @@ class StoryPage extends StoreWatcher {
     // than having to individually change instances of widgets.
 
     final HNItemStore itemStore = stores[itemStoreToken];
+    final HNAccountStore accountStore = stores[accountStoreToken];
+
     final item = itemStore.items[this.itemId];
     final itemStatus = itemStore.itemStatuses[this.itemId];
+
+    final account = accountStore.primaryAccount;
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
@@ -136,7 +162,7 @@ class StoryPage extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: () => _upvoteStory(),
+              onPressed: () => _upvoteStory(context, itemStatus, account),
               color: (itemStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
@@ -149,7 +175,7 @@ class StoryPage extends StoreWatcher {
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(),
+              onPressed: () => _saveStory(context, itemStatus, account),
               color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
