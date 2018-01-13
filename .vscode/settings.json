@@ -1,10 +1,13 @@
 {
   "cSpell.words": [
+    "Combinator",
     "Cupertino",
     "Intelli",
     "LTRB",
     "RGBO",
     "Rect",
+    "Scrollable",
+    "Scrollbar",
     "Stateful",
     "appbar",
     "autocorrect",
@@ -13,6 +16,7 @@
     "dedent",
     "downvoted",
     "horiz",
+    "sama",
     "sqflite",
     "sublist",
     "subpages",
