@@ -89,7 +89,7 @@ class StoryPage extends StoreWatcher {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            item.title,
+            item.title ?? '…',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
               fontWeight: FontWeight.w400,
@@ -100,9 +100,12 @@ class StoryPage extends StoreWatcher {
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(item.by),
+                new Text(item.by ?? '…'),
                 new Text(' • '),
-                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000))),
+                new Text(item.time != null ?
+                  timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000)) :
+                  '…'
+                ),
               ],
             ),
           ),
@@ -296,7 +299,7 @@ class StoryPage extends StoreWatcher {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text(item?.title),
+        title: new Text(item?.title ?? '…'),
         actions: <Widget>[],
       ),
       body: new RefreshIndicator(
