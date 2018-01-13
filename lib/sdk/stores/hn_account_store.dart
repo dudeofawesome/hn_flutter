@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
-import 'package:hn_flutter/sdk/sqlite_vals.dart';
+import 'package:hn_flutter/sdk/sqflite_vals.dart';
 
 class HNAccountStore extends Store {
   Directory _documentsDirectory;
