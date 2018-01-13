@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart' show
   debugPaintPointersEnabled,
   debugRepaintRainbowEnabled;
 
+import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/user.dart';
@@ -97,7 +98,7 @@ class HNAppState extends State<HNApp> {
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => new StoriesPage(),
-        // '/story': (BuildContext context) => new StoriesPage()
+        '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage()
       },
       onGenerateRoute: _getRoute,
     );

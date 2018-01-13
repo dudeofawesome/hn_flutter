@@ -123,7 +123,7 @@ class _MainDrawerState extends State<MainDrawer>
                 title: const Text('Settings'),
                 onTap: () async {
                   this._closeDrawer(context);
-                  this._openSettings();
+                  this._openSettings(context);
                 }
               ),
             ],
@@ -346,5 +346,7 @@ class _MainDrawerState extends State<MainDrawer>
     }
   }
 
-  _openSettings () async {}
+  _openSettings (BuildContext ctx) async {
+    Navigator.pushNamed(ctx, '/${Routes.SETTINGS}');
+  }
 }
