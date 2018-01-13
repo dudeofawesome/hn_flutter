@@ -430,7 +430,7 @@ class Comment extends StoreWatcher {
       );
     } else {
       final HNCommentService _hnStoryService = new HNCommentService();
-      _hnStoryService.getItemByID(itemId);
+      _hnItemService.getItemByID(itemId);
 
       return new Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
