@@ -22,6 +22,7 @@ class Comment extends StoreWatcher {
   final int itemId;
   final int depth;
   final bool loadChildren;
+  final String op;
   final List<BarButtons> buttons;
   final List<BarButtons> overflowButtons;
 
@@ -40,6 +41,7 @@ class Comment extends StoreWatcher {
       BarButtons.SHARE,
       BarButtons.COPY_TEXT,
     ],
+    this.op,
   }) : super(key: key);
 
   @override
@@ -109,17 +111,33 @@ class Comment extends StoreWatcher {
 
       Widget topRow;
 
+      final bylineStyle = new TextStyle(
+        fontWeight: FontWeight.w500,
+      );
+
       if (!commentStatus.loading) {
         topRow = new Row(
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
-              child: new Text(
-                comment.by ?? '…',
-                style: new TextStyle(
-                  fontWeight: FontWeight.w500,
+              child: (comment.by != null && comment.by == this.op) ?
+                new Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+                  decoration: new BoxDecoration(
+                    borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+                    color: Theme.of(context).accentColor,
+                  ),
+                  child: new Text(
+                    comment.by,
+                    style: bylineStyle.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                ) :
+                new Text(
+                  comment.by ?? '…',
+                  style: bylineStyle,
                 ),
-              ),
             ),
             comment.score != null ? new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
@@ -321,6 +339,7 @@ class Comment extends StoreWatcher {
           children: comment.kids.map((kid) => new Comment(
             itemId: kid,
             depth: depth + 1,
+            op: this.op,
           )).toList(),
         ) :
         new Container();

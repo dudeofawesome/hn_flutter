@@ -313,6 +313,7 @@ class StoryPage extends StoreWatcher {
                 if (item.kids != null && item.kids.length > 0) {
                   return new Comment(
                     itemId: item.kids[index - 1],
+                    op: item.by,
                   );
                 } else {
                   return const Padding(
