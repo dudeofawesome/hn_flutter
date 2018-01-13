@@ -34,10 +34,9 @@ class _MainDrawerState extends State<MainDrawer>
     );
     _animation = new CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeIn,
-        reverseCurve: Curves.easeOut,
+        curve: Curves.easeOut,
+        reverseCurve: Curves.easeIn,
       )
-      // .animate(_controller)
       ..addListener(() {
         setState(() {
           // the state that has changed here is the animation object’s value
