@@ -1,3 +1,5 @@
+import 'package:hn_flutter/utils/dedent.dart';
+
 class HNAccount {
   /// The user's unique username. Case-sensitive. Required.
   String id;
@@ -17,5 +19,15 @@ class HNAccount {
     this.email = map['email'];
     this.password = map['password'];
     this.accessToken = map['accessToken'];
+  }
+
+  String toString () {
+    return dedent('''
+      HNAccount
+        id: $id
+        email: $email
+        password: ***
+        accessToken: $accessToken
+    ''');
   }
 }

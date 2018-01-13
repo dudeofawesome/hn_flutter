@@ -50,8 +50,6 @@ class HNAccountStore extends Store {
         columns: [ACCOUNTS_ID, ACCOUNTS_PASSWORD, ACCOUNTS_ACCESS_TOKEN],
       );
 
-      print(accounts);
-
       accounts
         .map((accountMap) => new HNAccount.fromMap(accountMap))
         .forEach((account) {
@@ -61,20 +59,16 @@ class HNAccountStore extends Store {
           addHNAccount(account);
         });
 
-      if (primaryUserIdKeys.length == 0) {
-        print(primaryUserIdKeys);
-        this._primaryAccountId;
-      } else {
-        print(primaryUserIdKeys.first);
-        print(primaryUserIdKeys.first[KEYS_VALUE]);
-        // this._primaryUserId = primaryUserIdKeys.first;
+      if (primaryUserIdKeys.length > 0) {
+        print('primary account was ${primaryUserIdKeys.first[KEYS_VALUE]}');
+        setPrimaryHNAccount(primaryUserIdKeys.first[KEYS_VALUE]);
 
         // final primaryUser = accounts.firstWhere((account) => account[''] == this._primaryAccountId);
         // this._primaryUserPassword = primaryUser[ACCOUNTS_PASSWORD];
       }
     }).then((a) {});
 
-    triggerOnAction(addHNAccount, (HNAccount user) async {
+    triggerOnAction(addHNAccountAction, (HNAccount user) async {
       _accounts[user.id] = user;
 
       print('Adding ${user.id} to SQLite');
@@ -88,8 +82,6 @@ class HNAccountStore extends Store {
       );
 
       print('Added ${user.id} to SQLite');
-
-      setPrimaryHNAccount(user.id);
     });
 
     triggerOnAction(removeHNAccount, (String userId) async {
@@ -120,7 +112,7 @@ class HNAccountStore extends Store {
     triggerOnAction(setPrimaryHNAccount, (String userId) async {
       this._primaryAccountId = userId;
 
-      await this._keysDb.rawInsert(
+      this._keysDb.rawInsert(
         '''
         INSERT OR REPLACE INTO $KEYS_TABLE ($KEYS_ID, $KEYS_VALUE)
           VALUES (?, ?);

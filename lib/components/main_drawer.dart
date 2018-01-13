@@ -5,6 +5,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 
 class MainDrawer extends StatefulWidget {
   MainDrawer ({Key key}) : super(key: key);
@@ -75,6 +76,7 @@ class _MainDrawerState extends State<MainDrawer>
                         onPressed: () => _showRemoveAccountDialog(context, account.id),
                       ),
                       onTap: () async {
+                        this._switchAccount(context, account.id);
                         this._toggleAccounts();
                       },
                     )).toList()
@@ -316,7 +318,7 @@ class _MainDrawerState extends State<MainDrawer>
                 new FlatButton(
                   child: new Text('Remove'.toUpperCase()),
                   onPressed: () async {
-                    await this._removeAccount(userId);
+                    await this._removeAccount(context, userId);
                     Navigator.pop(ctx, true);
                   },
                 ),
@@ -330,6 +332,7 @@ class _MainDrawerState extends State<MainDrawer>
 
   _addAccount (BuildContext ctx, String userId, String userPassword) async {
     if (await this._hnAuthService.addAccount(userId, userPassword)) {
+      setPrimaryHNAccount(userId);
       Scaffold.of(ctx).showSnackBar(new SnackBar(
         content: new Text('Logged in'),
       ));
@@ -340,10 +343,17 @@ class _MainDrawerState extends State<MainDrawer>
     }
   }
 
-  _removeAccount (String userId) async {
+  _removeAccount (BuildContext ctx, String userId) async {
     if (await this._hnAuthService.removeAccount(userId)) {
     } else {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Failed to remove account'),
+      ));
     }
+  }
+
+  _switchAccount (BuildContext ctx, String userId) async {
+    setPrimaryHNAccount(userId);
   }
 
   _openSettings (BuildContext ctx) async {
