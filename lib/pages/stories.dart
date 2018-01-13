@@ -12,8 +12,6 @@ import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
-import 'package:hn_flutter/router.dart';
-
 class StoriesPage extends StoreWatcher {
   final HNStoryService _hnStoryService = new HNStoryService();
 
