@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:hn_flutter/components/story_card.dart';
-import 'package:hn_flutter/components/simple_markdown.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
