@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert' show UTF8, JSON;
-import 'dart:io' show HttpClient, HttpStatus, ContentType;
+import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
+import 'dart:convert' show UTF8;
 
 import 'package:http/http.dart' as http;
 
@@ -22,7 +22,7 @@ class HNAuthService {
   }
 
   Future<bool> addAccount (String userId, String userPassword) async {
-    final req = await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/login'))
+    final req = await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/login?goto=%2Fuser%3Fid%3D$userId'))
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
       ..write('acct=$userId&pw=$userPassword');
 
@@ -38,11 +38,27 @@ class HNAuthService {
         }
       })
       .then((res) async {
-        addHNAccount(new HNAccount(
+        String email;
+        Cookie accessCookie = res.cookies.firstWhere((cookie) => cookie.name == 'user');
+
+        final userReq = await (await _httpClient.getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
+          ..cookies.add(accessCookie)).close();
+        final body = await userReq.transform(UTF8.decoder).toList().then((body) => body.join());
+
+        final emailMatch = new RegExp(r'<input.*?name="uemail".*?value="(.*?)".*?>').firstMatch(body);
+        if (emailMatch != null) {
+          email = emailMatch[1];
+        }
+
+        return new HNAccount(
           id: userId,
+          email: email,
           password: userPassword,
-          accessToken: res.cookies.firstWhere((cookie) => cookie.name == 'user').value.split('&')[1],
-        ));
+          accessCookie: accessCookie,
+        );
+      })
+      .then((account) {
+        addHNAccount(account);
         return true;
       })
       .catchError((err) {

@@ -32,8 +32,9 @@ class HNItemService {
         body: {
           'id': '${item.id}',
           'un': save ? 'f' : 't',
-          'acct': account.id,
-          'pw': account.password,
+          // 'acct': account.id,
+          // 'pw': account.password,
+
         },
       )
       .then((res) {

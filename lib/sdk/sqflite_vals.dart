@@ -3,7 +3,7 @@ const ACCOUNTS_TABLE = 'accounts';
 const ACCOUNTS_ID = 'id';
 const ACCOUNTS_EMAIL = 'email';
 const ACCOUNTS_PASSWORD = 'password';
-const ACCOUNTS_ACCESS_TOKEN = 'accessToken';
+const ACCOUNTS_ACCESS_COOKIE = 'accessCookie';
 
 const KEYS_DB = 'keys.db';
 const KEYS_TABLE = 'keys';

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show JSON;
 import 'dart:io';
 
 import 'package:flutter_flux/flutter_flux.dart';
@@ -41,13 +42,13 @@ class HNAccountStore extends Store {
         print('CREATING ACCOUNTS TABLE');
         await db.execute('''
           CREATE TABLE $ACCOUNTS_TABLE
-            ($ACCOUNTS_ID TEXT PRIMARY KEY, $ACCOUNTS_EMAIL TEXT, $ACCOUNTS_PASSWORD TEXT, $ACCOUNTS_ACCESS_TOKEN TEXT)
+            ($ACCOUNTS_ID TEXT PRIMARY KEY, $ACCOUNTS_EMAIL TEXT, $ACCOUNTS_PASSWORD TEXT, $ACCOUNTS_ACCESS_COOKIE TEXT)
         ''');
       });
 
       final accounts = await this._accountsDb.query(
         ACCOUNTS_TABLE,
-        columns: [ACCOUNTS_ID, ACCOUNTS_PASSWORD, ACCOUNTS_ACCESS_TOKEN],
+        columns: [ACCOUNTS_ID, ACCOUNTS_EMAIL, ACCOUNTS_PASSWORD, ACCOUNTS_ACCESS_COOKIE],
       );
 
       accounts
@@ -73,12 +74,17 @@ class HNAccountStore extends Store {
 
       print('Adding ${user.id} to SQLite');
 
+      final cookieJson = JSON.encode({
+        'name': user.accessCookie.name,
+        'value': user.accessCookie.value,
+      });
+
       await this._accountsDb.rawInsert(
         '''
-        INSERT OR REPLACE INTO $ACCOUNTS_TABLE ($ACCOUNTS_ID, $ACCOUNTS_EMAIL, $ACCOUNTS_PASSWORD, $ACCOUNTS_ACCESS_TOKEN)
+        INSERT OR REPLACE INTO $ACCOUNTS_TABLE ($ACCOUNTS_ID, $ACCOUNTS_EMAIL, $ACCOUNTS_PASSWORD, $ACCOUNTS_ACCESS_COOKIE)
           VALUES (?, ?, ?, ?);
         ''',
-        [user.id, user.email, user.password, user.accessToken]
+        [user.id, user.email, user.password, cookieJson]
       );
 
       print('Added ${user.id} to SQLite');

@@ -1,3 +1,6 @@
+import 'dart:convert' show JSON;
+import 'dart:io' show Cookie;
+
 import 'package:hn_flutter/utils/dedent.dart';
 
 class HNAccount {
@@ -5,20 +8,25 @@ class HNAccount {
   String id;
   String email;
   String password;
-  String accessToken;
+  Cookie accessCookie;
 
   HNAccount ({
     this.id,
     this.email,
     this.password,
-    this.accessToken,
+    this.accessCookie,
   });
 
   HNAccount.fromMap (Map map) {
     this.id = map['id'];
     this.email = map['email'];
     this.password = map['password'];
-    this.accessToken = map['accessToken'];
+    if (map['accessCookie'] is Cookie) {
+      this.accessCookie = map['accessCookie'];
+    } else if (map['accessCookie'] is String) {
+      final jsonCookie = JSON.decode(map['accessCookie']);
+      this.accessCookie = new Cookie(jsonCookie['name'], jsonCookie['value']);
+    }
   }
 
   String toString () {
@@ -26,8 +34,8 @@ class HNAccount {
       HNAccount
         id: $id
         email: $email
-        password: ***
-        accessToken: $accessToken
+        password: ${password[0]}***
+        accessCookie.value: ${accessCookie.value}
     ''');
   }
 }
