@@ -184,7 +184,7 @@ class Comment extends StoreWatcher {
           case BarButtons.UPVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_upward),
-              color: commentStatus.upvoted ? Colors.orange : Colors.white,
+              color: (commentStatus.upvoted ?? false) ? Colors.orange : Colors.white,
               tooltip: 'Upvote',
               onPressed: () {
                 selectItem(comment.id);
@@ -194,7 +194,7 @@ class Comment extends StoreWatcher {
           case BarButtons.DOWNVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_downward),
-              color: commentStatus.downvoted ? Colors.blue : Colors.black,
+              color: (commentStatus.downvoted ?? false) ? Colors.blue : Colors.black,
               tooltip: 'Downvote',
               onPressed: () {
                 selectItem(comment.id);
