@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart' show DateFormat;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -77,6 +78,10 @@ class HNAccountStore extends Store {
       final cookieJson = JSON.encode({
         'name': user.accessCookie.name,
         'value': user.accessCookie.value,
+        'expires': user.accessCookie.expires.millisecondsSinceEpoch,
+        'domain': user.accessCookie.domain,
+        'httpOnly': user.accessCookie.httpOnly,
+        'secure': user.accessCookie.secure,
       });
 
       await this._accountsDb.rawInsert(
