@@ -353,7 +353,7 @@ class Comment extends StoreWatcher {
         ),
       );
 
-      final childComments = comment.kids != null && this.loadChildren && !commentStatus.hidden ?
+      final childComments = comment.kids != null && this.loadChildren && !(commentStatus?.hidden ?? false) ?
         new Column(
           children: comment.kids.map((kid) => new Comment(
             itemId: kid,
@@ -412,7 +412,7 @@ class Comment extends StoreWatcher {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           topRow,
-                          !commentStatus.hidden ? content : new Container(),
+                          !(commentStatus?.hidden ?? false) ? content : new Container(),
                         ],
                       ),
                     ),
@@ -422,7 +422,7 @@ class Comment extends StoreWatcher {
             ),
           ),
           selectedItemStore.item == comment.id ? buttonRow : new Container(),
-          !commentStatus.hidden ?
+          !(commentStatus?.hidden ?? false) ?
             childComments :
             new Container(),
         ],
