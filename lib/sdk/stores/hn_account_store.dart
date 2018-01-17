@@ -13,6 +13,8 @@ import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
 
 class HNAccountStore extends Store {
+  static final HNAccountStore _singleton = new HNAccountStore._internal();
+
   Directory _documentsDirectory;
   Database _keysDb;
   Database _accountsDb;
@@ -20,7 +22,7 @@ class HNAccountStore extends Store {
   String _primaryAccountId;
   final Map<String, HNAccount> _accounts = new Map();
 
-  HNAccountStore () {
+  HNAccountStore._internal () {
     new Future(() async {
       this._documentsDirectory = await getApplicationDocumentsDirectory();
 
@@ -131,6 +133,10 @@ class HNAccountStore extends Store {
         [KEY_PRIMARY_ACCOUNT_ID, userId],
       );
     });
+  }
+
+  factory HNAccountStore () {
+    return _singleton;
   }
 
   String get primaryAccountId => this._primaryAccountId;
