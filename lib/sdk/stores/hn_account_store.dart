@@ -70,7 +70,7 @@ class HNAccountStore extends Store {
       }
     }).then((a) {});
 
-    triggerOnAction(addHNAccountAction, (HNAccount user) async {
+    triggerOnAction(addHNAccount, (HNAccount user) async {
       _accounts[user.id] = user;
 
       print('Adding ${user.id} to SQLite');
