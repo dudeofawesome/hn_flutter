@@ -375,13 +375,9 @@ class Comment extends StoreWatcher {
       return new Column(
         children: <Widget>[
           new GestureDetector(
-            onTap: () {
-              print('comment ${comment.id} touched');
-              selectItem(comment.id);
-            },
-            onLongPress: () async {
-              print('comment ${comment.id} pressed');
-              await SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
+            onTap: () => selectItem(comment.id),
+            onLongPress: () {
+              SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
               showHideItem(comment.id);
             },
             child: new Padding(

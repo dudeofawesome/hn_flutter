@@ -6,17 +6,6 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   HNItemStore () {
     triggerOnAction(addHNItem, (HNItem item) {
-      // if (action.status != null) {
-      //   _setStatusDefaults(action.status);
-      // }
-
-      // this._items[action.item.id] = action.item;
-      // if (action.status != null) {
-      //   this._itemStatuses[action.item.id] = action.status;
-      // } else {
-      //   this._itemStatuses[action.item.id] = new HNItemStatus(id: action.item.id);
-      // }
-
       this._items[item.id] = item;
     });
 
@@ -72,7 +61,7 @@ class HNItemStore extends Store {
       itemStatus.saved = status.saved ?? itemStatus.saved;
       itemStatus.hidden = status.hidden ?? itemStatus.hidden;
       itemStatus.seen = status.seen ?? itemStatus.seen;
-      // itemStatus.authTokens ??= status.authTokens;
+
       if (itemStatus.authTokens != null && status.authTokens != null) {
         itemStatus.authTokens.upvote = status.authTokens.upvote ?? itemStatus.authTokens.upvote;
         itemStatus.authTokens.downvote = status.authTokens.downvote ?? itemStatus.authTokens.downvote;

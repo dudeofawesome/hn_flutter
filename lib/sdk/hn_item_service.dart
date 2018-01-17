@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
-import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
+import 'dart:io' show HttpClient, Cookie;
 
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
@@ -20,11 +20,7 @@ class HNItemService {
 
     if (accessCookie != null) {
       this._getItemPageById(id, accessCookie).then((page) async {
-        // final status = this._parseItemStatus(id, page);
-        // status.authTokens = this._parseItemAuthTokens(id, page);
-        // patchItemStatus(status);
         this._parseAllItems(page).forEach((patch) {
-          print(patch);
           patchItemStatus(patch);
         });
       });
@@ -48,12 +44,6 @@ class HNItemService {
       ))
       ..cookies.add(accessCookie))
       .close();
-
-    // req.transform(UTF8.decoder).listen((data) {
-    //   print(data);
-    // });
-
-    // final body = '';
 
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
 
@@ -98,15 +88,7 @@ class HNItemService {
     final hideLinks = document.querySelectorAll('''a[href^='hide']''');
     final faveLinks = document.querySelectorAll('''a[href^='fave']''');
 
-    // final faveMatches = new RegExp(r'''<a.*?id=(?:"|')up_([0-9]+)(?:"|').*?(class=(?:"|').*?nosee.*?(?:"|'))?.*?>''')
-    //   .allMatches(itemPage);
     final itemIds = upvoteLinks.map((match) => int.parse(match.id.substring(3)));
-    print('found ${itemIds.length} items');
-    print(itemIds);
-    print(upvoteLinks.length);
-    print(downvoteLinks.length);
-    print(hideLinks.length);
-    print(faveLinks.length);
 
     final patches = itemIds.map((id) => new HNItemStatus.patch(id: id, authTokens: new HNItemAuthTokens())).toList();
     patches.forEach((patch) {

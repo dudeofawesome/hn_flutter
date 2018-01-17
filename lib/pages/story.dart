@@ -142,9 +142,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
                 null,
               color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
             ),
-            // new IconButton(
-            //   icon: const Icon(Icons.more_vert),
-            // ),
             new PopupMenuButton<OverflowMenuItems>(
               icon: const Icon(
                 Icons.more_horiz,
