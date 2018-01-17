@@ -97,7 +97,7 @@ class StoryCard extends StoreWatcher {
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new HNItemService();
-        _hnItemService.getItemByID(storyId, account.accessCookie);
+        _hnItemService.getItemByID(storyId, account?.accessCookie);
       }
 
       return new Padding(

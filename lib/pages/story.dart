@@ -290,7 +290,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         actions: <Widget>[],
       ),
       body: new RefreshIndicator(
-        onRefresh: () => this.refreshStory(account.accessCookie),
+        onRefresh: () => this.refreshStory(account?.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
             itemCount: (item.kids?.length ?? 1) + 2,
@@ -360,7 +360,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
   _reply (int itemId) {}
 
-  Future<Null> refreshStory (Cookie accessCookie) async {
+  Future<Null> refreshStory ([Cookie accessCookie]) async {
     await this._hnItemService.getItemByID(widget.itemId, accessCookie);
   }
 

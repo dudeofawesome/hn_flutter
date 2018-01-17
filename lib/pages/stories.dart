@@ -28,30 +28,25 @@ class StoriesPage extends StoreWatcher {
   }
 
   Future<Null> _refresh (SortModes sortMode, Cookie accessCookie) async {
-    this._loadMore(0, sortMode, accessCookie);
-  }
-
-  Future<Null> _loadMore (int skip, SortModes sortMode, Cookie accessCookie) async {
     switch (sortMode) {
       case SortModes.TOP:
-        await this._hnStoryService.getTopStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getTopStories(accessCookie: accessCookie);
         break;
       case SortModes.NEW:
-        await this._hnStoryService.getNewStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getNewStories(accessCookie: accessCookie);
         break;
       case SortModes.BEST:
-        await this._hnStoryService.getBestStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getBestStories(accessCookie: accessCookie);
         break;
       case SortModes.ASK_HN:
-        await this._hnStoryService.getAskStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getAskStories(accessCookie: accessCookie);
         break;
       case SortModes.SHOW_HN:
-        await this._hnStoryService.getShowStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getShowStories(accessCookie: accessCookie);
         break;
       case SortModes.JOB:
-        await this._hnStoryService.getJobStories(skip: skip, accessCookie: accessCookie);
+        await this._hnStoryService.getJobStories(accessCookie: accessCookie);
         break;
-      default:
     }
   }
 
@@ -74,10 +69,10 @@ class StoriesPage extends StoreWatcher {
 
     final account = accountStore?.primaryAccount;
 
-    final stories = itemStore.sortedStoryIds
-      .where((itemId) => !(itemStore.itemStatuses[itemId]?.hidden ?? false))
-      .map((itemId) => itemStore.items[itemId])
-      .takeWhile((story) => story != null);
+    final stories = itemStore.sortedStoryIds;
+      // .where((itemId) => !(itemStore.itemStatuses[itemId]?.hidden ?? false))
+      // .map((itemId) => itemStore.items[itemId])
+      // .takeWhile((story) => story != null);
 
     final sortMode = uiStore.sortMode;
 
@@ -98,18 +93,19 @@ class StoriesPage extends StoreWatcher {
               padding: const EdgeInsets.only(top: 12.0),
               child: new Column(
                 children: <Widget>[
-                  new FlatButton(
-                    child: new Column(
-                      children: <Widget>[
-                        const Padding(
-                          padding: const EdgeInsets.only(bottom: 6.0),
-                          child: const Icon(Icons.replay),
-                        ),
-                        const Text('Load more'),
-                      ],
-                    ),
-                    onPressed: () => this._loadMore(stories.length, sortMode, account?.accessCookie),
-                  ),
+                  // new FlatButton(
+                  //   child: new Column(
+                  //     children: <Widget>[
+                  //       const Padding(
+                  //         padding: const EdgeInsets.only(bottom: 6.0),
+                  //         child: const Icon(Icons.replay),
+                  //       ),
+                  //       const Text('Load more'),
+                  //     ],
+                  //   ),
+                  //   onPressed: () => this._loadMore(stories.length, sortMode, account?.accessCookie),
+                  // ),
+                  const Text('''You've reached the end.'''),
                   // Bottom padding for FAB and home gesture bar
                   const FABBottomPadding(),
                 ],
@@ -117,7 +113,7 @@ class StoriesPage extends StoreWatcher {
             );
           } else {
             return new StoryCard(
-              storyId: stories.elementAt(index - 1).id,
+              storyId: stories.elementAt(index - 1),
             );
           }
         },
@@ -174,7 +170,7 @@ class StoriesPage extends StoreWatcher {
       drawer: new Drawer(
         child: new MainDrawer(),
       ),
-      body: itemStore.items.length > 0 ?
+      body: stories.length > 0 ?
         new RefreshIndicator(
           onRefresh: () => this._refresh(sortMode, account?.accessCookie),
           child: storyCards,
