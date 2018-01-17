@@ -186,40 +186,48 @@ class Comment extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               color: (commentStatus.upvoted ?? false) ? Colors.orange : Colors.white,
               tooltip: 'Upvote',
-              onPressed: () {
-                selectItem(comment.id);
-                this._upvoteComment(context, commentStatus, account);
-              },
+              onPressed: commentStatus?.authTokens?.upvote != null ?
+                () {
+                  selectItem(comment.id);
+                  this._upvoteComment(context, commentStatus, account);
+                } :
+                null,
             );
           case BarButtons.DOWNVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_downward),
               color: (commentStatus.downvoted ?? false) ? Colors.blue : Colors.black,
               tooltip: 'Downvote',
-              onPressed: () {
-                selectItem(comment.id);
-                // this._downvoteStory()
-              },
+              onPressed: commentStatus?.authTokens?.downvote != null ?
+                () {
+                  selectItem(comment.id);
+                  // this._downvoteStory()
+                } :
+                null,
             );
           case BarButtons.REPLY:
             return new IconButton(
               icon: const Icon(Icons.reply),
               color: Colors.white,
               tooltip: 'Reply',
-              onPressed: () {
-                selectItem(comment.id);
-                this._reply(comment.id);
-              },
+              onPressed: /* commentStatus?.authTokens?.reply != null ?
+                () {
+                  selectItem(comment.id);
+                  this._reply(comment.id);
+                } : */
+                null,
             );
           case BarButtons.SAVE:
             return new IconButton(
               icon: const Icon(Icons.star),
               color: (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
               tooltip: 'Save',
-              onPressed: () {
-                selectItem(comment.id);
-                this._saveComment(context, commentStatus, account);
-              },
+              onPressed: commentStatus?.authTokens?.save != null ?
+                () {
+                  selectItem(comment.id);
+                  this._saveComment(context, commentStatus, account);
+                } :
+                null,
             );
           case BarButtons.VIEW_PROFILE:
             return new IconButton(
