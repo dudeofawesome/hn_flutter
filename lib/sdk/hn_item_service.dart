@@ -13,9 +13,17 @@ class HNItemService {
   final _config = new HNConfig();
   final _httpClient = new HttpClient();
 
-  Future<HNItem> getItemByID (int id) {
+  Future<HNItem> getItemByID (int id, [Cookie accessCookie]) {
     addHNItem(new HNItem(id: id));
     patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+
+    if (accessCookie != null) {
+      this._getItemPageById(id, accessCookie).then((page) async {
+        final status = this._parseItemStatus(id, page);
+        status.authTokens = this._parseItemAuthTokens(id, page);
+        patchItemStatus(status);
+      });
+    }
 
     return http.get('${this._config.url}/item/$id.json')
       .then((res) => JSON.decode(res.body))
@@ -28,7 +36,7 @@ class HNItemService {
       });
   }
 
-  Future<String> _getItemAuthTokens (int itemId, String token, Cookie accessCookie) async {
+  Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
     final req = await (await _httpClient.getUrl(Uri.parse(
         '${this._config.apiHost}/item'
         '?id=$itemId'
@@ -48,52 +56,69 @@ class HNItemService {
       throw 'Invalid or expired auth cookie';
     }
 
-    switch (token) {
-      case 'logout':
-        return new RegExp(r'''<a.*?id='logout'.*?href="logout\?.*?auth=(.*?)&?.*?".*?>''').firstMatch(body)[1];
-      case 'upvote':
-        return new RegExp(r'''<a.*?id='up_''' + '$itemId' + r''''.*?href='vote\?.*?auth=(.*?)&?.*?'.*?>''').firstMatch(body)[1];
-      case 'downvote':
-        return new RegExp(r'''<a.*?id='down_''' + '$itemId' + r''''.*?href='vote\?.*?auth=(.*?)&?.*?'.*?>''').firstMatch(body)[1];
-      case 'hide':
-        return new RegExp(r'''<a.*?href=(?:"|')hide\?.*?auth=(.*?)(?:&.*?"|"|').*?>''').firstMatch(body)[1];
-      case 'fave':
-        return new RegExp(r'''<a.*?href=(?:"|')fave\?.*?auth=(.*?)(?:&.*?"|"|').*?>''').firstMatch(body)[1];
-      default:
-        throw 'Invalid token request';
-    }
+    return body;
   }
 
-  Future<Null> faveItem (HNItemStatus item, HNAccount account) async {
-    final bool save = !(item?.saved ?? false);
-    toggleSaveItem(item.id);
+  HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
+    return new HNItemAuthTokens(
+      // logout: new RegExp(r'''<a.*?id=(?:"|')logout(?:"|').*?href=(?:"|')logout\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      //   .firstMatch(itemPage)[1],
+      upvote: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+        .firstMatch(itemPage)?.group(1),
+      downvote: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+        .firstMatch(itemPage)?.group(1),
+      hide: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
+      save: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>''').firstMatch(itemPage)?.group(1),
+    );
+  }
+
+  HNItemStatus _parseItemStatus (int itemId, String itemPage) {
+    return new HNItemStatus.patch(
+      id: itemId,
+      upvoted: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+        .firstMatch(itemPage) != null,
+      downvoted: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+        .firstMatch(itemPage) != null,
+      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage) != null,
+      saved: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage) != null,
+      // seen: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage)[1],
+    );
+  }
+
+  Future<Null> faveItem (HNItemStatus status, HNAccount account) async {
+    final bool save = !(status?.saved ?? false);
+    toggleSaveItem(status.id);
     bool autoUpvoted = false;
-    if (!(item?.upvoted ?? false)) {
-      toggleUpvoteItem(item.id);
+    if (!(status?.upvoted ?? false)) {
+      toggleUpvoteItem(status.id);
       autoUpvoted = true;
     }
 
-    final authToken = await this._getItemAuthTokens(item.id, 'fave', account.accessCookie);
+    try {
+      final req = await (await _httpClient.getUrl(Uri.parse(
+          '${this._config.apiHost}/fave'
+          '?id=${status.id}'
+          '&un=${save ? 'f' : 't'}'
+          '${status?.authTokens?.save != null ? '&auth=' + status.authTokens.save : ''}'
+        ))
+        ..cookies.add(account.accessCookie))
+        .close();
 
-    final req = await (await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/fave'
-        '?id=${item.id}'
-        '&un=${save ? 'f' : 't'}'
-        '&auth=$authToken'
-      ))
-      ..cookies.add(account.accessCookie))
-      .close();
-
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-    if (body.contains('un-favorite')) {
-      // undo action
-      return;
-    } else {
-      toggleSaveItem(item.id);
-      if (autoUpvoted) {
-        toggleUpvoteItem(item.id);
+      final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+      var a = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body);
+      print(a);
+      if (a != null) {
+        return;
+      } else {
+        throw 'Bad login.';
       }
-      throw 'Bad login.';
+    } catch (err) {
+      // undo action
+      toggleSaveItem(status.id);
+      if (autoUpvoted) {
+        toggleUpvoteItem(status.id);
+      }
+      throw err;
     }
   }
 

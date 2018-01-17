@@ -72,6 +72,7 @@ class HNItemStore extends Store {
       itemStatus.saved = status.saved ?? itemStatus.saved;
       itemStatus.hidden = status.hidden ?? itemStatus.hidden;
       itemStatus.seen = status.seen ?? itemStatus.seen;
+      itemStatus.authTokens = status.authTokens ?? itemStatus.authTokens;
     });
   }
 

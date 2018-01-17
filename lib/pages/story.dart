@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Cookie;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,27 +17,32 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
-class StoryPage extends StoreWatcher {
-  final int itemId;
+class StoryPage extends StatefulWidget {
   final HNItemService _hnItemService = new HNItemService();
+  final _accountStore = new HNAccountStore();
+
+  final int itemId;
+  bool old = false;
 
   StoryPage ({
     Key key,
     @required this.itemId,
   }) : super(key: key) {
     markAsSeen(this.itemId);
+
+    this.refreshStory(_accountStore.primaryAccount?.accessCookie);
+
+    old = true;
   }
 
   @override
-  void initStores(ListenToStore listenToStore) {
-    listenToStore(itemStoreToken);
-    listenToStore(accountStoreToken);
-  }
+  _StoryPageState createState () => new _StoryPageState();
 
   void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
     this._hnItemService.voteItem(true, status, account)
@@ -72,8 +78,8 @@ class StoryPage extends StoreWatcher {
 
   _reply (int itemId) {}
 
-  Future<Null> refreshStory () async {
-    await this._hnItemService.getItemByID(this.itemId);
+  Future<Null> refreshStory (Cookie accessCookie) async {
+    await this._hnItemService.getItemByID(this.itemId, accessCookie);
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
@@ -85,9 +91,22 @@ class StoryPage extends StoreWatcher {
   void _viewProfile (BuildContext ctx, String author) {
     Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
   }
+}
+
+class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage> {
+  HNItemStore _itemStore;
+  HNAccountStore _accountStore;
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  void initState () {
+    super.initState();
+
+    this._itemStore = listenToStore(itemStoreToken);
+    this._accountStore = listenToStore(accountStoreToken);
+  }
+
+  @override
+  Widget build (BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -95,13 +114,10 @@ class StoryPage extends StoreWatcher {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    final HNItemStore itemStore = stores[itemStoreToken];
-    final HNAccountStore accountStore = stores[accountStoreToken];
+    final item = this._itemStore.items[widget.itemId];
+    final itemStatus = this._itemStore.itemStatuses[widget.itemId];
 
-    final item = itemStore.items[this.itemId];
-    final itemStatus = itemStore.itemStatuses[this.itemId];
-
-    final account = accountStore.primaryAccount;
+    final account = this._accountStore.primaryAccount;
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
@@ -158,20 +174,26 @@ class StoryPage extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: () => _upvoteStory(context, itemStatus, account),
+              onPressed: itemStatus?.authTokens?.upvote != null ?
+                () => widget._upvoteStory(context, itemStatus, account) :
+                null,
               color: (itemStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
-            //   onPressed: () => _downvoteStory(),
+            //   onPressed: itemStatus?.authTokens?.save != null ?
+            //     () => _downvoteStory(context, itemStatus, account) :
+            //     null,
             //   color: this.story.computed.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(context, itemStatus, account),
+              onPressed: itemStatus?.authTokens?.save != null ?
+                () => widget._saveStory(context, itemStatus, account) :
+                null,
               color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
@@ -209,11 +231,11 @@ class StoryPage extends StoreWatcher {
               onSelected: (OverflowMenuItems selection) async {
                 switch (selection) {
                   case OverflowMenuItems.SHARE:
-                    return await this._shareStory('https://news.ycombinator.com/item?id=${item.id}');
+                    return await widget._shareStory('https://news.ycombinator.com/item?id=${item.id}');
                   case OverflowMenuItems.COPY_TEXT:
                     return await Clipboard.setData(new ClipboardData(text: item.computed.simpleText));
                   case OverflowMenuItems.VIEW_PROFILE:
-                    return this._viewProfile(context, item.by);
+                    return widget._viewProfile(context, item.by);
                 }
               },
             ),
@@ -226,7 +248,7 @@ class StoryPage extends StoreWatcher {
     if (item.url != null) {
       cardContent = <Widget>[
         new GestureDetector(
-          onTap: () => this._openStoryUrl(context, item.url),
+          onTap: () => widget._openStoryUrl(context, item.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,
             children: <Widget>[
@@ -325,7 +347,7 @@ class StoryPage extends StoreWatcher {
         actions: <Widget>[],
       ),
       body: new RefreshIndicator(
-        onRefresh: this.refreshStory,
+        onRefresh: () => widget.refreshStory(account.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
             itemCount: (item.kids?.length ?? 1) + 2,
@@ -354,7 +376,7 @@ class StoryPage extends StoreWatcher {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () => this._reply(item.id),
+        onPressed: () => widget._reply(item.id),
         tooltip: 'Reply',
         child: const Icon(Icons.reply),
       ),

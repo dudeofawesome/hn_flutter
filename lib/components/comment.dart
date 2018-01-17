@@ -428,7 +428,7 @@ class Comment extends StoreWatcher {
         ],
       );
     } else {
-      _hnItemService.getItemByID(itemId);
+      _hnItemService.getItemByID(itemId, account.accessCookie);
 
       return new Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),

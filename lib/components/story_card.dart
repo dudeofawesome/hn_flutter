@@ -97,7 +97,7 @@ class StoryCard extends StoreWatcher {
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new HNItemService();
-        _hnItemService.getItemByID(storyId);
+        _hnItemService.getItemByID(storyId, account.accessCookie);
       }
 
       return new Padding(
@@ -166,20 +166,26 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: () => _upvoteStory(context, storyStatus, account),
+              onPressed: storyStatus?.authTokens?.save != null ?
+                () => _upvoteStory(context, storyStatus, account) :
+                null,
               color: (storyStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
-            //   onPressed: () => _downvoteStory(),
+            //   onPressed: storyStatus?.authTokens?.save != null ?
+            //     () => _downvoteStory(context, storyStatus, account) :
+            //     null,
             //   color: this.storyStatus.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(context, storyStatus, account),
+              onPressed: storyStatus?.authTokens?.save != null ?
+                () => _saveStory(context, storyStatus, account) :
+                null,
               color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
@@ -195,9 +201,10 @@ class StoryCard extends StoreWatcher {
                   value: OverflowMenuItems.SHARE,
                   child: const Text('Share'),
                 ),
-                const PopupMenuItem<OverflowMenuItems>(
+                new PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.HIDE,
                   child: const Text('Hide'),
+                  enabled: storyStatus?.authTokens?.hide != null,
                 ),
                 const PopupMenuItem<OverflowMenuItems>(
                   value: OverflowMenuItems.VIEW_PROFILE,

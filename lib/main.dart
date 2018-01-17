@@ -19,8 +19,8 @@ import 'package:hn_flutter/sdk/hn_story_service.dart';
 void main() {
   runApp(new HNApp());
 
-  final HNStoryService _hnStoryService = new HNStoryService();
-  _hnStoryService.getTopStories();
+  // final HNStoryService _hnStoryService = new HNStoryService();
+  // _hnStoryService.getTopStories();
 }
 
 class HNApp extends StatefulWidget {

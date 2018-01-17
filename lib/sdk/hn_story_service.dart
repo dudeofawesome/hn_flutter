@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Cookie;
 import 'package:http/http.dart' as http;
 import 'dart:convert' show JSON;
 
@@ -15,12 +16,14 @@ class HNStoryService {
     String sort,
     {
       int skip = 0,
+      Cookie accessCookie,
     }
   ) {
     return http.get('${this._config.url}/$sort.json')
       .then((res) => JSON.decode(res.body))
       .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
-      .then((List<List<int>> body) => [body[0], Future.wait(body[1].map((itemId) => _hnItemService.getItemByID(itemId)).toList())])
+      .then((List<List<int>> body) =>
+        [body[0], Future.wait(body[1].map((itemId) => _hnItemService.getItemByID(itemId, accessCookie)).toList())])
       .then((stories) {
         setStorySort(stories[0]);
       });
@@ -28,25 +31,31 @@ class HNStoryService {
 
   Future<List<HNItem>> getTopStories ({
     int skip = 0,
-  }) => this._getStories('topstories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('topstories', skip: skip, accessCookie: accessCookie);
 
   Future<List<HNItem>> getNewStories ({
     int skip = 0,
-  }) => this._getStories('newstories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('newstories', skip: skip, accessCookie: accessCookie);
 
   Future<List<HNItem>> getBestStories ({
     int skip = 0,
-  }) => this._getStories('beststories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('beststories', skip: skip, accessCookie: accessCookie);
 
   Future<List<HNItem>> getAskStories ({
     int skip = 0,
-  }) => this._getStories('askstories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('askstories', skip: skip, accessCookie: accessCookie);
 
   Future<List<HNItem>> getShowStories ({
     int skip = 0,
-  }) => this._getStories('showstories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('showstories', skip: skip, accessCookie: accessCookie);
 
   Future<List<HNItem>> getJobStories ({
     int skip = 0,
-  }) => this._getStories('jobstories', skip: skip);
+    Cookie accessCookie,
+  }) => this._getStories('jobstories', skip: skip, accessCookie: accessCookie);
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Cookie;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
@@ -9,6 +10,7 @@ import 'package:hn_flutter/components/story_card.dart';
 
 import 'package:hn_flutter/sdk/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
@@ -25,37 +27,37 @@ class StoriesPage extends StoreWatcher {
     listenToStore(uiStoreToken);
   }
 
-  Future<Null> _refresh (SortModes sortMode) async {
-    this._loadMore(0, sortMode);
+  Future<Null> _refresh (SortModes sortMode, Cookie accessCookie) async {
+    this._loadMore(0, sortMode, accessCookie);
   }
 
-  Future<Null> _loadMore (int skip, SortModes sortMode) async {
+  Future<Null> _loadMore (int skip, SortModes sortMode, Cookie accessCookie) async {
     switch (sortMode) {
       case SortModes.TOP:
-        await this._hnStoryService.getTopStories(skip: skip);
+        await this._hnStoryService.getTopStories(skip: skip, accessCookie: accessCookie);
         break;
       case SortModes.NEW:
-        await this._hnStoryService.getNewStories(skip: skip);
+        await this._hnStoryService.getNewStories(skip: skip, accessCookie: accessCookie);
         break;
       case SortModes.BEST:
-        await this._hnStoryService.getBestStories(skip: skip);
+        await this._hnStoryService.getBestStories(skip: skip, accessCookie: accessCookie);
         break;
       case SortModes.ASK_HN:
-        await this._hnStoryService.getAskStories(skip: skip);
+        await this._hnStoryService.getAskStories(skip: skip, accessCookie: accessCookie);
         break;
       case SortModes.SHOW_HN:
-        await this._hnStoryService.getShowStories(skip: skip);
+        await this._hnStoryService.getShowStories(skip: skip, accessCookie: accessCookie);
         break;
       case SortModes.JOB:
-        await this._hnStoryService.getJobStories(skip: skip);
+        await this._hnStoryService.getJobStories(skip: skip, accessCookie: accessCookie);
         break;
       default:
     }
   }
 
-  Future<Null> _changeSortMode (SortModes sortMode) async {
+  Future<Null> _changeSortMode (SortModes sortMode, Cookie accessCookie) async {
     setStorySortMode(sortMode);
-    await this._refresh(sortMode);
+    await this._refresh(sortMode, accessCookie);
   }
 
   @override
@@ -66,15 +68,22 @@ class StoriesPage extends StoreWatcher {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    final HNAccountStore accountStore = stores[accountStoreToken];
     final HNItemStore itemStore = stores[itemStoreToken];
     final UIStore uiStore = stores[uiStoreToken];
 
-    var stories = itemStore.sortedStoryIds
+    final account = accountStore?.primaryAccount;
+
+    final stories = itemStore.sortedStoryIds
       .where((itemId) => !(itemStore.itemStatuses[itemId]?.hidden ?? false))
       .map((itemId) => itemStore.items[itemId])
       .takeWhile((story) => story != null);
 
     final sortMode = uiStore.sortMode;
+
+    if (stories == null || stories.length == 0) {
+      this._refresh(sortMode, account?.accessCookie);
+    }
 
     final storyCards = new Scrollbar(
       child: new ListView.builder(
@@ -99,7 +108,7 @@ class StoriesPage extends StoreWatcher {
                         const Text('Load more'),
                       ],
                     ),
-                    onPressed: () => this._loadMore(stories.length, sortMode),
+                    onPressed: () => this._loadMore(stories.length, sortMode, account?.accessCookie),
                   ),
                   // Bottom padding for FAB and home gesture bar
                   const FABBottomPadding(),
@@ -158,7 +167,7 @@ class StoriesPage extends StoreWatcher {
                 child: const Text('Jobs'),
               ),
             ],
-            onSelected: this._changeSortMode,
+            onSelected: (sort) => this._changeSortMode(sort, account?.accessCookie),
           ),
         ],
       ),
@@ -167,7 +176,7 @@ class StoriesPage extends StoreWatcher {
       ),
       body: itemStore.items.length > 0 ?
         new RefreshIndicator(
-          onRefresh: () => this._refresh(sortMode),
+          onRefresh: () => this._refresh(sortMode, account?.accessCookie),
           child: storyCards,
         ) :
         loadingStories,

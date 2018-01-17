@@ -105,6 +105,8 @@ class HNItemStatus {
   bool hidden;
   bool seen;
 
+  HNItemAuthTokens authTokens;
+
   HNItemStatus ({
     @required this.id,
     this.loading = false,
@@ -113,6 +115,7 @@ class HNItemStatus {
     this.saved = false,
     this.hidden = false,
     this.seen = false,
+    this.authTokens,
   });
 
   HNItemStatus.fromItem (HNItem item) {
@@ -133,7 +136,32 @@ class HNItemStatus {
     this.saved,
     this.hidden,
     this.seen,
+    this.authTokens,
   });
+}
+
+class HNItemAuthTokens {
+  String upvote;
+  String downvote;
+  String save;
+  String hide;
+  String see;
+
+  HNItemAuthTokens ({
+    this.upvote,
+    this.downvote,
+    this.save,
+    this.hide,
+    this.see,
+  });
+
+  HNItemAuthTokens.fromMap (Map<String, dynamic> map) {
+    upvote = map['upvote'];
+    downvote = map['downvote'];
+    save = map['save'];
+    hide = map['hide'];
+    see = map['see'];
+  }
 }
 
 class HNItemComputed {
