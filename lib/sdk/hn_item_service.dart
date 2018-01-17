@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
 
+import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -19,9 +20,13 @@ class HNItemService {
 
     if (accessCookie != null) {
       this._getItemPageById(id, accessCookie).then((page) async {
-        final status = this._parseItemStatus(id, page);
-        status.authTokens = this._parseItemAuthTokens(id, page);
-        patchItemStatus(status);
+        // final status = this._parseItemStatus(id, page);
+        // status.authTokens = this._parseItemAuthTokens(id, page);
+        // patchItemStatus(status);
+        this._parseAllItems(page).forEach((patch) {
+          print(patch);
+          patchItemStatus(patch);
+        });
       });
     }
 
@@ -85,6 +90,56 @@ class HNItemService {
     );
   }
 
+  List<HNItemStatus> _parseAllItems (String itemPage) {
+    final document = parse(itemPage);
+
+    final upvoteLinks = document.querySelectorAll('''a[id^='up_']''');
+    final downvoteLinks = document.querySelectorAll('''a[id^='down_']''');
+    final hideLinks = document.querySelectorAll('''a[href^='hide']''');
+    final faveLinks = document.querySelectorAll('''a[href^='fave']''');
+
+    // final faveMatches = new RegExp(r'''<a.*?id=(?:"|')up_([0-9]+)(?:"|').*?(class=(?:"|').*?nosee.*?(?:"|'))?.*?>''')
+    //   .allMatches(itemPage);
+    final itemIds = upvoteLinks.map((match) => int.parse(match.id.substring(3)));
+    print('found ${itemIds.length} items');
+    print(itemIds);
+    print(upvoteLinks.length);
+    print(downvoteLinks.length);
+    print(hideLinks.length);
+    print(faveLinks.length);
+
+    final patches = itemIds.map((id) => new HNItemStatus.patch(id: id, authTokens: new HNItemAuthTokens())).toList();
+    patches.forEach((patch) {
+      final upvote = upvoteLinks.firstWhere((a) => a.id == 'up_${patch.id}', orElse: () {});
+      final downvote = downvoteLinks.firstWhere((a) => a.id == 'down_${patch.id}', orElse: () {});
+      final hide = hideLinks.firstWhere((a) => a.attributes['href'].startsWith('hide?id=${patch.id}'), orElse: () {});
+      final fave = faveLinks.firstWhere((a) => a.attributes['href'].startsWith('fave?id=${patch.id}'), orElse: () {});
+
+      if (upvote != null) {
+        patch.upvoted = upvote.classes.contains('nosee');
+        patch.authTokens.upvote =
+          new RegExp(r'vote\?id=' '${patch.id}' '(?:&.*?)?auth=(.+?)&').firstMatch(upvote.attributes['href'])?.group(1);
+      }
+      if (downvote != null) {
+        patch.downvoted = downvote.classes.contains('nosee');
+        patch.authTokens.downvote =
+          new RegExp(r'vote\?id=' '${patch.id}' '(?:&.*?)?auth=(.+?)&').firstMatch(downvote.attributes['href'])?.group(1);
+      }
+      if (hide != null) {
+        patch.hidden = hide.innerHtml.contains('un-hide');
+        patch.authTokens.hide =
+          new RegExp(r'auth=(.+)').firstMatch(hide.attributes['href'])?.group(1);
+      }
+      if (fave != null) {
+        patch.saved = fave.innerHtml.contains('un-fave');
+        patch.authTokens.save =
+          new RegExp(r'auth=(.+)').firstMatch(fave.attributes['href'])?.group(1);
+      }
+    });
+
+    return patches;
+  }
+
   Future<Null> faveItem (HNItemStatus status, HNAccount account) async {
     final bool save = !(status?.saved ?? false);
     toggleSaveItem(status.id);
@@ -105,9 +160,8 @@ class HNItemService {
         .close();
 
       final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-      var a = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body);
-      print(a);
-      if (a != null) {
+      var faved = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body) != null;
+      if (save == faved) {
         return;
       } else {
         throw 'Bad login.';

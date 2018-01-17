@@ -138,6 +138,22 @@ class HNItemStatus {
     this.seen,
     this.authTokens,
   });
+
+  String toString() => dedent('''
+    HNItemStatus:
+      id: $id
+      loading: $loading
+      upvoted: $upvoted
+      downvoted: $downvoted
+      saved: $saved
+      hidden: $hidden
+      seen: $seen
+      authTokens: ${authTokens == null ? 'null' : ''}
+        upvote: ${authTokens?.upvote}
+        downvote: ${authTokens?.downvote}
+        save: ${authTokens?.save}
+        hide: ${authTokens?.hide}
+  ''');
 }
 
 class HNItemAuthTokens {

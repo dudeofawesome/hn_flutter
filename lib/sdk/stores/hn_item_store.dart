@@ -72,7 +72,16 @@ class HNItemStore extends Store {
       itemStatus.saved = status.saved ?? itemStatus.saved;
       itemStatus.hidden = status.hidden ?? itemStatus.hidden;
       itemStatus.seen = status.seen ?? itemStatus.seen;
-      itemStatus.authTokens = status.authTokens ?? itemStatus.authTokens;
+      // itemStatus.authTokens ??= status.authTokens;
+      if (itemStatus.authTokens != null && status.authTokens != null) {
+        itemStatus.authTokens.upvote = status.authTokens.upvote ?? itemStatus.authTokens.upvote;
+        itemStatus.authTokens.downvote = status.authTokens.downvote ?? itemStatus.authTokens.downvote;
+        itemStatus.authTokens.hide = status.authTokens.hide ?? itemStatus.authTokens.hide;
+        itemStatus.authTokens.save = status.authTokens.save ?? itemStatus.authTokens.save;
+        itemStatus.authTokens.see = status.authTokens.see ?? itemStatus.authTokens.see;
+      } else if (status.authTokens != null) {
+        itemStatus.authTokens = status.authTokens;
+      }
     });
   }
 
