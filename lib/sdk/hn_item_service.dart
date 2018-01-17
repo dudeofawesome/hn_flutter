@@ -9,14 +9,18 @@ import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
+import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 class HNItemService {
   final _config = new HNConfig();
   final _httpClient = new HttpClient();
+  final _itemStore = new HNItemStore();
 
   Future<HNItem> getItemByID (int id, [Cookie accessCookie]) {
-    addHNItem(new HNItem(id: id));
-    patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    if (_itemStore.items[id] == null) {
+      addHNItem(new HNItem(id: id));
+      patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    }
 
     if (accessCookie != null) {
       this._getItemPageById(id, accessCookie).then((page) async {
