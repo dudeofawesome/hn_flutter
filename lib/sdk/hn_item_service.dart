@@ -14,13 +14,16 @@ class HNItemService {
   final _httpClient = new HttpClient();
 
   Future<HNItem> getItemByID (int id) {
-    addHNItem(new HNItemAction(new HNItem(id: id), new HNItemStatus.patch(id: id, loading: true)));
+    addHNItem(new HNItem(id: id));
+    patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
 
     return http.get('${this._config.url}/item/$id.json')
       .then((res) => JSON.decode(res.body))
       .then((item) => new HNItem.fromMap(item))
       .then((item) {
-        addHNItem(new HNItemAction(item, new HNItemStatus.patch(id: id, loading: false)));
+        addHNItem(item);
+        patchItemStatus(new HNItemStatus.patch(id: id, loading: false));
+
         return item;
       });
   }

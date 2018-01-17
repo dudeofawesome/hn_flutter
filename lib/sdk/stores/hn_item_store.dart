@@ -5,17 +5,19 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 class HNItemStore extends Store {
   HNItemStore () {
-    triggerOnAction(addHNItem, (HNItemAction action) {
+    triggerOnAction(addHNItem, (HNItem item) {
       // if (action.status != null) {
       //   _setStatusDefaults(action.status);
       // }
 
-      this._items[action.item.id] = action.item;
-      if (action.status != null) {
-        this._itemStatuses[action.item.id] = action.status;
-      } else {
-        this._itemStatuses[action.item.id] = new HNItemStatus(id: action.item.id);
-      }
+      // this._items[action.item.id] = action.item;
+      // if (action.status != null) {
+      //   this._itemStatuses[action.item.id] = action.status;
+      // } else {
+      //   this._itemStatuses[action.item.id] = new HNItemStatus(id: action.item.id);
+      // }
+
+      this._items[item.id] = item;
     });
 
     triggerOnAction(markAsSeen, (int itemId) {
@@ -38,7 +40,7 @@ class HNItemStore extends Store {
     });
 
     triggerOnAction(toggleDownvoteItem, (int itemId) {
-      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+      final itemStatus = this._itemStatuses[itemId];
 
       // TODO: don't mutate the old state but rather make a clone
       itemStatus.downvoted = !(itemStatus?.downvoted ?? false);
@@ -49,10 +51,27 @@ class HNItemStore extends Store {
     });
 
     triggerOnAction(showHideItem, (int itemId) {
-      final HNItemStatus itemStatus = this._itemStatuses[itemId];
+      final itemStatus = this._itemStatuses[itemId];
 
       // TODO: don't mutate the old state but rather make a clone
       itemStatus.hidden = !(itemStatus?.hidden ?? false);
+    });
+
+    triggerOnAction(patchItemStatus, (HNItemStatus status) {
+      var itemStatus = this._itemStatuses[status.id];
+
+      if (itemStatus == null) {
+        this._itemStatuses[status.id] = new HNItemStatus(id: status.id);
+        itemStatus = this._itemStatuses[status.id];
+      }
+
+      // TODO: don't mutate the old state but rather make a clone
+      itemStatus.loading = status.loading ?? itemStatus.loading;
+      itemStatus.upvoted = status.upvoted ?? itemStatus.upvoted;
+      itemStatus.downvoted = status.downvoted ?? itemStatus.downvoted;
+      itemStatus.saved = status.saved ?? itemStatus.saved;
+      itemStatus.hidden = status.hidden ?? itemStatus.hidden;
+      itemStatus.seen = status.seen ?? itemStatus.seen;
     });
   }
 

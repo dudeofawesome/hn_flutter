@@ -22,17 +22,13 @@ import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryPage extends StoreWatcher {
-  final int id;
   final int itemId;
   final HNItemService _hnItemService = new HNItemService();
 
   StoryPage ({
     Key key,
-    this.id,
     @required this.itemId,
   }) : super(key: key) {
-    // final HNCommentService hnCommentService = new HNCommentService();
-    // hnCommentService.getItemByID(id)
     markAsSeen(this.itemId);
   }
 

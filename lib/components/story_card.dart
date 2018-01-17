@@ -94,7 +94,7 @@ class StoryCard extends StoreWatcher {
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
-    if (story == null || storyStatus.loading) {
+    if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new HNItemService();
         _hnItemService.getItemByID(storyId);

@@ -11,9 +11,8 @@ import 'package:hn_flutter/sdk/models/hn_account.dart';
 class HNAuthService {
   static final HNAuthService _singleton = new HNAuthService._internal();
 
+  final _config = new HNConfig();
   final _httpClient = new HttpClient();
-
-  HNConfig _config = new HNConfig();
 
   HNAuthService._internal ();
 

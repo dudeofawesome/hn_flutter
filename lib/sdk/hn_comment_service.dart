@@ -17,7 +17,7 @@ class HNCommentService {
       .then((List<int> body) => body.sublist(0, 5))
       .then((List<int> body) => Future.wait(body.map((itemId) => this._itemService.getItemByID(itemId)).toList()))
       .then((List<HNItem> children) {
-        children.forEach((child) => addHNItem(new HNItemAction(child)));
+        children.forEach((child) => addHNItem(child));
       })
     );
   }
