@@ -144,7 +144,7 @@ class Comment extends StoreWatcher {
                   padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
                   decoration: new BoxDecoration(
                     borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
-                    color: Theme.of(context).accentColor,
+                    color: Colors.blue,
                   ),
                   child: new Text(
                     comment.by,
