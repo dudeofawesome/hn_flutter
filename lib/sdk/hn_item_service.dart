@@ -79,7 +79,7 @@ class HNItemService {
         .firstMatch(itemPage) != null,
       downvoted: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
         .firstMatch(itemPage) != null,
-      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage) != null,
+      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-hide''').firstMatch(itemPage) != null,
       saved: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage) != null,
       // seen: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage)[1],
     );
