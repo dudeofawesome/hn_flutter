@@ -70,6 +70,7 @@ class HNItemStore extends Store {
         itemStatus.authTokens.hide = status.authTokens.hide ?? itemStatus.authTokens.hide;
         itemStatus.authTokens.save = status.authTokens.save ?? itemStatus.authTokens.save;
         itemStatus.authTokens.see = status.authTokens.see ?? itemStatus.authTokens.see;
+        itemStatus.authTokens.reply = status.authTokens.reply ?? itemStatus.authTokens.reply;
       } else if (status.authTokens != null) {
         itemStatus.authTokens = status.authTokens;
       }

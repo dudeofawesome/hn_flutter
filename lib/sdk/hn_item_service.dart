@@ -87,6 +87,7 @@ class HNItemService {
     final downvoteLinks = document.querySelectorAll('''a[id^='down_']''');
     final hideLinks = document.querySelectorAll('''a[href^='hide']''');
     final faveLinks = document.querySelectorAll('''a[href^='fave']''');
+    final replyLinks = document.querySelectorAll('''input[name='hmac']''');
 
     final itemIds = upvoteLinks.map((match) => int.parse(match.id.substring(3)));
 
@@ -96,6 +97,12 @@ class HNItemService {
       final downvote = downvoteLinks.firstWhere((a) => a.id == 'down_${patch.id}', orElse: () {});
       final hide = hideLinks.firstWhere((a) => a.attributes['href'].startsWith('hide?id=${patch.id}'), orElse: () {});
       final fave = faveLinks.firstWhere((a) => a.attributes['href'].startsWith('fave?id=${patch.id}'), orElse: () {});
+      final reply = replyLinks.firstWhere((input) =>
+        input.parent.children.firstWhere(
+          (i) => i.attributes['name'] == 'parent' && i.attributes['value'] == '${patch.id}', orElse: () {}
+        ) != null,
+        orElse: () {}
+      );
 
       if (upvote != null) {
         patch.upvoted = upvote.classes.contains('nosee');
@@ -116,6 +123,9 @@ class HNItemService {
         patch.saved = fave.innerHtml.contains('un-fave');
         patch.authTokens.save =
           new RegExp(r'auth=(.+)').firstMatch(fave.attributes['href'])?.group(1);
+      }
+      if (reply != null) {
+        patch.authTokens.reply = reply.attributes['value'];
       }
     });
 

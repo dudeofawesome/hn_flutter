@@ -210,11 +210,11 @@ class Comment extends StoreWatcher {
               icon: const Icon(Icons.reply),
               color: Colors.white,
               tooltip: 'Reply',
-              onPressed: /* commentStatus?.authTokens?.reply != null ?
+              onPressed: commentStatus?.authTokens?.reply != null ?
                 () {
                   selectItem(comment.id);
                   this._reply(comment.id);
-                } : */
+                } :
                 null,
             );
           case BarButtons.SAVE:

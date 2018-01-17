@@ -153,6 +153,7 @@ class HNItemStatus {
         downvote: ${authTokens?.downvote}
         save: ${authTokens?.save}
         hide: ${authTokens?.hide}
+        reply: ${authTokens?.reply}
   ''');
 }
 
@@ -162,6 +163,7 @@ class HNItemAuthTokens {
   String save;
   String hide;
   String see;
+  String reply;
 
   HNItemAuthTokens ({
     this.upvote,
@@ -169,6 +171,7 @@ class HNItemAuthTokens {
     this.save,
     this.hide,
     this.see,
+    this.reply,
   });
 
   HNItemAuthTokens.fromMap (Map<String, dynamic> map) {
@@ -177,6 +180,7 @@ class HNItemAuthTokens {
     save = map['save'];
     hide = map['hide'];
     see = map['see'];
+    reply = map['reply'];
   }
 }
 
