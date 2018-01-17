@@ -4,7 +4,9 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 class HNItemStore extends Store {
-  HNItemStore () {
+  static final HNItemStore _singleton = new HNItemStore._internal();
+
+  HNItemStore._internal () {
     triggerOnAction(addHNItem, (HNItem item) {
       this._items[item.id] = item;
     });
@@ -74,6 +76,10 @@ class HNItemStore extends Store {
     });
   }
 
+  factory HNItemStore () {
+    return _singleton;
+  }
+
   Map<int, HNItem> _items = new Map();
   Map<int, HNItemStatus> _itemStatuses = new Map();
   List<int> _sortedStoryIds = <int>[];
@@ -81,8 +87,6 @@ class HNItemStore extends Store {
   Map<int, HNItem> get items => new Map.unmodifiable(_items);
   Map<int, HNItemStatus> get itemStatuses => new Map.unmodifiable(_itemStatuses);
   List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
-
-  // bool get isComposing => _currentMessage.isNotEmpty;
 
   _setStatusDefaults (HNItemStatus status) {
     if (status.downvoted == null) {
