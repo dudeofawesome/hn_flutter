@@ -17,85 +17,28 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
-import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryPage extends StatefulWidget {
-  final HNItemService _hnItemService = new HNItemService();
-  final _accountStore = new HNAccountStore();
-
   final int itemId;
-  bool old = false;
 
   StoryPage ({
     Key key,
     @required this.itemId,
-  }) : super(key: key) {
-    markAsSeen(this.itemId);
-
-    this.refreshStory(_accountStore.primaryAccount?.accessCookie);
-
-    old = true;
-  }
+  }) : super(key: key);
 
   @override
   _StoryPageState createState () => new _StoryPageState();
-
-  void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(true, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
-  }
-
-  void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(false, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
-  }
-
-  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
-    this._hnItemService.faveItem(storyStatus, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
-    // toggleSaveItem(this.storyId);
-  }
-
-  Future<Null> _shareStory (String storyUrl) async {
-    await share(storyUrl);
-  }
-
-  _reply (int itemId) {}
-
-  Future<Null> refreshStory (Cookie accessCookie) async {
-    await this._hnItemService.getItemByID(this.itemId, accessCookie);
-  }
-
-  _openStoryUrl (BuildContext ctx, String url) async {
-    if (await UrlLauncher.canLaunch(url)) {
-      await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
-    }
-  }
-
-  void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
-  }
 }
 
 class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage> {
-  HNItemStore _itemStore;
+  final _hnItemService = new HNItemService();
+
   HNAccountStore _accountStore;
+  HNItemStore _itemStore;
 
   @override
   void initState () {
@@ -103,6 +46,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     this._itemStore = listenToStore(itemStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
+
+    markAsSeen(widget.itemId);
+    this.refreshStory(_accountStore.primaryAccount?.accessCookie);
   }
 
   @override
@@ -175,7 +121,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               tooltip: 'Upvote',
               iconSize: 20.0,
               onPressed: itemStatus?.authTokens?.upvote != null ?
-                () => widget._upvoteStory(context, itemStatus, account) :
+                () => this._upvoteStory(context, itemStatus, account) :
                 null,
               color: (itemStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
@@ -192,7 +138,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               tooltip: 'Save',
               iconSize: 20.0,
               onPressed: itemStatus?.authTokens?.save != null ?
-                () => widget._saveStory(context, itemStatus, account) :
+                () => this._saveStory(context, itemStatus, account) :
                 null,
               color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
             ),
@@ -231,11 +177,11 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               onSelected: (OverflowMenuItems selection) async {
                 switch (selection) {
                   case OverflowMenuItems.SHARE:
-                    return await widget._shareStory('https://news.ycombinator.com/item?id=${item.id}');
+                    return await this._shareStory('https://news.ycombinator.com/item?id=${item.id}');
                   case OverflowMenuItems.COPY_TEXT:
                     return await Clipboard.setData(new ClipboardData(text: item.computed.simpleText));
                   case OverflowMenuItems.VIEW_PROFILE:
-                    return widget._viewProfile(context, item.by);
+                    return this._viewProfile(context, item.by);
                 }
               },
             ),
@@ -248,7 +194,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     if (item.url != null) {
       cardContent = <Widget>[
         new GestureDetector(
-          onTap: () => widget._openStoryUrl(context, item.url),
+          onTap: () => this._openStoryUrl(context, item.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,
             children: <Widget>[
@@ -347,7 +293,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         actions: <Widget>[],
       ),
       body: new RefreshIndicator(
-        onRefresh: () => widget.refreshStory(account.accessCookie),
+        onRefresh: () => this.refreshStory(account.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
             itemCount: (item.kids?.length ?? 1) + 2,
@@ -376,11 +322,59 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: () => widget._reply(item.id),
+        onPressed: () => this._reply(item.id),
         tooltip: 'Reply',
         child: const Icon(Icons.reply),
       ),
     );
+  }
+
+  void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(true, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
+  }
+
+  void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(false, status, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
+  }
+
+  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
+    this._hnItemService.faveItem(storyStatus, account)
+      .catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      });
+    // toggleSaveItem(this.storyId);
+  }
+
+  Future<Null> _shareStory (String storyUrl) async {
+    await share(storyUrl);
+  }
+
+  _reply (int itemId) {}
+
+  Future<Null> refreshStory (Cookie accessCookie) async {
+    await this._hnItemService.getItemByID(widget.itemId, accessCookie);
+  }
+
+  _openStoryUrl (BuildContext ctx, String url) async {
+    if (await UrlLauncher.canLaunch(url)) {
+      await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
+    }
+  }
+
+  void _viewProfile (BuildContext ctx, String author) {
+    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
   }
 }
 
