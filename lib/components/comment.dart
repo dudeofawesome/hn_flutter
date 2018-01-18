@@ -436,7 +436,7 @@ class Comment extends StoreWatcher {
 
       return new Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        child: new Text('Load more'),
+        child: new Text('Loading…'),
       );
     }
   }

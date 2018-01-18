@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
-import 'dart:io' show HttpClient, Cookie;
+import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
@@ -216,5 +216,33 @@ class HNItemService {
           return;
         }
       });
+  }
+
+  Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
+    final req = await (await _httpClient.postUrl(Uri.parse(
+        '${this._config.apiHost}/comment'
+        '?parent=$parentId'
+        '&goto=item%3Fid%3D$parentId'
+        '&hmac=${authTokens.reply}'
+        '&text=${Uri.encodeComponent(comment)}'
+      ))
+      ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
+      ..cookies.add(accessCookie))
+      .close();
+
+    print(req.headers);
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    print(body);
+    if (body.contains('Bad login')) {
+      throw 'Bad login.';
+    // } else if (
+    //   body.contains('<title>Add Comment | Hacker News</title>') &&
+    //   body.contains('Please confirm that this is your comment')
+    // ) {
+    //   // Looks like we need to submit the comment again
+    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    }
+
+    return null;
   }
 }
