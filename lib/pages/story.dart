@@ -40,6 +40,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   HNAccountStore _accountStore;
   HNItemStore _itemStore;
 
+  ScrollController _scrollController;
+
   @override
   void initState () {
     super.initState();
@@ -47,8 +49,20 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._itemStore = listenToStore(itemStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
 
+    this._scrollController = new ScrollController();
+
     markAsSeen(widget.itemId);
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
+  }
+
+  Future<Null> _scrollToTop () async {
+    if (this._scrollController.hasClients) {
+      await this._scrollController.animateTo(
+        0.0,
+        duration: new Duration(milliseconds: 500),
+        curve: Curves.bounceOut
+      );
+    }
   }
 
   @override
@@ -286,13 +300,20 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: new Text(item?.title ?? '…'),
+        title: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+          child: new Text(item?.title ?? '…'),
+        ),
+        flexibleSpace: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+        ),
         actions: <Widget>[],
       ),
       body: new RefreshIndicator(
         onRefresh: () => this.refreshStory(account?.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
+            controller: this._scrollController,
             itemCount: (item.kids?.length ?? 1) + 2,
             itemBuilder: (context, index) {
               if (index == 0) {
