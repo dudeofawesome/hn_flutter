@@ -21,7 +21,6 @@ class UIStore extends Store {
 
       String keysPath = join(this._documentsDirectory.path, KEYS_DB);
       this._keysDb = await openDatabase(keysPath, version: 1, onCreate: (Database db, int version) async {
-        print('CREATING KEYS TABLE');
         await db.execute('CREATE TABLE $KEYS_TABLE ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)');
       });
 
@@ -34,7 +33,6 @@ class UIStore extends Store {
       );
 
       if (storySortModeKeys.length > 0) {
-        print('primary account was ${storySortModeKeys.first[KEYS_VALUE]}');
         setStorySortMode(SortModes.values[int.parse(storySortModeKeys.first[KEYS_VALUE])]);
       }
     }).then((a) {});
