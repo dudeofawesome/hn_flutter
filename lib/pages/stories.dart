@@ -31,6 +31,7 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
   UIStore _uiStore;
 
   ScrollController _scrollController;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState () {
@@ -149,10 +150,14 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         // the App.build method, and use it to set our appbar title.
         title: const Text('Butterfly Reader'),
         actions: <Widget>[
-          // const IconButton(
-          //   icon: const Icon(Icons.sort),
-          //   tooltip: 'Sort',
-          // ),
+          new IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () {
+              this._refreshIndicatorKey.currentState.show();
+              this._refresh(sortMode, account.accessCookie);
+            },
+          ),
           new PopupMenuButton<SortModes>(
             icon: const Icon(Icons.sort),
             initialValue: sortMode,
@@ -191,6 +196,7 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
       ),
       body: stories.length > 0 ?
         new RefreshIndicator(
+          key: this._refreshIndicatorKey,
           onRefresh: () => this._refresh(sortMode, account?.accessCookie),
           child: storyCards,
         ) :
