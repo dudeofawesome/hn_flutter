@@ -66,18 +66,22 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         break;
     }
 
-    if (this._scrollController.hasClients) {
-      this._scrollController.animateTo(
-        0.0,
-        duration: new Duration(milliseconds: 500),
-        curve: Curves.bounceOut
-      );
-    }
+    this._scrollToTop();
   }
 
   Future<Null> _changeSortMode (SortModes sortMode, Cookie accessCookie) async {
     setStorySortMode(sortMode);
     await this._refresh(sortMode, accessCookie);
+  }
+
+  Future<Null> _scrollToTop () async {
+    if (this._scrollController.hasClients) {
+      await this._scrollController.animateTo(
+        0.0,
+        duration: new Duration(milliseconds: 500),
+        curve: Curves.bounceOut
+      );
+    }
   }
 
   @override
@@ -148,7 +152,13 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: const Text('Butterfly Reader'),
+        title: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+          child: const Text('Butterfly Reader'),
+        ),
+        flexibleSpace: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+        ),
         actions: <Widget>[
           new IconButton(
             icon: const Icon(Icons.refresh),
