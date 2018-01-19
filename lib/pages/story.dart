@@ -60,7 +60,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       await this._scrollController.animateTo(
         0.0,
         duration: new Duration(milliseconds: 500),
-        curve: Curves.bounceOut
+        curve: Curves.easeInOut
       );
     }
   }
