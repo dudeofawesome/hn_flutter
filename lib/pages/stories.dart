@@ -14,17 +14,33 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
-class StoriesPage extends StoreWatcher {
-  final HNStoryService _hnStoryService = new HNStoryService();
-
+class StoriesPage extends StatefulWidget {
   StoriesPage ({
-    Key key
+    Key key,
   }) : super(key: key);
 
   @override
-  void initStores(ListenToStore listenToStore) {
-    listenToStore(itemStoreToken);
-    listenToStore(uiStoreToken);
+  _StoriesPageState createState () => new _StoriesPageState();
+}
+
+class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<StoriesPage> {
+  final HNStoryService _hnStoryService = new HNStoryService();
+
+  HNAccountStore _accountStore;
+  HNItemStore _itemStore;
+  UIStore _uiStore;
+
+  ScrollController _scrollController;
+
+  @override
+  void initState () {
+    super.initState();
+
+    this._accountStore = listenToStore(accountStoreToken);
+    this._itemStore = listenToStore(itemStoreToken);
+    this._uiStore = listenToStore(uiStoreToken);
+
+    this._scrollController = new ScrollController();
   }
 
   Future<Null> _refresh (SortModes sortMode, Cookie accessCookie) async {
@@ -48,6 +64,14 @@ class StoriesPage extends StoreWatcher {
         await this._hnStoryService.getJobStories(accessCookie: accessCookie);
         break;
     }
+
+    if (this._scrollController.hasClients) {
+      this._scrollController.animateTo(
+        0.0,
+        duration: new Duration(milliseconds: 500),
+        curve: Curves.bounceOut
+      );
+    }
   }
 
   Future<Null> _changeSortMode (SortModes sortMode, Cookie accessCookie) async {
@@ -56,25 +80,19 @@ class StoriesPage extends StoreWatcher {
   }
 
   @override
-  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    final HNAccountStore accountStore = stores[accountStoreToken];
-    final HNItemStore itemStore = stores[itemStoreToken];
-    final UIStore uiStore = stores[uiStoreToken];
 
-    final account = accountStore?.primaryAccount;
+    final account = this._accountStore?.primaryAccount;
 
-    final stories = itemStore.sortedStoryIds;
-      // .where((itemId) => !(itemStore.itemStatuses[itemId]?.hidden ?? false))
-      // .map((itemId) => itemStore.items[itemId])
-      // .takeWhile((story) => story != null);
+    final stories = this._itemStore.sortedStoryIds;
 
-    final sortMode = uiStore.sortMode;
+    final sortMode = this._uiStore.sortMode;
 
     if (stories == null || stories.length == 0) {
       this._refresh(sortMode, account?.accessCookie);
@@ -82,6 +100,7 @@ class StoriesPage extends StoreWatcher {
 
     final storyCards = new Scrollbar(
       child: new ListView.builder(
+        controller: this._scrollController,
         itemCount: stories.length + 2,
         itemBuilder: (context, index) {
           if (index == 0) {
