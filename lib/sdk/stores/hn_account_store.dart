@@ -11,28 +11,19 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
+import 'package:hn_flutter/sdk/local_storage_service.dart';
 
 class HNAccountStore extends Store {
   static final HNAccountStore _singleton = new HNAccountStore._internal();
 
-  Directory _documentsDirectory;
-  Database _keysDb;
-  Database _accountsDb;
+  final LocalStorageService _localStorage = new LocalStorageService();
 
   String _primaryAccountId;
   final Map<String, HNAccount> _accounts = new Map();
 
   HNAccountStore._internal () {
     new Future(() async {
-      this._documentsDirectory = await getApplicationDocumentsDirectory();
-
-      String keysPath = join(this._documentsDirectory.path, KEYS_DB);
-      this._keysDb = await openDatabase(keysPath, version: 1, onCreate: (Database db, int version) async {
-        print('CREATING KEYS TABLE');
-        await db.execute('CREATE TABLE $KEYS_TABLE ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)');
-      });
-
-      final primaryUserIdKeys = await this._keysDb.query(
+      final primaryUserIdKeys = await this._localStorage.databases[KEYS_DB].query(
         KEYS_TABLE,
         columns: [KEYS_ID, KEYS_VALUE],
         where: '$KEYS_ID = ?',
@@ -40,16 +31,7 @@ class HNAccountStore extends Store {
         limit: 1,
       );
 
-      String accountsPath = join(this._documentsDirectory.path, ACCOUNTS_DB);
-      this._accountsDb = await openDatabase(accountsPath, version: 1, onCreate: (Database db, int version) async {
-        print('CREATING ACCOUNTS TABLE');
-        await db.execute('''
-          CREATE TABLE $ACCOUNTS_TABLE
-            ($ACCOUNTS_ID TEXT PRIMARY KEY, $ACCOUNTS_EMAIL TEXT, $ACCOUNTS_PASSWORD TEXT, $ACCOUNTS_ACCESS_COOKIE TEXT)
-        ''');
-      });
-
-      final accounts = await this._accountsDb.query(
+      final accounts = await this._localStorage.databases[ACCOUNTS_DB].query(
         ACCOUNTS_TABLE,
         columns: [ACCOUNTS_ID, ACCOUNTS_EMAIL, ACCOUNTS_PASSWORD, ACCOUNTS_ACCESS_COOKIE],
       );
@@ -86,7 +68,7 @@ class HNAccountStore extends Store {
         'secure': user.accessCookie.secure,
       });
 
-      await this._accountsDb.rawInsert(
+      await this._localStorage.databases[ACCOUNTS_DB].rawInsert(
         '''
         INSERT OR REPLACE INTO $ACCOUNTS_TABLE ($ACCOUNTS_ID, $ACCOUNTS_EMAIL, $ACCOUNTS_PASSWORD, $ACCOUNTS_ACCESS_COOKIE)
           VALUES (?, ?, ?, ?);
@@ -102,7 +84,7 @@ class HNAccountStore extends Store {
 
       print('Removing $userId from SQLite');
 
-      await this._accountsDb.delete(
+      await this._localStorage.databases[ACCOUNTS_DB].delete(
         ACCOUNTS_TABLE,
         where: '$ACCOUNTS_ID = ?',
         whereArgs: [userId],
@@ -111,7 +93,7 @@ class HNAccountStore extends Store {
       print('Removed $userId from SQLite');
 
       if (this._accounts.length == 0) {
-        await this._keysDb.delete(
+        await this._localStorage.databases[KEYS_DB].delete(
           KEYS_TABLE,
           where: '$KEYS_ID = ?',
           whereArgs: [KEY_PRIMARY_ACCOUNT_ID],
@@ -125,7 +107,7 @@ class HNAccountStore extends Store {
     triggerOnAction(setPrimaryHNAccount, (String userId) async {
       this._primaryAccountId = userId;
 
-      this._keysDb.rawInsert(
+      this._localStorage.databases[KEYS_DB].rawInsert(
         '''
         INSERT OR REPLACE INTO $KEYS_TABLE ($KEYS_ID, $KEYS_VALUE)
           VALUES (?, ?);

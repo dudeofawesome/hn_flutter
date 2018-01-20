@@ -397,7 +397,9 @@ class Comment extends StoreWatcher {
                     left: this.depth > 0 ? new BorderSide(
                       width: 4.0,
                       color: commentColor,
-                    ) : const BorderSide(),
+                    ) : const BorderSide(
+                      width: 0.0,
+                    ),
                     bottom: const BorderSide(
                       width: 1.0,
                       color: Colors.black12,
