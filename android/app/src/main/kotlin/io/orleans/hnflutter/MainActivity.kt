@@ -33,8 +33,8 @@ class MainActivity (): FlutterActivity() {
   private fun checkForLinkEvent(intent: Intent) {
     Log.d(LOG_TAG, "CHECKING INTENT FOR LINK")
     Log.d(LOG_TAG, intent.toString())
-    Log.d(LOG_TAG, intent?.action?.toString() ?: "no action")
-    Log.d(LOG_TAG, intent?.data?.toString() ?: "no data")
+    Log.d(LOG_TAG, intent.action?.toString() ?: "no action")
+    Log.d(LOG_TAG, intent.data?.toString() ?: "no data")
 
     if (intent.action == Intent.ACTION_VIEW) {
       val path = intent.data.getQueryParameter("path")
