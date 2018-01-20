@@ -115,9 +115,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "5426c00e32b7566a49b24e38376d77fa6133bfc7"
-      url: "git@github.com:victorbonnet/flutter_web_browser.git"
+      ref: "feat/upgrade-gradle"
+      resolved-ref: c381ed360923f15a99f663f83ed5fef221b5db6f
+      url: "git@github.com:dudeofawesome/flutter_web_browser.git"
     source: git
     version: "0.0.1"
   front_end:
@@ -441,7 +441,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "2.0.1"
   utf:
     dependency: transitive
     description:
