@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart' show
@@ -14,13 +16,12 @@ import 'package:hn_flutter/pages/user.dart';
 
 import 'package:hn_flutter/router.dart';
 
-import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/local_storage_service.dart';
 
-void main() {
+Future<Null> main () async {
+  await new LocalStorageService().init();
+
   runApp(new HNApp());
-
-  // final HNStoryService _hnStoryService = new HNStoryService();
-  // _hnStoryService.getTopStories();
 }
 
 class HNApp extends StatefulWidget {

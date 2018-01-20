@@ -8,23 +8,16 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
+import 'package:hn_flutter/sdk/local_storage_service.dart';
 
 class UIStore extends Store {
   static final UIStore _singleton = new UIStore._internal();
 
-  Directory _documentsDirectory;
-  Database _keysDb;
+  final LocalStorageService _localStorage = new LocalStorageService();
 
   UIStore._internal () {
     new Future(() async {
-      this._documentsDirectory = await getApplicationDocumentsDirectory();
-
-      String keysPath = join(this._documentsDirectory.path, KEYS_DB);
-      this._keysDb = await openDatabase(keysPath, version: 1, onCreate: (Database db, int version) async {
-        await db.execute('CREATE TABLE $KEYS_TABLE ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)');
-      });
-
-      final storySortModeKeys = await this._keysDb.query(
+      final storySortModeKeys = await this._localStorage.databases[KEYS_DB].query(
         KEYS_TABLE,
         columns: [KEYS_ID, KEYS_VALUE],
         where: '$KEYS_ID = ?',
@@ -48,7 +41,7 @@ class UIStore extends Store {
     triggerOnAction(setStorySortMode, (SortModes sortMode) async {
       _sortMode = sortMode;
 
-      await this._keysDb.rawInsert(
+      await this._localStorage.databases[KEYS_DB].rawInsert(
         '''
         INSERT OR REPLACE INTO $KEYS_TABLE ($KEYS_ID, $KEYS_VALUE)
           VALUES (?, ?);
