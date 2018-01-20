@@ -44,14 +44,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="https" android:host="news.ycombinator.com" />
-            </intent-filter>
-
-            <intent-filter android:label="@string/filter_title_item" >
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="http" android:host="news.ycombinator.com" />
             </intent-filter>
 
