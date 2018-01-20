@@ -383,7 +383,12 @@ class Comment extends StoreWatcher {
       return new Column(
         children: <Widget>[
           new GestureDetector(
-            onTap: () => selectItem(comment.id),
+            onTap: () {
+              if (selectedItemStore.item != comment.id && commentStatus.authTokens.reply == null) {
+                _hnItemService.getItemAuthById(comment.id, account.accessCookie);
+              }
+              selectItem(comment.id);
+            },
             onLongPress: () {
               SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
               showHideItem(comment.id);

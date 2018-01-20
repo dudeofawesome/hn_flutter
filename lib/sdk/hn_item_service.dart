@@ -41,9 +41,40 @@ class HNItemService {
       });
   }
 
+  Future<Null> getItemAuthById (int id, Cookie accessCookie) async {
+    if (_itemStore.items[id] == null) {
+      addHNItem(new HNItem(id: id));
+      patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    }
+
+    this._getItemReplyPageById(id, accessCookie).then((replyPage) async {
+      this._parseAllItems(replyPage).forEach((patch) {
+        print(patch);
+        patchItemStatus(patch);
+      });
+    });
+  }
+
   Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
     final req = await (await _httpClient.getUrl(Uri.parse(
         '${this._config.apiHost}/item'
+        '?id=$itemId'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+      throw 'Invalid or expired auth cookie';
+    }
+
+    return body;
+  }
+
+  Future<String> _getItemReplyPageById (int itemId, Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/reply'
         '?id=$itemId'
       ))
       ..cookies.add(accessCookie))
