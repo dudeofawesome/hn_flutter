@@ -43,7 +43,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:host="news.ycombinator.com" android:scheme="https" />
+                <data android:scheme="https" android:host="news.ycombinator.com" />
             </intent-filter>
 
             <intent-filter android:label="@string/filter_title_item" >
@@ -52,7 +52,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:host="news.ycombinator.com" android:scheme="http" />
+                <data android:scheme="http" android:host="news.ycombinator.com" />
             </intent-filter>
 
         </activity>

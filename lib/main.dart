@@ -21,6 +21,7 @@ void main() {
 
   // final HNStoryService _hnStoryService = new HNStoryService();
   // _hnStoryService.getTopStories();
+  // registerDeepLinkChannel();
 }
 
 class HNApp extends StatefulWidget {
@@ -69,9 +70,15 @@ class HNAppState extends State<HNApp> {
     return null;
   }
 
+  @override
+  initState () {
+    super.initState();
+    registerDeepLinkChannel();
+  }
+
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build (BuildContext context) {
     // assert(() {
     //   debugPaintSizeEnabled = _configuration.debugShowSizes;
     //   debugPaintBaselinesEnabled = _configuration.debugShowBaselines;
@@ -96,10 +103,7 @@ class HNAppState extends State<HNApp> {
       // debugShowMaterialGrid: _configuration.debugShowGrid,
       // showPerformanceOverlay: _configuration.showPerformanceOverlay,
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
-      routes: <String, WidgetBuilder>{
-        '/': (BuildContext context) => new StoriesPage(),
-        '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage()
-      },
+      routes: staticRoutes,
       onGenerateRoute: _getRoute,
     );
   }
