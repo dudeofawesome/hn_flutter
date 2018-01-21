@@ -101,7 +101,64 @@ class Comment extends StoreWatcher {
     await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
-  void _reply (int itemId) {
+  Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
+    String comment;
+    comment = await showDialog(
+      context: ctx,
+      child: new SimpleDialog(
+        title: const Text('Reply'),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        children: <Widget>[
+          new TextField(
+            maxLines: null,
+            autofocus: true,
+            autocorrect: true,
+            keyboardType: TextInputType.text,
+            decoration: new InputDecoration(
+              labelText: 'Comment',
+            ),
+            onChanged: (val) => comment = val,
+          ),
+          const Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+          ),
+          new ButtonTheme.bar(
+            child: new ButtonBar(
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text('Cancel'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                new FlatButton(
+                  child: new Text('Reply'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx, comment),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
+    );
+
+    print(comment);
+
+    if (comment != null) {
+      await this._hnItemService.replyToItemById(
+        status.id,
+        comment,
+        status.authTokens,
+        account.accessCookie,
+      ).catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+        throw err;
+      });
+
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Comment added.'),
+      ));
+    }
   }
 
   void _viewProfile (BuildContext ctx, String author) {
@@ -223,7 +280,7 @@ class Comment extends StoreWatcher {
               onPressed: commentStatus?.authTokens?.reply != null ?
                 () {
                   selectItem(comment.id);
-                  this._reply(comment.id);
+                  this._reply(context, commentStatus, account);
                 } :
                 null,
             );
@@ -339,7 +396,7 @@ class Comment extends StoreWatcher {
                 case BarButtons.DOWNVOTE:
                   return this._downvoteComment(context, commentStatus, account);
                 case BarButtons.REPLY:
-                  return this._reply(comment.id);
+                  return this._reply(context, commentStatus, account);
                 case BarButtons.SAVE:
                   return this._saveComment(context, commentStatus, account);
                 case BarButtons.VIEW_PROFILE:
