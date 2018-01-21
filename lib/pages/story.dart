@@ -9,11 +9,14 @@ import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:tuple/tuple.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
@@ -49,7 +52,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._itemStore = listenToStore(itemStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
 
-    this._scrollController = new ScrollController();
+    this._scrollController = new ScrollController(
+      initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0,
+    );
 
     markAsSeen(widget.itemId);
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
@@ -63,6 +68,11 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         curve: Curves.easeInOut
       );
     }
+  }
+
+  Future<bool> _onPopScope () async {
+    setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.position.pixels));
+    return true;
   }
 
   @override
@@ -295,55 +305,58 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     //     ),
     //   );
 
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new GestureDetector(
-          onTap: () => this._scrollToTop(),
-          child: new Text(item?.title ?? '…'),
+    return new WillPopScope(
+      onWillPop: this._onPopScope,
+      child: new Scaffold(
+        appBar: new AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: new GestureDetector(
+            onTap: () => this._scrollToTop(),
+            child: new Text(item?.title ?? '…'),
+          ),
+          flexibleSpace: new GestureDetector(
+            onTap: () => this._scrollToTop(),
+          ),
+          actions: <Widget>[],
         ),
-        flexibleSpace: new GestureDetector(
-          onTap: () => this._scrollToTop(),
-        ),
-        actions: <Widget>[],
-      ),
-      body: new RefreshIndicator(
-        onRefresh: () => this.refreshStory(account?.accessCookie),
-        child: new Scrollbar(
-          child: new ListView.builder(
-            controller: this._scrollController,
-            itemCount: (item.kids?.length ?? 1) + 2,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return storyCard;
-              } else if (index == (item.kids?.length ?? 1) + 1) {
-                return const FABBottomPadding();
-              } else {
-                if (item.kids != null && item.kids.length > 0) {
-                  return new Comment(
-                    itemId: item.kids[index - 1],
-                    op: item.by,
-                  );
+        body: new RefreshIndicator(
+          onRefresh: () => this.refreshStory(account?.accessCookie),
+          child: new Scrollbar(
+            child: new ListView.builder(
+              controller: this._scrollController,
+              itemCount: (item.kids?.length ?? 1) + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return storyCard;
+                } else if (index == (item.kids?.length ?? 1) + 1) {
+                  return const FABBottomPadding();
                 } else {
-                  return const Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: const Center(
-                      child: const Text('No comments'),
-                    ),
-                  );
+                  if (item.kids != null && item.kids.length > 0) {
+                    return new Comment(
+                      itemId: item.kids[index - 1],
+                      op: item.by,
+                    );
+                  } else {
+                    return const Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: const Center(
+                        child: const Text('No comments'),
+                      ),
+                    );
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
         ),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Reply',
-        child: const Icon(Icons.reply),
-        onPressed: itemStatus?.authTokens?.reply != null ?
-          () => this._reply(context, itemStatus, account) :
-          null,
+        floatingActionButton: new FloatingActionButton(
+          tooltip: 'Reply',
+          child: const Icon(Icons.reply),
+          onPressed: itemStatus?.authTokens?.reply != null ?
+            () => this._reply(context, itemStatus, account) :
+            null,
+        ),
       ),
     );
   }
