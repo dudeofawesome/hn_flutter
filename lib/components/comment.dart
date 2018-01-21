@@ -449,7 +449,10 @@ class Comment extends StoreWatcher {
         children: <Widget>[
           new GestureDetector(
             onTap: () {
-              if (selectedItemStore.item != comment.id && commentStatus.authTokens?.reply == null) {
+              if (
+                selectedItemStore.item != comment.id &&
+                commentStatus.authTokens?.reply == null && account?.accessCookie != null
+              ) {
                 _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
               }
               selectItem(comment.id);
