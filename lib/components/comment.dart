@@ -73,13 +73,23 @@ class Comment extends StoreWatcher {
       });
   }
 
-  void _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.faveItem(status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  Future<Null> _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    return new Future<Null>(() async {
+      if (status.authTokens?.save == null) {
+        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
+          .firstWhere((patch) => patch.id == status.id);
+
+        if (status?.authTokens?.save == null) {
+          throw '''Couldn't favorite item''';
+        }
+      }
+
+      return this._hnItemService.faveItem(status, account);
+    }).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
   Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
@@ -222,12 +232,10 @@ class Comment extends StoreWatcher {
               icon: const Icon(Icons.star),
               color: (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
               tooltip: 'Save',
-              onPressed: commentStatus?.authTokens?.save != null ?
-                () {
-                  selectItem(comment.id);
-                  this._saveComment(context, commentStatus, account);
-                } :
-                null,
+              onPressed: () {
+                selectItem(comment.id);
+                this._saveComment(context, commentStatus, account);
+              },
             );
           case BarButtons.VIEW_PROFILE:
             return new IconButton(

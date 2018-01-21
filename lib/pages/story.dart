@@ -259,7 +259,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       ];
     }
 
-
     final storyCard = new Container(
       width: double.INFINITY,
       margin: const EdgeInsets.only(bottom: 8.0),
