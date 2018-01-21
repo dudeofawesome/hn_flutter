@@ -41,18 +41,30 @@ class HNItemService {
       });
   }
 
-  Future<Null> getItemAuthById (int id, Cookie accessCookie) async {
+  Future<List<HNItemStatus>> getStoryItemAuthById (int id, Cookie accessCookie) async {
     if (_itemStore.items[id] == null) {
       addHNItem(new HNItem(id: id));
       patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
     }
 
-    this._getItemReplyPageById(id, accessCookie).then((replyPage) async {
-      this._parseAllItems(replyPage).forEach((patch) {
-        print(patch);
+    final page = await this._getItemPageById(id, accessCookie);
+    return this._parseAllItems(page)
+      ..forEach((patch) {
         patchItemStatus(patch);
       });
-    });
+  }
+
+  Future<List<HNItemStatus>> getCommentItemAuthById (int id, Cookie accessCookie) async {
+    if (_itemStore.items[id] == null) {
+      addHNItem(new HNItem(id: id));
+      patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    }
+
+    final replyPage = await this._getItemReplyPageById(id, accessCookie);
+    return this._parseAllItems(replyPage)
+      ..forEach((patch) {
+        patchItemStatus(patch);
+      });
   }
 
   Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {

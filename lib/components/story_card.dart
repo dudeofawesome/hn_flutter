@@ -44,13 +44,23 @@ class StoryCard extends StoreWatcher {
     Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
   }
 
-  void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(true, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
+    return new Future<Null>(() async {
+      if (status.authTokens?.upvote == null) {
+        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
+          .firstWhere((patch) => patch.id == status.id);
+
+        if (status?.authTokens?.upvote == null) {
+          throw '''Couldn't send upvote''';
+        }
+      }
+
+      return this._hnItemService.voteItem(true, status, account);
+    }).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
   void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
@@ -166,9 +176,7 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: storyStatus?.authTokens?.save != null ?
-                () => _upvoteStory(context, storyStatus, account) :
-                null,
+              onPressed: () => _upvoteStory(context, storyStatus, account),
               color: (storyStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
