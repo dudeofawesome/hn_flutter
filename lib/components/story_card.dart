@@ -63,23 +63,42 @@ class StoryCard extends StoreWatcher {
     });
   }
 
-  void _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(false, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  Future<Null> _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    return new Future<Null>(() async {
+      if (status.authTokens?.downvote == null) {
+        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
+          .firstWhere((patch) => patch.id == status.id);
+
+        if (status?.authTokens?.downvote == null) {
+          throw '''Couldn't send downvote''';
+        }
+      }
+
+      return this._hnItemService.voteItem(false, status, account);
+    }).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
-  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
-    this._hnItemService.faveItem(storyStatus, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
-    // toggleSaveItem(this.storyId);
+  Future<Null> _saveStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    return new Future<Null>(() async {
+      if (status.authTokens?.save == null) {
+        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
+          .firstWhere((patch) => patch.id == status.id);
+
+        if (status?.authTokens?.save == null) {
+          throw '''Couldn't favorite item''';
+        }
+      }
+
+      return this._hnItemService.faveItem(status, account);
+    }).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
   Future<Null> _shareStory (String storyUrl) async {
@@ -182,18 +201,14 @@ class StoryCard extends StoreWatcher {
             // new IconButton(
             //   icon: const Icon(Icons.arrow_downward),
             //   tooltip: 'Downvote',
-            //   onPressed: storyStatus?.authTokens?.save != null ?
-            //     () => _downvoteStory(context, storyStatus, account) :
-            //     null,
+            //   onPressed: _downvoteStory(context, storyStatus, account),
             //   color: this.storyStatus.downvoted ? Colors.blue : Colors.black,
             // ),
             new IconButton(
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: storyStatus?.authTokens?.save != null ?
-                () => _saveStory(context, storyStatus, account) :
-                null,
+              onPressed: () => _saveStory(context, storyStatus, account),
               color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
