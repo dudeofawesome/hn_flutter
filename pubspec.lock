@@ -21,7 +21,7 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.13.3"
+    version: "2.0.3"
   barback:
     dependency: transitive
     description:
@@ -154,7 +154,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.3+14"
+    version: "0.11.3+16"
   http_multi_server:
     dependency: transitive
     description:
@@ -347,7 +347,7 @@ packages:
   sky_engine:
     dependency: transitive
     description:
-      path: "../../Library/Developer/flutter/bin/cache/pkg/sky_engine"
+      path: "../../Library/Developer/Flutter/bin/cache/pkg/sky_engine"
       relative: true
     source: path
     version: "0.0.99"
@@ -478,4 +478,4 @@ packages:
     source: hosted
     version: "2.1.13"
 sdks:
-  dart: ">=1.24.0 <=2.0.0-dev.16.0"
+  dart: ">=2.0.0-dev.15.0 <=2.0.0-dev.16.0"
