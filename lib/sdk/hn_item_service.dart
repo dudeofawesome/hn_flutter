@@ -262,15 +262,23 @@ class HNItemService {
   }
 
   Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
-    final req = await (await _httpClient.postUrl(Uri.parse(
-        '${this._config.apiHost}/comment'
-        '?parent=$parentId'
-        '&goto=item%3Fid%3D$parentId'
-        '&hmac=${authTokens.reply}'
-        '&text=${Uri.encodeComponent(comment)}'
-      ))
+    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
+      ..cookies.add(accessCookie)
+      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      ..cookies.add(accessCookie))
+      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
+      ..write(
+        'parent=$parentId'
+        '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
+        '&hmac=${authTokens.reply}'
+        '&text=${Uri.encodeQueryComponent(comment)}'
+      ))
+      // ..write({
+      //   'parent': '$parentId',
+      //   'goto': Uri.encodeQueryComponent('item?id=$parentId'),
+      //   'hmac': authTokens.reply,
+      //   'text': Uri.encodeQueryComponent(comment),
+      // }))
       .close();
 
     print(req.headers);
