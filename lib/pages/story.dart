@@ -421,21 +421,23 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     print(comment);
 
-    await this._hnItemService.replyToItemById(
-      widget.itemId,
-      comment,
-      status.authTokens,
-      account.accessCookie,
-    ).catchError((err) {
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text(err),
-      ));
-      throw err;
-    });
+    if (comment != null) {
+      await this._hnItemService.replyToItemById(
+        widget.itemId,
+        comment,
+        status.authTokens,
+        account.accessCookie,
+      ).catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err),
+        ));
+        throw err;
+      });
 
-    Scaffold.of(ctx).showSnackBar(new SnackBar(
-      content: new Text('Comment added.'),
-    ));
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Comment added.'),
+      ));
+    }
   }
 
   Future<Null> refreshStory ([Cookie accessCookie]) async {
