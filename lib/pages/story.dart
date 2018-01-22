@@ -53,7 +53,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._accountStore = listenToStore(accountStoreToken);
 
     this._scrollController = new ScrollController(
-      initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0,
+      initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0.0,
     );
 
     markAsSeen(widget.itemId);
