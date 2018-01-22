@@ -195,7 +195,9 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.arrow_upward),
               tooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: () => _upvoteStory(context, storyStatus, account),
+              onPressed: account != null ?
+                () => _upvoteStory(context, storyStatus, account) :
+                null,
               color: (storyStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
             ),
             // new IconButton(
@@ -208,7 +210,9 @@ class StoryCard extends StoreWatcher {
               icon: const Icon(Icons.star),
               tooltip: 'Save',
               iconSize: 20.0,
-              onPressed: () => _saveStory(context, storyStatus, account),
+              onPressed: account != null ?
+                () => _saveStory(context, storyStatus, account) :
+                null,
               color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             // new IconButton(
