@@ -38,10 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-        </activity>
-
-        <activity android:name=".DeepLinkerActivity">
-
             <intent-filter android:label="@string/filter_title_item">
                 <action android:name="android.intent.action.VIEW" />
 
