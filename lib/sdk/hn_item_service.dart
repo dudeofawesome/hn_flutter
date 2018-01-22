@@ -296,4 +296,44 @@ class HNItemService {
 
     return null;
   }
+
+  Future<Null> postItem (
+    String authToken, Cookie accessCookie,
+    String title,
+    {
+      String text, String url,
+    }
+  ) async {
+    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r'))
+      ..cookies.add(accessCookie)
+      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
+      ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
+      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
+      ..write(
+        'fnop=submit-page'
+        '&fnid=$authToken'
+        '&title=$title'
+        '&url=$url'
+        '&text=$text'
+      ))
+      .close();
+
+    print(req.headers);
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    print(body);
+
+    if (body.contains('Bad login')) {
+      throw 'Bad login.';
+    // } else if (
+    //   body.contains('<title>Add Comment | Hacker News</title>') &&
+    //   body.contains('Please confirm that this is your comment')
+    // ) {
+    //   // Looks like we need to submit the comment again
+    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    } else if (body.contains('''You're posting too fast. Please slow down. Thanks.''')) {
+      throw '''You're posting too fast. Please slow down. Thanks.''';
+    }
+
+    return null;
+  }
 }

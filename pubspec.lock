@@ -102,10 +102,12 @@ packages:
   flutter_markdown:
     dependency: "direct main"
     description:
-      name: flutter_markdown
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.1"
+      path: "."
+      ref: bed98a71161cfdb3141b971360ad8198c1ea3729
+      resolved-ref: bed98a71161cfdb3141b971360ad8198c1ea3729
+      url: "git@github.com:flutter/flutter_markdown.git"
+    source: git
+    version: "0.1.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter

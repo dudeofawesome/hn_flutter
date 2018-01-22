@@ -65,7 +65,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       debouncer.debounce();
     });
 
-    markAsSeen(widget.itemId);
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
   }
 
@@ -100,13 +99,17 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
+    if (!(itemStatus?.seen ?? true)) {
+      markAsSeen(widget.itemId);
+    }
+
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            item.title ?? '…',
+            item?.title ?? '…',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
               fontWeight: FontWeight.w400,
@@ -117,9 +120,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(item.by ?? '…'),
+                new Text(item?.by ?? '…'),
                 new Text(' • '),
-                new Text(item.time != null ?
+                new Text(item?.time != null ?
                   timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000)) :
                   '…'
                 ),
@@ -138,8 +141,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text('${item.score} points'),
-                new Text('${item.descendants} comments'),
+                new Text('${item?.score ?? '…'} points'),
+                new Text('${item?.descendants ?? '…'} comments'),
               ],
             ),
           ),
@@ -173,7 +176,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               onPressed: itemStatus?.authTokens?.save != null ?
                 () => this._saveStory(context, itemStatus, account) :
                 null,
-              color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
+              color: (itemStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             new PopupMenuButton<OverflowMenuItems>(
               icon: const Icon(
@@ -197,7 +200,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
                 final menu = <PopupMenuEntry<OverflowMenuItems>>[];
 
                 menu.add(share);
-                if (item.text != null) {
+                if (item?.text != null) {
                   menu.add(copyText);
                 }
                 menu.add(viewProfile);
@@ -221,7 +224,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
 
     List<Widget> cardContent;
-    if (item.url != null) {
+    if (item?.url != null) {
       cardContent = <Widget>[
         new GestureDetector(
           onTap: () => this._openStoryUrl(context, item.url),
@@ -262,7 +265,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         titleColumn,
         bottomRow,
       ];
-    } else if (item.text != null) {
+    } else if (item?.text != null) {
       cardContent = <Widget>[
         titleColumn,
         new Padding(
@@ -332,14 +335,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
-            itemCount: (item.kids?.length ?? 1) + 2,
+            itemCount: (item?.kids?.length ?? 1) + 2,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return storyCard;
-              } else if (index == (item.kids?.length ?? 1) + 1) {
+              } else if (index == (item?.kids?.length ?? 1) + 1) {
                 return const FABBottomPadding();
               } else {
-                if (item.kids != null && item.kids.length > 0) {
+                if (item?.kids != null && item.kids.length > 0) {
                   return new Comment(
                     itemId: item.kids[index - 1],
                     op: item.by,
