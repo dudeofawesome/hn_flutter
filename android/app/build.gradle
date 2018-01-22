@@ -1,8 +1,8 @@
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withInputStream { stream ->
-        localProperties.load(stream)
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
     }
 }
 
@@ -12,6 +12,7 @@ if (flutterRoot == null) {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystorePropertiesFile = rootProject.file("key.properties")
@@ -19,8 +20,12 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 
     lintOptions {
         disable 'InvalidPackage'
@@ -30,7 +35,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "io.orleans.hnflutter"
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 002
         versionName "0.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -66,6 +71,7 @@ flutter {
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
