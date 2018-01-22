@@ -220,11 +220,13 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
           child: storyCards,
         ) :
         loadingStories,
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Submit Story',
-        child: new Icon(Icons.add),
-        onPressed: () => this._submitStoryModal(context),
-      ),
+      floatingActionButton: account != null ?
+        new FloatingActionButton(
+          tooltip: 'Submit Story',
+          child: new Icon(Icons.add),
+          onPressed: () => this._submitStoryModal(context),
+        ) :
+        null,
     );
   }
 }

@@ -360,13 +360,15 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Reply',
-        child: const Icon(Icons.reply),
-        onPressed: itemStatus?.authTokens?.reply != null ?
-          () => this._reply(context, itemStatus, account) :
-          null,
-      ),
+      floatingActionButton: account != null ?
+        new FloatingActionButton(
+          tooltip: 'Reply',
+          child: const Icon(Icons.reply),
+          onPressed: itemStatus?.authTokens?.reply != null ?
+            () => this._reply(context, itemStatus, account) :
+            null,
+        ) :
+        null,
     );
   }
 
