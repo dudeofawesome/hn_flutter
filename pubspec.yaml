@@ -27,7 +27,9 @@ dependencies:
   path_provider: ^0.3.0
   share: ^0.3.0
   sqflite: ^0.4.0
+  throttle_debounce: ^0.1.2+1
   timeago: ^1.2.0
+  tuple: ^1.0.1
   url_launcher: ^2.0.1
 
 dev_dependencies:

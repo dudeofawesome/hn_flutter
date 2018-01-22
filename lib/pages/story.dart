@@ -8,12 +8,16 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
+import 'package:throttle_debounce/throttle_debounce.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:tuple/tuple.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
@@ -49,7 +53,17 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._itemStore = listenToStore(itemStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
 
-    this._scrollController = new ScrollController();
+    this._scrollController = new ScrollController(
+      initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0.0,
+    );
+
+    final debouncer = new Debouncer(const Duration(milliseconds: 250), (List args) {
+      setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
+    }, []);
+
+    this._scrollController.addListener(() {
+      debouncer.debounce();
+    });
 
     markAsSeen(widget.itemId);
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
@@ -63,6 +77,11 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         curve: Curves.easeInOut
       );
     }
+  }
+
+  Future<bool> _onPopScope () async {
+    setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
+    return true;
   }
 
   @override
@@ -259,7 +278,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       ];
     }
 
-
     final storyCard = new Container(
       width: double.INFINITY,
       margin: const EdgeInsets.only(bottom: 8.0),
@@ -422,21 +440,23 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     print(comment);
 
-    await this._hnItemService.replyToItemById(
-      widget.itemId,
-      comment,
-      status.authTokens,
-      account.accessCookie,
-    ).catchError((err) {
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text(err),
-      ));
-      throw err;
-    });
+    if (comment != null) {
+      await this._hnItemService.replyToItemById(
+        widget.itemId,
+        comment,
+        status.authTokens,
+        account.accessCookie,
+      ).catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err),
+        ));
+        throw err;
+      });
 
-    Scaffold.of(ctx).showSnackBar(new SnackBar(
-      content: new Text('Comment added.'),
-    ));
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Comment added.'),
+      ));
+    }
   }
 
   Future<Null> refreshStory ([Cookie accessCookie]) async {
