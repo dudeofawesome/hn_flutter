@@ -33,7 +33,8 @@ class HNAppState extends State<HNApp> {
   @override
   initState () {
     super.initState();
-    registerDeepLinkChannel();
+
+    registerDeepLinkChannel(context);
   }
 
   // This widget is the root of your application.
@@ -63,6 +64,7 @@ class HNAppState extends State<HNApp> {
       // debugShowMaterialGrid: _configuration.debugShowGrid,
       // showPerformanceOverlay: _configuration.showPerformanceOverlay,
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
+      initialRoute: null,
       routes: staticRoutes,
       onGenerateRoute: getRoute,
     );
