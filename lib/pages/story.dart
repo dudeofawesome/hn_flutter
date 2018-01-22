@@ -8,6 +8,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
+import 'package:throttle_debounce/throttle_debounce.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:tuple/tuple.dart';
 
@@ -55,6 +56,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._scrollController = new ScrollController(
       initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0.0,
     );
+
+    final debouncer = new Debouncer(const Duration(milliseconds: 250), (List args) {
+      setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
+    }, []);
+
+    this._scrollController.addListener(() {
+      debouncer.debounce();
+    });
 
     markAsSeen(widget.itemId);
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
@@ -305,58 +314,55 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     //     ),
     //   );
 
-    return new WillPopScope(
-      onWillPop: this._onPopScope,
-      child: new Scaffold(
-        appBar: new AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: new GestureDetector(
-            onTap: () => this._scrollToTop(),
-            child: new Text(item?.title ?? '…'),
-          ),
-          flexibleSpace: new GestureDetector(
-            onTap: () => this._scrollToTop(),
-          ),
-          actions: <Widget>[],
+    return new Scaffold(
+      appBar: new AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+          child: new Text(item?.title ?? '…'),
         ),
-        body: new RefreshIndicator(
-          onRefresh: () => this.refreshStory(account?.accessCookie),
-          child: new Scrollbar(
-            child: new ListView.builder(
-              controller: this._scrollController,
-              itemCount: (item.kids?.length ?? 1) + 2,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return storyCard;
-                } else if (index == (item.kids?.length ?? 1) + 1) {
-                  return const FABBottomPadding();
+        flexibleSpace: new GestureDetector(
+          onTap: () => this._scrollToTop(),
+        ),
+        actions: <Widget>[],
+      ),
+      body: new RefreshIndicator(
+        onRefresh: () => this.refreshStory(account?.accessCookie),
+        child: new Scrollbar(
+          child: new ListView.builder(
+            controller: this._scrollController,
+            itemCount: (item.kids?.length ?? 1) + 2,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return storyCard;
+              } else if (index == (item.kids?.length ?? 1) + 1) {
+                return const FABBottomPadding();
+              } else {
+                if (item.kids != null && item.kids.length > 0) {
+                  return new Comment(
+                    itemId: item.kids[index - 1],
+                    op: item.by,
+                  );
                 } else {
-                  if (item.kids != null && item.kids.length > 0) {
-                    return new Comment(
-                      itemId: item.kids[index - 1],
-                      op: item.by,
-                    );
-                  } else {
-                    return const Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: const Center(
-                        child: const Text('No comments'),
-                      ),
-                    );
-                  }
+                  return const Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: const Center(
+                      child: const Text('No comments'),
+                    ),
+                  );
                 }
-              },
-            ),
+              }
+            },
           ),
         ),
-        floatingActionButton: new FloatingActionButton(
-          tooltip: 'Reply',
-          child: const Icon(Icons.reply),
-          onPressed: itemStatus?.authTokens?.reply != null ?
-            () => this._reply(context, itemStatus, account) :
-            null,
-        ),
+      ),
+      floatingActionButton: new FloatingActionButton(
+        tooltip: 'Reply',
+        child: const Icon(Icons.reply),
+        onPressed: itemStatus?.authTokens?.reply != null ?
+          () => this._reply(context, itemStatus, account) :
+          null,
       ),
     );
   }

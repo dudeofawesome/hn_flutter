@@ -428,6 +428,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.26"
+  throttle_debounce:
+    dependency: "direct main"
+    description:
+      name: throttle_debounce
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2+1"
   timeago:
     dependency: "direct main"
     description:
