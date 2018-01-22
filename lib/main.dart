@@ -30,46 +30,6 @@ class HNApp extends StatefulWidget {
 }
 
 class HNAppState extends State<HNApp> {
-  Route<Null> _getRoute (RouteSettings settings) {
-    // Routes, by convention, are split on slashes, like filesystem paths.
-    final List<String> path = settings.name.split('/');
-    // We only support paths that start with a slash, so bail if
-    // the first component is not empty:
-    if (path[0] != '') {
-      return null;
-    }
-    // If the path is "/stock:..." then show a stock page for the
-    // specified stock symbol.
-    if (path[1].startsWith('${Routes.STORIES}:')) {
-      // We don't yet support subpages of a stock, so bail if there's
-      // any more path components.
-      if (path.length != 2) {
-        return null;
-      }
-      // Extract the symbol part of "stock:..." and return a route
-      // for that symbol.
-      final int itemId = int.parse(path[1].substring(Routes.STORIES.length + 1));
-      return new CupertinoPageRoute<Null>(
-        settings: settings,
-        builder: (BuildContext context) => new StoryPage(itemId: itemId),
-      );
-    }
-
-    if (path[1].startsWith('${Routes.USERS}:')) {
-      if (path.length != 2) {
-        return null;
-      }
-
-      final String userId = path[1].substring(Routes.USERS.length + 1);
-      return new CupertinoPageRoute<Null>(
-        settings: settings,
-        builder: (BuildContext context) => new UserPage(userId: userId),
-      );
-    }
-    // The other paths we support are in the routes table.
-    return null;
-  }
-
   @override
   initState () {
     super.initState();
@@ -104,7 +64,7 @@ class HNAppState extends State<HNApp> {
       // showPerformanceOverlay: _configuration.showPerformanceOverlay,
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
       routes: staticRoutes,
-      onGenerateRoute: _getRoute,
+      onGenerateRoute: getRoute,
     );
   }
 
