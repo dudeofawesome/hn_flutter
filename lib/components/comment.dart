@@ -73,13 +73,23 @@ class Comment extends StoreWatcher {
       });
   }
 
-  void _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.faveItem(status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  Future<Null> _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+    return new Future<Null>(() async {
+      if (status.authTokens?.save == null) {
+        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
+          .firstWhere((patch) => patch.id == status.id);
+
+        if (status?.authTokens?.save == null) {
+          throw '''Couldn't favorite item''';
+        }
+      }
+
+      return this._hnItemService.faveItem(status, account);
+    }).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
   Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
@@ -91,7 +101,64 @@ class Comment extends StoreWatcher {
     await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
-  void _reply (int itemId) {
+  Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
+    String comment;
+    comment = await showDialog(
+      context: ctx,
+      child: new SimpleDialog(
+        title: const Text('Reply'),
+        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+        children: <Widget>[
+          new TextField(
+            maxLines: null,
+            autofocus: true,
+            autocorrect: true,
+            keyboardType: TextInputType.text,
+            decoration: new InputDecoration(
+              labelText: 'Comment',
+            ),
+            onChanged: (val) => comment = val,
+          ),
+          const Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+          ),
+          new ButtonTheme.bar(
+            child: new ButtonBar(
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text('Cancel'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                new FlatButton(
+                  child: new Text('Reply'.toUpperCase()),
+                  onPressed: () => Navigator.pop(ctx, comment),
+                ),
+              ],
+            ),
+          ),
+        ],
+      )
+    );
+
+    print(comment);
+
+    if (comment != null) {
+      await this._hnItemService.replyToItemById(
+        status.id,
+        comment,
+        status.authTokens,
+        account.accessCookie,
+      ).catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+        throw err;
+      });
+
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Comment added.'),
+      ));
+    }
   }
 
   void _viewProfile (BuildContext ctx, String author) {
@@ -213,7 +280,7 @@ class Comment extends StoreWatcher {
               onPressed: commentStatus?.authTokens?.reply != null ?
                 () {
                   selectItem(comment.id);
-                  this._reply(comment.id);
+                  this._reply(context, commentStatus, account);
                 } :
                 null,
             );
@@ -222,7 +289,7 @@ class Comment extends StoreWatcher {
               icon: const Icon(Icons.star),
               color: (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
               tooltip: 'Save',
-              onPressed: commentStatus?.authTokens?.save != null ?
+              onPressed: account != null ?
                 () {
                   selectItem(comment.id);
                   this._saveComment(context, commentStatus, account);
@@ -331,7 +398,7 @@ class Comment extends StoreWatcher {
                 case BarButtons.DOWNVOTE:
                   return this._downvoteComment(context, commentStatus, account);
                 case BarButtons.REPLY:
-                  return this._reply(comment.id);
+                  return this._reply(context, commentStatus, account);
                 case BarButtons.SAVE:
                   return this._saveComment(context, commentStatus, account);
                 case BarButtons.VIEW_PROFILE:
@@ -383,7 +450,15 @@ class Comment extends StoreWatcher {
       return new Column(
         children: <Widget>[
           new GestureDetector(
-            onTap: () => selectItem(comment.id),
+            onTap: () {
+              if (
+                selectedItemStore.item != comment.id &&
+                commentStatus.authTokens?.reply == null && account?.accessCookie != null
+              ) {
+                _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
+              }
+              selectItem(comment.id);
+            },
             onLongPress: () {
               SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
               showHideItem(comment.id);
@@ -397,7 +472,9 @@ class Comment extends StoreWatcher {
                     left: this.depth > 0 ? new BorderSide(
                       width: 4.0,
                       color: commentColor,
-                    ) : const BorderSide(),
+                    ) : const BorderSide(
+                      width: 0.0,
+                    ),
                     bottom: const BorderSide(
                       width: 1.0,
                       color: Colors.black12,

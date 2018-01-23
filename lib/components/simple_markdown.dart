@@ -64,7 +64,7 @@ class SimpleMarkdown extends StatelessWidget {
     final theme = Theme.of(context);
     final styleSheet = new MarkdownStyleSheet.fromTheme(theme).copyWith(
       blockquoteDecoration: new BoxDecoration(
-        color: Colors.grey[350],
+        color: Colors.grey.withOpacity(0.5),
         borderRadius: new BorderRadius.circular(3.0),
       ),
     );

@@ -4,6 +4,8 @@ import 'dart:io' show Cookie;
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
+import 'package:hn_flutter/pages/submit_story.dart';
+
 import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/story_card.dart';
@@ -79,9 +81,16 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
       await this._scrollController.animateTo(
         0.0,
         duration: new Duration(milliseconds: 500),
-        curve: Curves.bounceOut
+        curve: Curves.easeInOut
       );
     }
+  }
+
+  Future<Null> _submitStoryModal (BuildContext ctx) async {
+    return await showDialog(
+      context: ctx,
+      child: new SubmitStoryPage(),
+    );
   }
 
   @override
@@ -211,11 +220,13 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
           child: storyCards,
         ) :
         loadingStories,
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'New Story',
-        child: new Icon(Icons.add),
-        // onPressed: _incrementCounter,
-      ),
+      floatingActionButton: account != null ?
+        new FloatingActionButton(
+          tooltip: 'Submit Story',
+          child: new Icon(Icons.add),
+          onPressed: () => this._submitStoryModal(context),
+        ) :
+        null,
     );
   }
 }

@@ -8,12 +8,16 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
+import 'package:throttle_debounce/throttle_debounce.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
+import 'package:tuple/tuple.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/hn_item_service.dart';
@@ -49,9 +53,18 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     this._itemStore = listenToStore(itemStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
 
-    this._scrollController = new ScrollController();
+    this._scrollController = new ScrollController(
+      initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0.0,
+    );
 
-    markAsSeen(widget.itemId);
+    final debouncer = new Debouncer(const Duration(milliseconds: 250), (List args) {
+      setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
+    }, []);
+
+    this._scrollController.addListener(() {
+      debouncer.debounce();
+    });
+
     this.refreshStory(_accountStore.primaryAccount?.accessCookie);
   }
 
@@ -60,9 +73,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       await this._scrollController.animateTo(
         0.0,
         duration: new Duration(milliseconds: 500),
-        curve: Curves.bounceOut
+        curve: Curves.easeInOut
       );
     }
+  }
+
+  Future<bool> _onPopScope () async {
+    setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
+    return true;
   }
 
   @override
@@ -81,13 +99,17 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
+    if (!(itemStatus?.seen ?? true)) {
+      markAsSeen(widget.itemId);
+    }
+
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            item.title ?? '…',
+            item?.title ?? '…',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
               fontWeight: FontWeight.w400,
@@ -98,9 +120,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(item.by ?? '…'),
+                new Text(item?.by ?? '…'),
                 new Text(' • '),
-                new Text(item.time != null ?
+                new Text(item?.time != null ?
                   timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000)) :
                   '…'
                 ),
@@ -119,8 +141,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text('${item.score} points'),
-                new Text('${item.descendants} comments'),
+                new Text('${item?.score ?? '…'} points'),
+                new Text('${item?.descendants ?? '…'} comments'),
               ],
             ),
           ),
@@ -154,7 +176,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               onPressed: itemStatus?.authTokens?.save != null ?
                 () => this._saveStory(context, itemStatus, account) :
                 null,
-              color: (itemStatus.saved ?? false) ? Colors.amber : Colors.black,
+              color: (itemStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             new PopupMenuButton<OverflowMenuItems>(
               icon: const Icon(
@@ -178,7 +200,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
                 final menu = <PopupMenuEntry<OverflowMenuItems>>[];
 
                 menu.add(share);
-                if (item.text != null) {
+                if (item?.text != null) {
                   menu.add(copyText);
                 }
                 menu.add(viewProfile);
@@ -202,7 +224,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
 
     List<Widget> cardContent;
-    if (item.url != null) {
+    if (item?.url != null) {
       cardContent = <Widget>[
         new GestureDetector(
           onTap: () => this._openStoryUrl(context, item.url),
@@ -243,7 +265,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         titleColumn,
         bottomRow,
       ];
-    } else if (item.text != null) {
+    } else if (item?.text != null) {
       cardContent = <Widget>[
         titleColumn,
         new Padding(
@@ -258,7 +280,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         bottomRow,
       ];
     }
-
 
     final storyCard = new Container(
       width: double.INFINITY,
@@ -314,14 +335,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
-            itemCount: (item.kids?.length ?? 1) + 2,
+            itemCount: (item?.kids?.length ?? 1) + 2,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return storyCard;
-              } else if (index == (item.kids?.length ?? 1) + 1) {
+              } else if (index == (item?.kids?.length ?? 1) + 1) {
                 return const FABBottomPadding();
               } else {
-                if (item.kids != null && item.kids.length > 0) {
+                if (item?.kids != null && item.kids.length > 0) {
                   return new Comment(
                     itemId: item.kids[index - 1],
                     op: item.by,
@@ -339,13 +360,15 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Reply',
-        child: const Icon(Icons.reply),
-        onPressed: itemStatus?.authTokens?.reply != null ?
-          () => this._reply(context, itemStatus, account) :
-          null,
-      ),
+      floatingActionButton: account != null ?
+        new FloatingActionButton(
+          tooltip: 'Reply',
+          child: const Icon(Icons.reply),
+          onPressed: itemStatus?.authTokens?.reply != null ?
+            () => this._reply(context, itemStatus, account) :
+            null,
+        ) :
+        null,
     );
   }
 
@@ -422,21 +445,23 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     print(comment);
 
-    await this._hnItemService.replyToItemById(
-      widget.itemId,
-      comment,
-      status.authTokens,
-      account.accessCookie,
-    ).catchError((err) {
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text(err),
-      ));
-      throw err;
-    });
+    if (comment != null) {
+      await this._hnItemService.replyToItemById(
+        widget.itemId,
+        comment,
+        status.authTokens,
+        account.accessCookie,
+      ).catchError((err) {
+        Scaffold.of(ctx).showSnackBar(new SnackBar(
+          content: new Text(err),
+        ));
+        throw err;
+      });
 
-    Scaffold.of(ctx).showSnackBar(new SnackBar(
-      content: new Text('Comment added.'),
-    ));
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text('Comment added.'),
+      ));
+    }
   }
 
   Future<Null> refreshStory ([Cookie accessCookie]) async {

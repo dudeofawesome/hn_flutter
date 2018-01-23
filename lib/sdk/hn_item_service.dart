@@ -41,9 +41,52 @@ class HNItemService {
       });
   }
 
+  Future<List<HNItemStatus>> getStoryItemAuthById (int id, Cookie accessCookie) async {
+    if (_itemStore.items[id] == null) {
+      addHNItem(new HNItem(id: id));
+      patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    }
+
+    final page = await this._getItemPageById(id, accessCookie);
+    return this._parseAllItems(page)
+      ..forEach((patch) {
+        patchItemStatus(patch);
+      });
+  }
+
+  Future<List<HNItemStatus>> getCommentItemAuthById (int id, Cookie accessCookie) async {
+    if (_itemStore.items[id] == null) {
+      addHNItem(new HNItem(id: id));
+      patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
+    }
+
+    final replyPage = await this._getItemReplyPageById(id, accessCookie);
+    return this._parseAllItems(replyPage)
+      ..forEach((patch) {
+        patchItemStatus(patch);
+      });
+  }
+
   Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
     final req = await (await _httpClient.getUrl(Uri.parse(
         '${this._config.apiHost}/item'
+        '?id=$itemId'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+      throw 'Invalid or expired auth cookie';
+    }
+
+    return body;
+  }
+
+  Future<String> _getItemReplyPageById (int itemId, Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/reply'
         '?id=$itemId'
       ))
       ..cookies.add(accessCookie))
@@ -219,15 +262,23 @@ class HNItemService {
   }
 
   Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
-    final req = await (await _httpClient.postUrl(Uri.parse(
-        '${this._config.apiHost}/comment'
-        '?parent=$parentId'
-        '&goto=item%3Fid%3D$parentId'
-        '&hmac=${authTokens.reply}'
-        '&text=${Uri.encodeComponent(comment)}'
-      ))
+    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
+      ..cookies.add(accessCookie)
+      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      ..cookies.add(accessCookie))
+      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
+      ..write(
+        'parent=$parentId'
+        '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
+        '&hmac=${authTokens.reply}'
+        '&text=${Uri.encodeQueryComponent(comment)}'
+      ))
+      // ..write({
+      //   'parent': '$parentId',
+      //   'goto': Uri.encodeQueryComponent('item?id=$parentId'),
+      //   'hmac': authTokens.reply,
+      //   'text': Uri.encodeQueryComponent(comment),
+      // }))
       .close();
 
     print(req.headers);
@@ -241,6 +292,46 @@ class HNItemService {
     // ) {
     //   // Looks like we need to submit the comment again
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    }
+
+    return null;
+  }
+
+  Future<Null> postItem (
+    String authToken, Cookie accessCookie,
+    String title,
+    {
+      String text, String url,
+    }
+  ) async {
+    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r'))
+      ..cookies.add(accessCookie)
+      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
+      ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
+      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
+      ..write(
+        'fnop=submit-page'
+        '&fnid=$authToken'
+        '&title=$title'
+        '&url=$url'
+        '&text=$text'
+      ))
+      .close();
+
+    print(req.headers);
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    print(body);
+
+    if (body.contains('Bad login')) {
+      throw 'Bad login.';
+    // } else if (
+    //   body.contains('<title>Add Comment | Hacker News</title>') &&
+    //   body.contains('Please confirm that this is your comment')
+    // ) {
+    //   // Looks like we need to submit the comment again
+    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    } else if (body.contains('''You're posting too fast. Please slow down. Thanks.''')) {
+      throw '''You're posting too fast. Please slow down. Thanks.''';
     }
 
     return null;
