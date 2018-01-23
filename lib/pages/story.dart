@@ -226,7 +226,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     List<Widget> cardContent;
     if (item?.url != null) {
       cardContent = <Widget>[
-        new GestureDetector(
+        new InkWell(
           onTap: () => this._openStoryUrl(context, item.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,

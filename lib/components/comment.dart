@@ -449,7 +449,7 @@ class Comment extends StoreWatcher {
 
       return new Column(
         children: <Widget>[
-          new GestureDetector(
+          new InkWell(
             onTap: () {
               if (
                 selectedItemStore.item != comment.id &&

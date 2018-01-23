@@ -257,7 +257,7 @@ class StoryCard extends StoreWatcher {
     List<Widget> cardContent;
     if (story.url != null) {
       cardContent = <Widget>[
-        new GestureDetector(
+        new InkWell(
           onTap: () => this._openStoryUrl(context, story.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,
@@ -315,7 +315,7 @@ class StoryCard extends StoreWatcher {
     return new Padding(
       padding: cardOuterPadding,
       child: new Card(
-        child: new GestureDetector(
+        child: new InkWell(
           onTap: () => this._openStory(context),
           child: new Column(
             mainAxisSize: MainAxisSize.min,
