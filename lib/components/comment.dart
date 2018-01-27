@@ -20,9 +20,7 @@ import 'package:hn_flutter/sdk/hn_item_service.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
 
-class Comment extends StoreWatcher {
-  final _hnItemService = new HNItemService();
-
+class Comment extends StatefulWidget {
   final int itemId;
   final int depth;
   final bool loadChildren;
@@ -49,10 +47,42 @@ class Comment extends StoreWatcher {
   }) : super(key: key);
 
   @override
-  void initStores(ListenToStore listenToStore) {
-    listenToStore(itemStoreToken);
-    listenToStore(uiStoreToken);
-    listenToStore(accountStoreToken);
+  _CommentState createState () => new _CommentState();
+}
+
+class _CommentState extends State<Comment>
+  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin {
+
+  final _hnItemService = new HNItemService();
+  HNItemStore _itemStore;
+  UIStore _selectedItemStore;
+  HNAccountStore _accountStore;
+
+  Animation<double> _animation;
+  AnimationController _controller;
+
+  @override
+  void initState () {
+    super.initState();
+
+    this._itemStore = listenToStore(itemStoreToken);
+    this._selectedItemStore = listenToStore(uiStoreToken);
+    this._accountStore = listenToStore(accountStoreToken);
+
+    _controller = new AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = new CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+        reverseCurve: Curves.easeIn,
+      )
+      ..addListener(() {
+        setState(() {
+          // the state that has changed here is the animation object’s value
+        });
+      });
   }
 
   void _upvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
@@ -173,8 +203,13 @@ class Comment extends StoreWatcher {
     await Clipboard.setData(new ClipboardData(text: text));
   }
 
+  void _toggleButtonBar (int commentId) {
+    this._controller.reverse();
+    selectItem(commentId);
+  }
+
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build (BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -182,13 +217,13 @@ class Comment extends StoreWatcher {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    final HNItemStore itemStore = stores[itemStoreToken];
-    final UIStore selectedItemStore = stores[uiStoreToken];
-    final HNAccountStore accountStore = stores[accountStoreToken];
+    final comment = _itemStore.items[widget.itemId];
+    final commentStatus = _itemStore.itemStatuses[widget.itemId];
+    final account = _accountStore.primaryAccount;
 
-    final comment = itemStore.items[this.itemId];
-    final commentStatus = itemStore.itemStatuses[this.itemId];
-    final account = accountStore.primaryAccount;
+    if (_selectedItemStore.item != null && _selectedItemStore.item == comment?.id) {
+      this._controller.forward();
+    }
 
     if (comment != null) {
       if (comment.type != null && comment.type != 'comment') {
@@ -206,7 +241,7 @@ class Comment extends StoreWatcher {
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
-              child: (comment.by != null && comment.by == this.op) ?
+              child: (comment.by != null && comment.by == widget.op) ?
                 new Container(
                   padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
                   decoration: new BoxDecoration(
@@ -260,7 +295,7 @@ class Comment extends StoreWatcher {
           commentStatus.loading ? const Text('Loading…') : const Text('[deleted]'),
       );
 
-      final List<Widget> buttons = this.buttons.map<Widget>((button) {
+      final List<Widget> buttons = widget.buttons.map<Widget>((button) {
         switch (button) {
           case BarButtons.UPVOTE:
             return new IconButton(
@@ -269,7 +304,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Upvote',
               onPressed: commentStatus?.authTokens?.upvote != null ?
                 () {
-                  selectItem(comment.id);
+                  this._toggleButtonBar(comment.id);
                   this._upvoteComment(context, commentStatus, account);
                 } :
                 null,
@@ -281,7 +316,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Downvote',
               onPressed: commentStatus?.authTokens?.downvote != null ?
                 () {
-                  selectItem(comment.id);
+                  this._toggleButtonBar(comment.id);
                   // this._downvoteStory()
                 } :
                 null,
@@ -293,7 +328,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Reply',
               onPressed: commentStatus?.authTokens?.reply != null ?
                 () {
-                  selectItem(comment.id);
+                  this._toggleButtonBar(comment.id);
                   this._reply(context, commentStatus, account);
                 } :
                 null,
@@ -305,7 +340,7 @@ class Comment extends StoreWatcher {
               tooltip: 'Save',
               onPressed: account != null ?
                 () {
-                  selectItem(comment.id);
+                  this._toggleButtonBar(comment.id);
                   this._saveComment(context, commentStatus, account);
                 } :
                 null,
@@ -316,7 +351,7 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'View Profile',
               onPressed: () {
-                selectItem(comment.id);
+                this._toggleButtonBar(comment.id);
                 this._viewProfile(context, comment.by);
               },
             );
@@ -326,7 +361,7 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'View Profile',
               onPressed: () {
-                selectItem(comment.id);
+                this._toggleButtonBar(comment.id);
                 this._viewContext(context, comment.parent);
               },
             );
@@ -336,7 +371,7 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'Copy Text',
               onPressed: () {
-                selectItem(comment.id);
+                this._toggleButtonBar(comment.id);
                 this._copyText(comment.computed.simpleText);
               },
             );
@@ -346,21 +381,21 @@ class Comment extends StoreWatcher {
               color: Colors.white,
               tooltip: 'Share',
               onPressed: () {
-                selectItem(comment.id);
-                this._shareComment(comment, itemStore.items);
+                this._toggleButtonBar(comment.id);
+                this._shareComment(comment, _itemStore.items);
               },
             );
         }
       }).toList();
 
-      if (this.overflowButtons?.length > 0) {
+      if (widget.overflowButtons?.length > 0) {
         buttons.add(
           new PopupMenuButton<BarButtons>(
             icon: const Icon(
               Icons.more_horiz,
               color: Colors.white,
             ),
-            itemBuilder: (BuildContext ctx) => this.overflowButtons.map((button) {
+            itemBuilder: (BuildContext ctx) => widget.overflowButtons.map((button) {
               switch (button) {
                 case BarButtons.UPVOTE:
                   return const PopupMenuItem<BarButtons>(
@@ -405,7 +440,7 @@ class Comment extends StoreWatcher {
               }
             }).toList(),
             onSelected: (BarButtons selection) async {
-              selectItem(comment.id);
+              this._toggleButtonBar(comment.id);
               switch (selection) {
                 case BarButtons.UPVOTE:
                   return this._upvoteComment(context, commentStatus, account);
@@ -422,39 +457,44 @@ class Comment extends StoreWatcher {
                 case BarButtons.COPY_TEXT:
                   return this._copyText(comment.computed.simpleText);
                 case BarButtons.SHARE:
-                  return await this._shareComment(comment, itemStore.items);
+                  return await this._shareComment(comment, _itemStore.items);
               }
             },
           )
         );
       }
 
-      final buttonRow = new Container(
-        decoration: new BoxDecoration(
-          color: Theme.of(context).primaryColor,
-        ),
-        child: new Padding(
-          padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
-          child: new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: buttons,
+      final buttonRow = new ClipRect(
+        child: new Align(
+          heightFactor: this._animation.value,
+          child: new Container(
+            decoration: new BoxDecoration(
+              color: Theme.of(context).primaryColor,
+            ),
+            child: new Padding(
+              padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0),
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: buttons,
+              ),
+            ),
           ),
         ),
       );
 
-      final childComments = comment.kids != null && this.loadChildren && !(commentStatus?.hidden ?? false) ?
+      final childComments = comment.kids != null && widget.loadChildren && !(commentStatus?.hidden ?? false) ?
         new Column(
           children: comment.kids.map((kid) => new Comment(
             itemId: kid,
-            depth: depth + 1,
-            op: this.op,
+            depth: widget.depth + 1,
+            op: widget.op,
           )).toList(),
         ) :
         new Container();
 
       Color commentColor;
-      if (this.depth > 0) {
-        int index = this.depth - 1;
+      if (widget.depth > 0) {
+        int index = widget.depth - 1;
         while (index >= commentColors.length) {
           index -= commentColors.length;
         }
@@ -466,24 +506,25 @@ class Comment extends StoreWatcher {
           new InkWell(
             onTap: () {
               if (
-                selectedItemStore.item != comment.id &&
+                _selectedItemStore.item != comment.id &&
                 commentStatus.authTokens?.reply == null && account?.accessCookie != null
               ) {
                 _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
               }
-              selectItem(comment.id);
+
+              this._toggleButtonBar(comment.id);
             },
             onLongPress: () {
               SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
               showHideItem(comment.id);
             },
             child: new Padding(
-              padding: new EdgeInsets.only(left: this.depth > 0 ? (this.depth - 1) * 4.0 : 0.0),
+              padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
               child: new Container(
                 width: double.INFINITY,
                 decoration: new BoxDecoration(
                   border: new Border(
-                    left: this.depth > 0 ? new BorderSide(
+                    left: widget.depth > 0 ? new BorderSide(
                       width: 4.0,
                       color: commentColor,
                     ) : const BorderSide(
@@ -494,7 +535,7 @@ class Comment extends StoreWatcher {
                       color: Colors.black12,
                     ),
                   ),
-                  color: selectedItemStore.item == comment.id ?
+                  color: _selectedItemStore.item == comment.id ?
                     Theme.of(context).primaryColor.withOpacity(0.3) :
                     Theme.of(context).cardColor,
                 ),
@@ -516,14 +557,14 @@ class Comment extends StoreWatcher {
               ),
             ),
           ),
-          selectedItemStore.item == comment.id ? buttonRow : new Container(),
+          this._animation.value > 0 ? buttonRow : new Container(),
           !(commentStatus?.hidden ?? false) ?
             childComments :
             new Container(),
         ],
       );
     } else {
-      _hnItemService.getItemByID(itemId);
+      _hnItemService.getItemByID(widget.itemId);
 
       return new Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
