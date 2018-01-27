@@ -45,6 +45,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   HNItemStore _itemStore;
 
   ScrollController _scrollController;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState () {
@@ -65,7 +66,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       debouncer.debounce();
     });
 
-    this.refreshStory(_accountStore.primaryAccount?.accessCookie);
+    this._refreshStory(_accountStore.primaryAccount?.accessCookie);
   }
 
   Future<Null> _scrollToTop () async {
@@ -328,10 +329,20 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         flexibleSpace: new GestureDetector(
           onTap: () => this._scrollToTop(),
         ),
-        actions: <Widget>[],
+        actions: <Widget>[
+          new IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () {
+              this._refreshIndicatorKey.currentState.show();
+              this._refreshStory();
+            }
+          ),
+        ],
       ),
       body: new RefreshIndicator(
-        onRefresh: () => this.refreshStory(account?.accessCookie),
+        key: this._refreshIndicatorKey,
+        onRefresh: () => this._refreshStory(account?.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
@@ -464,7 +475,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
   }
 
-  Future<Null> refreshStory ([Cookie accessCookie]) async {
+  Future<Null> _refreshStory ([Cookie accessCookie]) async {
     await this._hnItemService.getItemByID(widget.itemId, accessCookie);
   }
 
