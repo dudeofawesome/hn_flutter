@@ -83,7 +83,8 @@ class _MainDrawerState extends State<MainDrawer>
                     ..addAll([
                       new ListTile(
                         title: new Text('Add account'),
-                        trailing: const IconButton(
+                        trailing: new IconButton(
+                          disabledColor: Colors.black45,
                           icon: const Icon(Icons.add),
                         ),
                         onTap: () async {
