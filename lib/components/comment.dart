@@ -227,11 +227,25 @@ class Comment extends StoreWatcher {
             ),
             comment.score != null ? new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-              child: new Text('${comment.score} points'),
+              child: new Text(
+                '${comment.score} points',
+                style: new TextStyle(
+                  color: (commentStatus?.upvoted ?? false) ? Colors.orange :
+                    (commentStatus?.downvoted ?? false) ? Colors.blue :
+                      Theme.of(context).textTheme.display1.color,
+                ),
+              ),
             ) : new Container(),
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
-              child: new Text('${timeAgo(new DateTime.fromMillisecondsSinceEpoch(comment.time * 1000))}'),
+              child: new Text(
+                '${timeAgo(new DateTime.fromMillisecondsSinceEpoch(comment.time * 1000))}',
+                style: new TextStyle(
+                  color: (commentStatus?.upvoted ?? false) ? Colors.orange :
+                    (commentStatus?.downvoted ?? false) ? Colors.blue :
+                      Theme.of(context).textTheme.display1.color,
+                ),
+              ),
             ),
           ],
         );
