@@ -143,14 +143,12 @@ class ImagePreview extends StatelessWidget {
 Future<T> showOverlay<T> ({
   @required BuildContext context,
   @required String imageUrl,
-  bool barrierDismissible: true,
 }) {
   return Navigator.of(context, rootNavigator: true).push(new _OverlayRoute<T>(
     child: new ImagePreview(
       imageUrl: imageUrl,
     ),
     theme: Theme.of(context, shadowThemeOnly: true),
-    barrierDismissible: barrierDismissible,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
   ));
 }
@@ -158,11 +156,9 @@ Future<T> showOverlay<T> ({
 class _OverlayRoute<T> extends PopupRoute<T> {
   _OverlayRoute ({
     @required this.theme,
-    bool barrierDismissible: true,
     this.barrierLabel,
     @required this.child,
-  }) : assert(barrierDismissible != null),
-       _barrierDismissible = barrierDismissible;
+  });
 
   final Widget child;
   final ThemeData theme;
@@ -171,8 +167,7 @@ class _OverlayRoute<T> extends PopupRoute<T> {
   Duration get transitionDuration => const Duration(milliseconds: 150);
 
   @override
-  bool get barrierDismissible => _barrierDismissible;
-  final bool _barrierDismissible;
+  bool get barrierDismissible => false;
 
   @override
   Color get barrierColor => Colors.black45;
