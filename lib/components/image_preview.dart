@@ -55,86 +55,111 @@ class ImagePreview extends StatelessWidget {
           //     color: Colors.white,
           //   ),
           // ),
-          new GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: new SizedBox.expand(
-              child: new Hero(
-                tag: this.imageUrl,
-                child: new Image.network(
-                  this.imageUrl,
-                  fit: BoxFit.contain,
-                ),
-              ),
+          _image(context),
+          _bottomSheet(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _image (BuildContext context) {
+    return new Draggable(
+      feedback: new Text('TEST'),
+      childWhenDragging: new Container(),
+      child: new GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: new SizedBox.expand(
+          child: new Hero(
+            tag: this.imageUrl,
+            child: new Image.network(
+              this.imageUrl,
+              fit: BoxFit.contain,
             ),
           ),
-          new IconTheme(
-            data: new IconThemeData(
-              color: Colors.white,
-            ),
-            child: new DefaultTextStyle(
-              style: new TextStyle(
-                color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomSheet (BuildContext context) {
+    return new IconTheme(
+      data: new IconThemeData(
+        color: Colors.white,
+      ),
+      child: new DefaultTextStyle(
+        style: new TextStyle(
+          color: Colors.white,
+        ),
+        child: new DecoratedBox(
+          decoration: new BoxDecoration(
+            color: Colors.grey[800],
+          ),
+          child: new SafeArea(
+            top: false,
+            child: new DecoratedBox(
+              decoration: new BoxDecoration(
+                color: Colors.grey[850],
               ),
-              child: new DecoratedBox(
-                decoration: new BoxDecoration(
-                  color: Colors.grey[850],
-                ),
-                child: new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    new Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: new Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      new Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: new FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: new Text(
+                            this.imageUrl,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
+                        ),
+                      ),
+                      new IconButton(
+                        icon: const Icon(Icons.close),
+                        tooltip: 'Close',
+                      ),
+                    ],
+                  ),
+                  new DecoratedBox(
+                    decoration: new BoxDecoration(
+                      color: Colors.grey[800],
+                    ),
+                    child: new Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        new Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          // child: new Text(
-                          //   this.imageUrl,
-                          //   // softWrap: true,
-                          //   overflow: TextOverflow.ellipsis,
-                          // ),
+                        new IconButton(
+                          icon: const Icon(Icons.open_in_browser),
+                          tooltip: 'Open in Browser',
+                          onPressed: () => this._openInBrowser(context),
                         ),
                         new IconButton(
-                          icon: const Icon(Icons.close),
-                          tooltip: 'Close',
+                          icon: const Icon(Icons.content_copy),
+                          tooltip: 'Copy URL',
+                          onPressed: this._copyUrl,
+                        ),
+                        new IconButton(
+                          icon: const Icon(Icons.share),
+                          tooltip: 'Share',
+                          onPressed: this._shareImage,
+                        ),
+                        new IconButton(
+                          icon: const Icon(Icons.file_download),
+                          tooltip: 'Download',
+                          onPressed: this._download,
                         ),
                       ],
                     ),
-                    new DecoratedBox(
-                      decoration: new BoxDecoration(
-                        color: Colors.grey[800],
-                      ),
-                      child: new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          new IconButton(
-                            icon: const Icon(Icons.open_in_browser),
-                            tooltip: 'Open in Browser',
-                            onPressed: () => this._openInBrowser(context),
-                          ),
-                          new IconButton(
-                            icon: const Icon(Icons.content_copy),
-                            tooltip: 'Copy URL',
-                            onPressed: this._copyUrl,
-                          ),
-                          new IconButton(
-                            icon: const Icon(Icons.share),
-                            tooltip: 'Share',
-                            onPressed: this._shareImage,
-                          ),
-                          new IconButton(
-                            icon: const Icon(Icons.file_download),
-                            tooltip: 'Download',
-                            onPressed: this._download,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
