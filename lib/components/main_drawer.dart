@@ -108,8 +108,8 @@ class _MainDrawerState extends State<MainDrawer>
                 leading: const Icon(Icons.account_circle),
                 title: const Text('Profile'),
                 onTap: () async {
-                  await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
                   this._closeDrawer(context);
+                  await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
                 },
               ),
               const Divider(),
