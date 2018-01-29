@@ -105,6 +105,15 @@ class _MainDrawerState extends State<MainDrawer>
           child: new Column(
             children: <Widget>[
               new ListTile(
+                leading: const Icon(Icons.account_circle),
+                title: const Text('Profile'),
+                onTap: () async {
+                  await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                  this._closeDrawer(context);
+                },
+              ),
+              const Divider(),
+              new ListTile(
                 leading: const Icon(Icons.book),
                 title: const Text('Open Story'),
                 onTap: () async {
