@@ -8,28 +8,33 @@ import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 
-class ImagePreview extends StatelessWidget {
+class ImagePreview extends StatefulWidget{
   final String imageUrl;
 
-  const ImagePreview (
-    {
-      Key key,
-      @required this.imageUrl,
-    }
-  ) : super(key: key);
+  const ImagePreview ({
+    Key key,
+    @required this.imageUrl,
+  }) : super(key: key);
+
+  @override
+  _ImagePreviewState createState () => new _ImagePreviewState();
+}
+
+class _ImagePreviewState extends State<ImagePreview> {
+  Key _dismissibleKey = new Key('dismissibleImage');
 
   _openInBrowser (BuildContext ctx) async {
-    if (await UrlLauncher.canLaunch(this.imageUrl)) {
-      await FlutterWebBrowser.openWebPage(url: this.imageUrl, androidToolbarColor: Theme.of(ctx).primaryColor);
+    if (await UrlLauncher.canLaunch(widget.imageUrl)) {
+      await FlutterWebBrowser.openWebPage(url: widget.imageUrl, androidToolbarColor: Theme.of(ctx).primaryColor);
     }
   }
 
   Future<Null> _copyUrl () async {
-    await Clipboard.setData(new ClipboardData(text: this.imageUrl));
+    await Clipboard.setData(new ClipboardData(text: widget.imageUrl));
   }
 
   Future<Null> _shareImage () async {
-    await share(this.imageUrl);
+    await share(widget.imageUrl);
   }
 
   Future<Null> _download () async {}
@@ -63,16 +68,17 @@ class ImagePreview extends StatelessWidget {
   }
 
   Widget _image (BuildContext context) {
-    return new Draggable(
-      feedback: new Text('TEST'),
-      childWhenDragging: new Container(),
+    return new Dismissible(
+      key: this._dismissibleKey,
+      direction: DismissDirection.vertical,
+      onDismissed: (dir) => Navigator.pop(context),
       child: new GestureDetector(
         onTap: () => Navigator.pop(context),
         child: new SizedBox.expand(
           child: new Hero(
-            tag: this.imageUrl,
+            tag: widget.imageUrl,
             child: new Image.network(
-              this.imageUrl,
+              widget.imageUrl,
               fit: BoxFit.contain,
             ),
           ),
@@ -112,7 +118,7 @@ class ImagePreview extends StatelessWidget {
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: new Text(
-                            this.imageUrl,
+                            widget.imageUrl,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             softWrap: false,
