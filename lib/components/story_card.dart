@@ -162,7 +162,7 @@ class StoryCard extends StoreWatcher {
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(story?.by ?? ((storyStatus?.loading ?? true) ? '…' : '[deleted]')),
+                new Text(story?.by ?? ((story?.deleted ?? false) ? '[deleted]' : '…')),
                 new Text(' • '),
                 new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
               ],
