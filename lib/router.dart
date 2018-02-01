@@ -48,9 +48,7 @@ Route<Null> getRoute (RouteSettings settings) {
       settings: settings,
       builder: (BuildContext context) => new StoryPage(itemId: itemId),
     );
-  }
-
-  if (path[1].startsWith('${Routes.USERS}:')) {
+  } else if (path[1].startsWith('${Routes.USERS}:')) {
     if (path.length != 2) {
       return null;
     }
@@ -59,6 +57,24 @@ Route<Null> getRoute (RouteSettings settings) {
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new UserPage(userId: userId),
+    );
+  } else if (path[1].startsWith('${Routes.STARRED}')) {
+    if (path.length != 2) {
+      return null;
+    }
+
+    return new CupertinoPageRoute<Null>(
+      settings: settings,
+      builder: (BuildContext context) => new StarredPage(),
+    );
+  } else if (path[1].startsWith('${Routes.VOTED}')) {
+    if (path.length != 2) {
+      return null;
+    }
+
+    return new CupertinoPageRoute<Null>(
+      settings: settings,
+      builder: (BuildContext context) => new VotedPage(),
     );
   }
   // The other paths we support are in the routes table.
