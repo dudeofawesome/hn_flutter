@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
+import 'package:fluro/fluro.dart';
 // import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
@@ -192,11 +193,11 @@ class _CommentState extends State<Comment>
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
+    new HNRouter().router.navigateTo(ctx, '/${Routes.USERS}/$author', transition: TransitionType.native);
   }
 
   void _viewContext (BuildContext ctx, int parent) {
-    // Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
+    // new HNRouter().router.navigateTo(ctx, '/${Routes.USERS}/$author', transition: TransitionType.native);
   }
 
   Future<Null> _copyText (String text) async {

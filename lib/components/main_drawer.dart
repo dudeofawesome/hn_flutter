@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
+import 'package:fluro/fluro.dart';
 
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/hn_auth_service.dart';
@@ -114,7 +115,7 @@ class _MainDrawerState extends State<MainDrawer>
                   title: const Text('Profile'),
                   onTap: () async {
                     this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
+                    new HNRouter().router.navigateTo(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}', transition: TransitionType.native);
                   },
                 ),
                 new ListTile(
@@ -122,7 +123,7 @@ class _MainDrawerState extends State<MainDrawer>
                   title: const Text('Stared'),
                   onTap: () async {
                     this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.STARRED}');
+                    new HNRouter().router.navigateTo(context, '/${Routes.STARRED}', transition: TransitionType.native);
                   },
                 ),
                 new ListTile(
@@ -133,7 +134,7 @@ class _MainDrawerState extends State<MainDrawer>
                   title: const Text('Voted'),
                   onTap: () async {
                     this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.VOTED}');
+                    new HNRouter().router.navigateTo(context, '/${Routes.VOTED}', transition: TransitionType.native);
                   },
                 ),
                 const Divider(),
@@ -234,7 +235,7 @@ class _MainDrawerState extends State<MainDrawer>
 
     if (storyId != null) {
       print(storyId);
-      Navigator.pushNamed(ctx, '/${Routes.STORIES}/$storyId');
+      new HNRouter().router.navigateTo(ctx, '/${Routes.STORIES}/$storyId', transition: TransitionType.native);
     }
   }
 
@@ -392,6 +393,6 @@ class _MainDrawerState extends State<MainDrawer>
   }
 
   _openSettings (BuildContext ctx) async {
-    Navigator.pushNamed(ctx, '/${Routes.SETTINGS}');
+    new HNRouter().router.navigateTo(ctx, '/${Routes.SETTINGS}', transition: TransitionType.native);
   }
 }

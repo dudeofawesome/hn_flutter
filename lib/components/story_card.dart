@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
+import 'package:fluro/fluro.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
@@ -41,7 +42,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
+    new HNRouter().router.navigateTo(ctx, '/${Routes.STORIES}/${this.storyId}', transition: TransitionType.native);
   }
 
   Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
@@ -110,7 +111,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}/$by');
+    new HNRouter().router.navigateTo(ctx, '/${Routes.USERS}/$by', transition: TransitionType.native);
   }
 
   @override
