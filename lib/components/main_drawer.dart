@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
@@ -113,6 +115,25 @@ class _MainDrawerState extends State<MainDrawer>
                   onTap: () async {
                     this._closeDrawer(context);
                     await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                  },
+                ),
+                new ListTile(
+                  leading: const Icon(Icons.star),
+                  title: const Text('Stared'),
+                  onTap: () async {
+                    this._closeDrawer(context);
+                    await Navigator.pushNamed(context, '/${Routes.STARRED}');
+                  },
+                ),
+                new ListTile(
+                  leading: new Transform.rotate(
+                    angle: math.PI,
+                    child: const Icon(Icons.arrow_drop_down_circle),
+                  ),
+                  title: const Text('Voted'),
+                  onTap: () async {
+                    this._closeDrawer(context);
+                    await Navigator.pushNamed(context, '/${Routes.VOTED}');
                   },
                 ),
                 const Divider(),

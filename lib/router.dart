@@ -3,14 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart' show MethodChannel, MethodCall;
 
 import 'package:hn_flutter/pages/settings.dart';
+import 'package:hn_flutter/pages/starred.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/user.dart';
+import 'package:hn_flutter/pages/voted.dart';
 import 'package:hn_flutter/utils/channels.dart';
 
 class Routes {
   static const STORIES = 'item';
   static const USERS = 'user';
+  static const STARRED = 'starred';
+  static const VOTED = 'voted';
   static const SETTINGS = 'settings';
 }
 
