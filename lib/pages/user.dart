@@ -50,7 +50,7 @@ class UserPage extends StoreWatcher {
     }
 
     return new DefaultTabController(
-      length: choices.length,
+      length: _choices.length,
       child: new Scaffold(
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
@@ -63,17 +63,17 @@ class UserPage extends StoreWatcher {
               onPressed: () => _saveUser(),
               // color: user.computed.saved ? Colors.amber : Colors.black,
             ),
-            new PopupMenuButton<OverflowMenuItems>(
+            new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-                const PopupMenuItem<OverflowMenuItems>(
-                  value: OverflowMenuItems.SHARE,
+              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
+                const PopupMenuItem<_OverflowMenuItems>(
+                  value: _OverflowMenuItems.SHARE,
                   child: const Text('Share'),
                 ),
               ],
-              onSelected: (OverflowMenuItems selection) async {
+              onSelected: (_OverflowMenuItems selection) async {
                 switch (selection) {
-                  case OverflowMenuItems.SHARE:
+                  case _OverflowMenuItems.SHARE:
                     return await this._shareUser(user.id);
                 }
               },
@@ -82,7 +82,7 @@ class UserPage extends StoreWatcher {
           ],
           bottom: new TabBar(
             // isScrollable: true,
-            tabs: choices.map((choice) => new Tab(
+            tabs: _choices.map((choice) => new Tab(
               text: choice.title.toUpperCase(),
               icon: new Icon(choice.icon),
             )).toList(),
@@ -100,7 +100,7 @@ class UserPage extends StoreWatcher {
   }
 }
 
-enum OverflowMenuItems {
+enum _OverflowMenuItems {
   SHARE,
 }
 
@@ -110,14 +110,14 @@ enum SortModes {
   BEST,
 }
 
-class Choice {
-  const Choice({ this.title, this.icon });
+class _Choice {
+  const _Choice({ this.title, this.icon });
   final String title;
   final IconData icon;
 }
 
-const List<Choice> choices = const <Choice>[
-  const Choice(title: 'User', icon: Icons.account_box),
-  const Choice(title: 'Submitted', icon: Icons.forum),
-  const Choice(title: 'Comments', icon: Icons.chat),
+const List<_Choice> _choices = const <_Choice>[
+  const _Choice(title: 'User', icon: Icons.account_box),
+  const _Choice(title: 'Submitted', icon: Icons.forum),
+  const _Choice(title: 'Comments', icon: Icons.chat),
 ];
