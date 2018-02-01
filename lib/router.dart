@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart' show MethodChannel, MethodCall;
+import 'package:fluro/fluro.dart';
 
 import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/starred.dart';
@@ -9,6 +10,40 @@ import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/user.dart';
 import 'package:hn_flutter/pages/voted.dart';
 import 'package:hn_flutter/utils/channels.dart';
+
+class HNRouter {
+  static final HNRouter _singleton = new HNRouter._internal();
+  final router = new Router();
+
+  HNRouter._internal () {
+    defineRoutes(this.router);
+  }
+
+  factory HNRouter () => _singleton;
+
+  static void defineRoutes (Router router) {
+    router.define('/', handler: storiesHandler);
+    router.define("/item", handler: storiesHandler);
+    router.define("/item/:id", handler: storyHandler);
+    router.define("/user/:id", handler: usersHandler);
+    router.define("/voted", handler: storiesHandler);
+    router.define("/starred", handler: storiesHandler);
+    router.define("/settings", handler: storiesHandler);
+  }
+
+  static final storiesHandler = new Handler(handlerFunc: (context, params) =>
+    new StoriesPage());
+  static final storyHandler = new Handler(handlerFunc: (context, params) =>
+    new StoryPage(itemId: int.parse(params['id'])));
+  static final usersHandler = new Handler(handlerFunc: (context, params) =>
+    new UserPage(userId: params['id']));
+  static final votedHandler = new Handler(handlerFunc: (context, params) =>
+    new VotedPage());
+  static final starredHandler = new Handler(handlerFunc: (context, params) =>
+    new StarredPage());
+  static final settingsHandler = new Handler(handlerFunc: (context, params) =>
+    new SettingsPage());
+}
 
 class Routes {
   static const STORIES = 'item';

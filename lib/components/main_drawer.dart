@@ -114,7 +114,7 @@ class _MainDrawerState extends State<MainDrawer>
                   title: const Text('Profile'),
                   onTap: () async {
                     this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                    await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
                   },
                 ),
                 new ListTile(
@@ -234,7 +234,7 @@ class _MainDrawerState extends State<MainDrawer>
 
     if (storyId != null) {
       print(storyId);
-      Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
+      Navigator.pushNamed(ctx, '/${Routes.STORIES}/$storyId');
     }
   }
 

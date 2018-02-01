@@ -486,7 +486,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 }
 

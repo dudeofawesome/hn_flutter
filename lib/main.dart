@@ -30,6 +30,8 @@ class HNApp extends StatefulWidget {
 }
 
 class HNAppState extends State<HNApp> {
+  HNRouter router = new HNRouter();
+
   @override
   initState () {
     super.initState();
@@ -65,8 +67,7 @@ class HNAppState extends State<HNApp> {
       // showPerformanceOverlay: _configuration.showPerformanceOverlay,
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
       initialRoute: null,
-      routes: staticRoutes,
-      onGenerateRoute: getRoute,
+      onGenerateRoute: router.router.generator,
     );
   }
 
