@@ -152,7 +152,7 @@ class StoryCard extends StoreWatcher {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            story.title ?? 'NO story.title FOUND!',
+            story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
             ),
@@ -162,7 +162,7 @@ class StoryCard extends StoreWatcher {
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(story.by),
+                new Text(story?.by ?? ((storyStatus?.loading ?? true) ? '…' : '[deleted]')),
                 new Text(' • '),
                 new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
               ],
@@ -180,7 +180,7 @@ class StoryCard extends StoreWatcher {
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text('${story.score} points'),
+                new Text('${story.score ?? '0'} points'),
                 new Text('${story.descendants ?? '0'} comments'),
               ],
             ),
