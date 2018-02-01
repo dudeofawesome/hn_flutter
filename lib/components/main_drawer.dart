@@ -52,96 +52,100 @@ class _MainDrawerState extends State<MainDrawer>
 
   @override
   Widget build (BuildContext context) {
-    return new ListView(
-      children: <Widget>[
-        new UserAccountsDrawerHeader(
-          accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
-            new Text(this._accountStore.primaryAccount.email) : null,
-          accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
-          onDetailsPressed: this._toggleAccounts,
-        ),
-        new ClipRect(
-          child: new Align(
-            heightFactor: _animation.value,
-            child: new Container(
-              // color: Colors.grey[700],
-              child: new Column(
-                children: this._accountStore.accounts.values
-                  // .where((account) => account.id != this._accountStore.primaryAccountId)
-                  .map<Widget>((account) =>
-                    new ListTile(
-                      title: new Text(account.id),
-                      trailing: new IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => _showRemoveAccountDialog(context, account.id),
-                      ),
-                      onTap: () async {
-                        this._switchAccount(context, account.id);
-                        this._toggleAccounts();
-                      },
-                    )).toList()
-                    ..addAll([
+    return new MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: new ListView(
+        children: <Widget>[
+          new UserAccountsDrawerHeader(
+            accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
+              new Text(this._accountStore.primaryAccount.email) : null,
+            accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
+            onDetailsPressed: this._toggleAccounts,
+          ),
+          new ClipRect(
+            child: new Align(
+              heightFactor: _animation.value,
+              child: new Container(
+                // color: Colors.grey[700],
+                child: new Column(
+                  children: this._accountStore.accounts.values
+                    // .where((account) => account.id != this._accountStore.primaryAccountId)
+                    .map<Widget>((account) =>
                       new ListTile(
-                        title: new Text('Add account'),
+                        title: new Text(account.id),
                         trailing: new IconButton(
-                          disabledColor: Colors.black45,
-                          icon: const Icon(Icons.add),
+                          icon: const Icon(Icons.close),
+                          onPressed: () => _showRemoveAccountDialog(context, account.id),
                         ),
                         onTap: () async {
-                          if (await this._showAddAccountDialog(context) ?? false) {
-                            this._closeDrawer(context);
-                          }
+                          this._switchAccount(context, account.id);
+                          this._toggleAccounts();
                         },
-                      ),
-                      const Divider(),
-                    ]),
+                      )).toList()
+                      ..addAll([
+                        new ListTile(
+                          title: new Text('Add account'),
+                          trailing: new IconButton(
+                            disabledColor: Colors.black45,
+                            icon: const Icon(Icons.add),
+                          ),
+                          onTap: () async {
+                            if (await this._showAddAccountDialog(context) ?? false) {
+                              this._closeDrawer(context);
+                            }
+                          },
+                        ),
+                        const Divider(),
+                      ]),
+                ),
               ),
             ),
           ),
-        ),
-        new MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: new Column(
-            children: <Widget>[
-              new ListTile(
-                leading: const Icon(Icons.account_circle),
-                title: const Text('Profile'),
-                onTap: () async {
-                  this._closeDrawer(context);
-                  await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
-                },
-              ),
-              const Divider(),
-              new ListTile(
-                leading: const Icon(Icons.book),
-                title: const Text('Open Story'),
-                onTap: () async {
-                  await this._showStoryDialog(context);
-                  this._closeDrawer(context);
-                },
-              ),
-              new ListTile(
-                leading: const Icon(Icons.account_circle),
-                title: const Text('Open User'),
-                onTap: () async {
-                  await this._showUserDialog(context);
-                  this._closeDrawer(context);
-                },
-              ),
-              const Divider(),
-              new ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
-                onTap: () async {
-                  this._closeDrawer(context);
-                  this._openSettings(context);
-                }
-              ),
-            ],
-          ),
-        )
-      ],
+          new MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: new Column(
+              children: <Widget>[
+                new ListTile(
+                  leading: const Icon(Icons.account_circle),
+                  title: const Text('Profile'),
+                  onTap: () async {
+                    this._closeDrawer(context);
+                    await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                  },
+                ),
+                const Divider(),
+                new ListTile(
+                  leading: const Icon(Icons.book),
+                  title: const Text('Open Story'),
+                  onTap: () async {
+                    await this._showStoryDialog(context);
+                    this._closeDrawer(context);
+                  },
+                ),
+                new ListTile(
+                  leading: const Icon(Icons.account_circle),
+                  title: const Text('Open User'),
+                  onTap: () async {
+                    await this._showUserDialog(context);
+                    this._closeDrawer(context);
+                  },
+                ),
+                const Divider(),
+                new ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: const Text('Settings'),
+                  onTap: () async {
+                    this._closeDrawer(context);
+                    this._openSettings(context);
+                  }
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 
