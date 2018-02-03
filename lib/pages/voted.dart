@@ -8,18 +8,20 @@ import 'package:share/share.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/hn_user_service.dart';
 
-class VotedPage extends StoreWatcher {
-  VotedPage ({
-    Key key,
-  }) : super(key: key);
-
+class VotedPage extends StatefulWidget {
   @override
-  void initStores(ListenToStore listenToStore) {
+  _VotedPageState createState () => new _VotedPageState();
+}
+
+class _VotedPageState extends State<VotedPage> with StoreWatcherMixin<VotedPage> {
+  @override
+  void initState () {
+    super.initState();
     listenToStore(userStoreToken);
   }
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build (BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -27,7 +29,7 @@ class VotedPage extends StoreWatcher {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    final HNUserStore userStore = stores[userStoreToken];
+    // final HNUserStore userStore = stores[userStoreToken];
     // final user = userStore.users[this.userId];
 
     // if (user == null) {
