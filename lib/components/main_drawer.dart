@@ -109,62 +109,72 @@ class _MainDrawerState extends State<MainDrawer>
             removeTop: true,
             child: new Column(
               children: <Widget>[
-                new ListTile(
-                  leading: const Icon(Icons.account_circle),
-                  title: const Text('Profile'),
-                  onTap: () async {
-                    this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
-                  },
-                ),
-                new ListTile(
-                  leading: const Icon(Icons.star),
-                  title: const Text('Stared'),
-                  onTap: () async {
-                    this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.STARRED}');
-                  },
-                ),
-                new ListTile(
-                  leading: new Transform.rotate(
-                    angle: math.PI,
-                    child: const Icon(Icons.arrow_drop_down_circle),
-                  ),
-                  title: const Text('Voted'),
-                  onTap: () async {
-                    this._closeDrawer(context);
-                    await Navigator.pushNamed(context, '/${Routes.VOTED}');
-                  },
-                ),
-                const Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.book),
-                  title: const Text('Open Story'),
-                  onTap: () async {
-                    await this._showStoryDialog(context);
-                    this._closeDrawer(context);
-                  },
-                ),
-                new ListTile(
-                  leading: const Icon(Icons.account_circle),
-                  title: const Text('Open User'),
-                  onTap: () async {
-                    await this._showUserDialog(context);
-                    this._closeDrawer(context);
-                  },
-                ),
-                const Divider(),
-                new ListTile(
-                  leading: const Icon(Icons.settings),
-                  title: const Text('Settings'),
-                  onTap: () async {
-                    this._closeDrawer(context);
-                    this._openSettings(context);
-                  }
+                this._accountStore.primaryAccountId != null
+                  ? new Column(
+                    children: <Widget>[
+                      new ListTile(
+                        leading: const Icon(Icons.account_circle),
+                        title: const Text('Profile'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                        },
+                      ),
+                      new ListTile(
+                        leading: const Icon(Icons.star),
+                        title: const Text('Stared'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.STARRED}');
+                        },
+                      ),
+                      new ListTile(
+                        leading: new Transform.rotate(
+                          angle: math.PI,
+                          child: const Icon(Icons.arrow_drop_down_circle),
+                        ),
+                        title: const Text('Voted'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.VOTED}');
+                        },
+                      ),
+                      const Divider(),
+                    ],
+                  )
+                  : new Container(),
+                new Column(
+                  children: <Widget>[
+                    new ListTile(
+                      leading: const Icon(Icons.book),
+                      title: const Text('Open Story'),
+                      onTap: () async {
+                        await this._showStoryDialog(context);
+                        this._closeDrawer(context);
+                      },
+                    ),
+                    new ListTile(
+                      leading: const Icon(Icons.account_circle),
+                      title: const Text('Open User'),
+                      onTap: () async {
+                        await this._showUserDialog(context);
+                        this._closeDrawer(context);
+                      },
+                    ),
+                    const Divider(),
+                    new ListTile(
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () async {
+                        this._closeDrawer(context);
+                        this._openSettings(context);
+                      }
+                    ),
+                  ],
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
