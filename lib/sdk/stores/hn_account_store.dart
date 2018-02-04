@@ -98,6 +98,7 @@ class HNAccountStore extends Store {
           where: '$KEYS_ID = ?',
           whereArgs: [KEY_PRIMARY_ACCOUNT_ID],
         );
+        this._primaryAccountId = null;
       } else {
         final newPrimaryUserId = this._accounts.values.first.id;
         setPrimaryHNAccount(newPrimaryUserId);
