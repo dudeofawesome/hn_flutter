@@ -512,7 +512,7 @@ class _CommentState extends State<Comment>
           new Material(
             color: Theme.of(context).cardColor,
             child: new InkWell(
-              splashColor: Theme.of(context).primaryColor,
+              splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
               onTap: () {
                 if (
                   _selectedItemStore.item != comment.id &&
