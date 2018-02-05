@@ -147,7 +147,7 @@ class _MainDrawerState extends State<MainDrawer>
                   children: <Widget>[
                     new ListTile(
                       leading: const Icon(Icons.book),
-                      title: const Text('Open Story'),
+                      title: const Text('View Story'),
                       onTap: () async {
                         await this._showStoryDialog(context);
                         this._closeDrawer(context);
@@ -155,7 +155,7 @@ class _MainDrawerState extends State<MainDrawer>
                     ),
                     new ListTile(
                       leading: const Icon(Icons.account_circle),
-                      title: const Text('Open User'),
+                      title: const Text('View User'),
                       onTap: () async {
                         await this._showUserDialog(context);
                         this._closeDrawer(context);
