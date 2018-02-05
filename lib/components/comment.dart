@@ -504,6 +504,7 @@ class _CommentState extends State<Comment>
       return new Column(
         children: <Widget>[
           new InkWell(
+            splashColor: Theme.of(context).primaryColor,
             onTap: () {
               if (
                 _selectedItemStore.item != comment.id &&
