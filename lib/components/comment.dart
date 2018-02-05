@@ -482,15 +482,17 @@ class _CommentState extends State<Comment>
         ),
       );
 
-      final childComments = comment.kids != null && widget.loadChildren && !(commentStatus?.hidden ?? false) ?
-        new Column(
+      final childComments = (
+          comment.kids != null && widget.loadChildren && !(commentStatus?.hidden ?? false)
+        )
+        ? new Column(
           children: comment.kids.map((kid) => new Comment(
             itemId: kid,
             depth: widget.depth + 1,
             op: widget.op,
           )).toList(),
-        ) :
-        new Container();
+        )
+        : new Container();
 
       Color commentColor;
       if (widget.depth > 0) {
