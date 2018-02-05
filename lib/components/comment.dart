@@ -58,8 +58,9 @@ class _CommentState extends State<Comment>
   UIStore _selectedItemStore;
   HNAccountStore _accountStore;
 
-  Animation<double> _animation;
   AnimationController _controller;
+  Animation<double> _btnHeightAnimation;
+  ColorTween _backgroundColorTween;
 
   @override
   void initState () {
@@ -69,20 +70,21 @@ class _CommentState extends State<Comment>
     this._selectedItemStore = listenToStore(uiStoreToken);
     this._accountStore = listenToStore(accountStoreToken);
 
-    _controller = new AnimationController(
+    this._controller = new AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _animation = new CurvedAnimation(
+    this._btnHeightAnimation = new CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOut,
         reverseCurve: Curves.easeIn,
-      )
-      ..addListener(() {
-        setState(() {
-          // the state that has changed here is the animation object’s value
-        });
-      });
+      )..addListener(() => setState(() {
+        // the state that has changed here is the animation object’s value
+      }));
+    this._backgroundColorTween = new ColorTween(
+      begin: Colors.transparent,
+      end: Colors.red,
+    )..animate(this._btnHeightAnimation);
   }
 
   void _upvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
@@ -466,7 +468,7 @@ class _CommentState extends State<Comment>
 
       final buttonRow = new ClipRect(
         child: new Align(
-          heightFactor: this._animation.value,
+          heightFactor: this._btnHeightAnimation.value,
           child: new Container(
             decoration: new BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -503,64 +505,67 @@ class _CommentState extends State<Comment>
         commentColor = commentColors[index];
       }
 
+      this._backgroundColorTween.end = Theme.of(context).primaryColor.withOpacity(0.3);
+
       return new Column(
         children: <Widget>[
-          new InkWell(
-            splashColor: Theme.of(context).primaryColor,
-            onTap: () {
-              if (
-                _selectedItemStore.item != comment.id &&
-                commentStatus.authTokens?.reply == null && account?.accessCookie != null
-              ) {
-                _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
-              }
+          new Material(
+            color: Theme.of(context).cardColor,
+            child: new InkWell(
+              splashColor: Theme.of(context).primaryColor,
+              onTap: () {
+                if (
+                  _selectedItemStore.item != comment.id &&
+                  commentStatus.authTokens?.reply == null && account?.accessCookie != null
+                ) {
+                  _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
+                }
 
-              this._toggleButtonBar(comment.id);
-            },
-            onLongPress: () {
-              SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
-              showHideItem(comment.id);
-            },
-            child: new Padding(
-              padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
-              child: new Container(
-                width: double.INFINITY,
-                decoration: new BoxDecoration(
-                  border: new Border(
-                    left: widget.depth > 0 ? new BorderSide(
-                      width: 4.0,
-                      color: commentColor,
-                    ) : const BorderSide(
-                      width: 0.0,
-                    ),
-                    bottom: const BorderSide(
-                      width: 1.0,
-                      color: Colors.black12,
-                    ),
-                  ),
-                  color: _selectedItemStore.item == comment.id ?
-                    Theme.of(context).primaryColor.withOpacity(0.3) :
-                    Theme.of(context).cardColor,
-                ),
-                child: new Column(
-                  children: <Widget>[
-                    new Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: new Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          topRow,
-                          !(commentStatus?.hidden ?? false) ? content : new Container(),
-                        ],
+                this._toggleButtonBar(comment.id);
+              },
+              onLongPress: () {
+                SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
+                showHideItem(comment.id);
+              },
+              child: new Padding(
+                padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
+                child: new Container(
+                  width: double.INFINITY,
+                  decoration: new BoxDecoration(
+                    border: new Border(
+                      left: widget.depth > 0 ? new BorderSide(
+                        width: 4.0,
+                        color: commentColor,
+                      ) : const BorderSide(
+                        width: 0.0,
+                      ),
+                      bottom: const BorderSide(
+                        width: 1.0,
+                        color: Colors.black12,
                       ),
                     ),
-                  ],
+                    color: this._backgroundColorTween.lerp(this._btnHeightAnimation.value),
+                  ),
+                  child: new Column(
+                    children: <Widget>[
+                      new Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: new Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            topRow,
+                            !(commentStatus?.hidden ?? false) ? content : new Container(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-          this._animation.value > 0 ? buttonRow : new Container(),
+          this._btnHeightAnimation.value > 0 ? buttonRow : new Container(),
           !(commentStatus?.hidden ?? false) ?
             childComments :
             new Container(),
