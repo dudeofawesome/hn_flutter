@@ -205,10 +205,7 @@ class _CommentState extends State<Comment>
     await Clipboard.setData(new ClipboardData(text: text));
   }
 
-  void _toggleButtonBar (int commentId) {
-    this._controller.reverse();
-    selectItem(commentId);
-  }
+  void _toggleButtonBar (int commentId) => selectItem(commentId);
 
   @override
   Widget build (BuildContext context) {
@@ -225,6 +222,11 @@ class _CommentState extends State<Comment>
 
     if (_selectedItemStore.item != null && _selectedItemStore.item == comment?.id) {
       this._controller.forward();
+    } else if (
+      _selectedItemStore.item != comment?.id &&
+      (this._controller.isAnimating || this._controller.isCompleted)
+    ) {
+      this._controller.reverse();
     }
 
     if (comment != null) {
