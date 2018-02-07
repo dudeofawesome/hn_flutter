@@ -19,10 +19,14 @@ class Injector {
 
   factory Injector () => _singleton;
 
-  Injector._internal ();
+  Injector._internal () {
+    for (final flavor in Flavor.values) {
+      this._instances[flavor] = new Map();
+    }
+  }
 
   HNUserService get hnUserService {
-    if (_instances[_flavor]?.containsKey('HNUserService') == null) {
+    if (!_instances[_flavor].containsKey('HNUserService')) {
       HNUserService instance;
       switch (_flavor) {
         case Flavor.PROD:
