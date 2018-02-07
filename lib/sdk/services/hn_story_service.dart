@@ -6,7 +6,7 @@ import 'dart:convert' show JSON;
 import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
-import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 class HNStoryService {
   HNConfig _config = new HNConfig();

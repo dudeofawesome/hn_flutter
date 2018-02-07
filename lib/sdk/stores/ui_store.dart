@@ -9,7 +9,7 @@ import 'package:tuple/tuple.dart';
 
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
-import 'package:hn_flutter/sdk/local_storage_service.dart';
+import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 
 class UIStore extends Store {
   static final UIStore _singleton = new UIStore._internal();

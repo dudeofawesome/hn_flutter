@@ -6,7 +6,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
-import 'package:hn_flutter/sdk/hn_user_service.dart';
+import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 
 class VotedPage extends StatefulWidget {
   @override
