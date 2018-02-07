@@ -16,9 +16,12 @@ import 'package:hn_flutter/pages/user.dart';
 
 import 'package:hn_flutter/router.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 
 Future<Null> main () async {
+  Injector.configure(Flavor.PROD);
+
   await new LocalStorageService().init();
 
   runApp(new HNApp());
