@@ -6,17 +6,18 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:hn_flutter/sdk/services/abstract/local_storage_service.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
 
-class LocalStorageService {
-  static final LocalStorageService _singleton = new LocalStorageService._internal();
+class LocalStorageServiceMock implements LocalStorageService {
+  static final LocalStorageServiceMock _singleton = new LocalStorageServiceMock._internal();
 
   Directory _documentsDirectory;
   Map<String, Database> _databases = new Map();
 
-  LocalStorageService._internal ();
+  LocalStorageServiceMock._internal ();
 
-  factory LocalStorageService () {
+  factory LocalStorageServiceMock () {
     return _singleton;
   }
 

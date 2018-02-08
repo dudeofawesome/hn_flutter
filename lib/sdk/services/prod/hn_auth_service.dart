@@ -4,19 +4,20 @@ import 'dart:convert' show UTF8;
 
 import 'package:http/http.dart' as http;
 
+import 'package:hn_flutter/sdk/services/abstract/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 
-class HNAuthService {
-  static final HNAuthService _singleton = new HNAuthService._internal();
+class HNAuthServiceProd implements HNAuthService {
+  static final HNAuthServiceProd _singleton = new HNAuthServiceProd._internal();
 
   final _config = new HNConfig();
   final _httpClient = new HttpClient();
 
-  HNAuthService._internal ();
+  HNAuthServiceProd._internal ();
 
-  factory HNAuthService () {
+  factory HNAuthServiceProd () {
     return _singleton;
   }
 

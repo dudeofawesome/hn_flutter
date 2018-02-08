@@ -3,14 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart' show MethodChannel, MethodCall;
 
 import 'package:hn_flutter/pages/settings.dart';
+import 'package:hn_flutter/pages/starred.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/user.dart';
+import 'package:hn_flutter/pages/voted.dart';
 import 'package:hn_flutter/utils/channels.dart';
 
 class Routes {
   static const STORIES = 'item';
   static const USERS = 'user';
+  static const STARRED = 'starred';
+  static const VOTED = 'voted';
   static const SETTINGS = 'settings';
 }
 
@@ -44,9 +48,7 @@ Route<Null> getRoute (RouteSettings settings) {
       settings: settings,
       builder: (BuildContext context) => new StoryPage(itemId: itemId),
     );
-  }
-
-  if (path[1].startsWith('${Routes.USERS}:')) {
+  } else if (path[1].startsWith('${Routes.USERS}:')) {
     if (path.length != 2) {
       return null;
     }
@@ -55,6 +57,24 @@ Route<Null> getRoute (RouteSettings settings) {
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new UserPage(userId: userId),
+    );
+  } else if (path[1].startsWith('${Routes.STARRED}')) {
+    if (path.length != 2) {
+      return null;
+    }
+
+    return new CupertinoPageRoute<Null>(
+      settings: settings,
+      builder: (BuildContext context) => new StarredPage(),
+    );
+  } else if (path[1].startsWith('${Routes.VOTED}')) {
+    if (path.length != 2) {
+      return null;
+    }
+
+    return new CupertinoPageRoute<Null>(
+      settings: settings,
+      builder: (BuildContext context) => new VotedPage(),
     );
   }
   // The other paths we support are in the routes table.

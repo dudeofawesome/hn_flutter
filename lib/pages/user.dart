@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
-import 'package:hn_flutter/sdk/hn_user_service.dart';
+import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 
 import 'package:hn_flutter/components/user_about_tab.dart';
 import 'package:hn_flutter/components/user_comments_tab.dart';
 import 'package:hn_flutter/components/user_submitted_tab.dart';
 
 class UserPage extends StoreWatcher {
+  final HNUserService _hnUserService = new Injector().hnUserService;
+
   final String userId;
 
   UserPage ({
@@ -45,12 +48,11 @@ class UserPage extends StoreWatcher {
 
     if (user == null) {
       print('getting user $userId');
-      final HNUserService _hnStoryService = new HNUserService();
-      _hnStoryService.getUserByID(this.userId);
+      this._hnUserService.getUserByID(this.userId);
     }
 
     return new DefaultTabController(
-      length: choices.length,
+      length: _choices.length,
       child: new Scaffold(
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
@@ -63,17 +65,17 @@ class UserPage extends StoreWatcher {
               onPressed: () => _saveUser(),
               // color: user.computed.saved ? Colors.amber : Colors.black,
             ),
-            new PopupMenuButton<OverflowMenuItems>(
+            new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-                const PopupMenuItem<OverflowMenuItems>(
-                  value: OverflowMenuItems.SHARE,
+              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
+                const PopupMenuItem<_OverflowMenuItems>(
+                  value: _OverflowMenuItems.SHARE,
                   child: const Text('Share'),
                 ),
               ],
-              onSelected: (OverflowMenuItems selection) async {
+              onSelected: (_OverflowMenuItems selection) async {
                 switch (selection) {
-                  case OverflowMenuItems.SHARE:
+                  case _OverflowMenuItems.SHARE:
                     return await this._shareUser(user.id);
                 }
               },
@@ -82,7 +84,7 @@ class UserPage extends StoreWatcher {
           ],
           bottom: new TabBar(
             // isScrollable: true,
-            tabs: choices.map((choice) => new Tab(
+            tabs: _choices.map((choice) => new Tab(
               text: choice.title.toUpperCase(),
               icon: new Icon(choice.icon),
             )).toList(),
@@ -100,7 +102,7 @@ class UserPage extends StoreWatcher {
   }
 }
 
-enum OverflowMenuItems {
+enum _OverflowMenuItems {
   SHARE,
 }
 
@@ -110,38 +112,14 @@ enum SortModes {
   BEST,
 }
 
-class Choice {
-  const Choice({ this.title, this.icon });
+class _Choice {
+  const _Choice({ this.title, this.icon });
   final String title;
   final IconData icon;
 }
 
-const List<Choice> choices = const <Choice>[
-  const Choice(title: 'User', icon: Icons.account_box),
-  const Choice(title: 'Submitted', icon: Icons.forum),
-  const Choice(title: 'Comments', icon: Icons.chat),
+const List<_Choice> _choices = const <_Choice>[
+  const _Choice(title: 'User', icon: Icons.account_box),
+  const _Choice(title: 'Submitted', icon: Icons.forum),
+  const _Choice(title: 'Comments', icon: Icons.chat),
 ];
-
-class ChoiceCard extends StatelessWidget {
-  const ChoiceCard({ Key key, this.choice }) : super(key: key);
-
-  final Choice choice;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextStyle textStyle = Theme.of(context).textTheme.display1;
-    return new Card(
-      color: Colors.white,
-      child: new Center(
-        child: new Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            new Icon(choice.icon, size: 128.0, color: textStyle.color),
-            new Text(choice.title, style: textStyle),
-          ],
-        ),
-      ),
-    );
-  }
-}
