@@ -12,3 +12,6 @@ packages
 **/*.jks
 **/*.p12
 **/*.pem
+
+# error logs
+flutter_*.log

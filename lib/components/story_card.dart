@@ -8,10 +8,11 @@ import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBro
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
-import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
@@ -19,7 +20,7 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryCard extends StoreWatcher {
-  final _hnItemService = new HNItemService();
+  final _hnItemService = new Injector().hnItemService;
 
   final int storyId;
 
@@ -125,7 +126,7 @@ class StoryCard extends StoreWatcher {
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
-        final HNItemService _hnItemService = new HNItemService();
+        final HNItemService _hnItemService = new Injector().hnItemService;
         _hnItemService.getItemByID(storyId, account?.accessCookie);
       }
 
@@ -152,7 +153,7 @@ class StoryCard extends StoreWatcher {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
-            story.title ?? 'NO story.title FOUND!',
+            story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
               fontSize: 18.0,
             ),
@@ -162,7 +163,7 @@ class StoryCard extends StoreWatcher {
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(story.by),
+                new Text(story?.by ?? ((story?.deleted ?? false) ? '[deleted]' : '…')),
                 new Text(' • '),
                 new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
               ],
@@ -180,7 +181,7 @@ class StoryCard extends StoreWatcher {
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text('${story.score} points'),
+                new Text('${story.score ?? '0'} points'),
                 new Text('${story.descendants ?? '0'} comments'),
               ],
             ),
@@ -257,7 +258,7 @@ class StoryCard extends StoreWatcher {
     List<Widget> cardContent;
     if (story.url != null) {
       cardContent = <Widget>[
-        new GestureDetector(
+        new InkWell(
           onTap: () => this._openStoryUrl(context, story.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,
@@ -315,7 +316,7 @@ class StoryCard extends StoreWatcher {
     return new Padding(
       padding: cardOuterPadding,
       child: new Card(
-        child: new GestureDetector(
+        child: new InkWell(
           onTap: () => this._openStory(context),
           child: new Column(
             mainAxisSize: MainAxisSize.min,
