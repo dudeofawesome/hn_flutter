@@ -4,6 +4,7 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/services/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
@@ -22,7 +23,7 @@ class _MainDrawerState extends State<MainDrawer>
   Animation<double> _animation;
   AnimationController _controller;
 
-  final HNAuthService _hnAuthService = new HNAuthService();
+  final HNAuthService _hnAuthService = new Injector().hnAuthService;
   HNAccountStore _accountStore;
 
   void initState () {
