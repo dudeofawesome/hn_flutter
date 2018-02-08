@@ -112,11 +112,9 @@ class _ImagePreviewState extends State<ImagePreview> {
                   new Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      new Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: new FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
+                      new Expanded(
+                        child: new Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: new Text(
                             widget.imageUrl,
                             overflow: TextOverflow.ellipsis,
