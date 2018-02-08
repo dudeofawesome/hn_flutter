@@ -1,4 +1,5 @@
 import 'package:hn_flutter/sdk/services/hn_user_service.dart';
+import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 import 'package:hn_flutter/sdk/services/hn_story_service.dart';
 import 'package:hn_flutter/sdk/services/hn_comment_service.dart';
 
@@ -40,6 +41,22 @@ class Injector {
       _instances[_flavor]['HNUserService'] = instance;
     }
     return _instances[_flavor]['HNUserService'];
+  }
+
+  HNItemService get hnItemService {
+    if (!_instances[_flavor].containsKey('HNItemService')) {
+      HNItemService instance;
+      switch (_flavor) {
+        case Flavor.PROD:
+          instance = new HNItemServiceProd();
+          break;
+        case Flavor.MOCK:
+          instance = new HNItemServiceMock();
+          break;
+      }
+      _instances[_flavor]['HNItemService'] = instance;
+    }
+    return _instances[_flavor]['HNItemService'];
   }
 
   HNStoryService get hnStoryService {
