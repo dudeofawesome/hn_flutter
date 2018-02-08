@@ -10,6 +10,7 @@ import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/story_card.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/services/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
@@ -26,7 +27,7 @@ class StoriesPage extends StatefulWidget {
 }
 
 class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<StoriesPage> {
-  final HNStoryService _hnStoryService = new HNStoryService();
+  final HNStoryService _hnStoryService = new Injector().hnStoryService;
 
   HNAccountStore _accountStore;
   HNItemStore _itemStore;
