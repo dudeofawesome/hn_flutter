@@ -126,6 +126,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                       new IconButton(
                         icon: const Icon(Icons.close),
                         tooltip: 'Close',
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ],
                   ),
@@ -151,11 +152,11 @@ class _ImagePreviewState extends State<ImagePreview> {
                           tooltip: 'Share',
                           onPressed: this._shareImage,
                         ),
-                        new IconButton(
-                          icon: const Icon(Icons.file_download),
-                          tooltip: 'Download',
-                          onPressed: this._download,
-                        ),
+                        // new IconButton(
+                        //   icon: const Icon(Icons.file_download),
+                        //   tooltip: 'Download',
+                        //   onPressed: this._download,
+                        // ),
                       ],
                     ),
                   ),
