@@ -8,15 +8,16 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
-import 'package:hn_flutter/sdk/local_storage_service.dart';
+import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 
 class HNAccountStore extends Store {
   static final HNAccountStore _singleton = new HNAccountStore._internal();
 
-  final LocalStorageService _localStorage = new LocalStorageService();
+  final LocalStorageService _localStorage = new Injector().localStorageService;
 
   String _primaryAccountId;
   final Map<String, HNAccount> _accounts = new Map();

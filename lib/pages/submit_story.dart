@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
-import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 class SubmitStoryPage extends StoreWatcher {
   SubmitStoryPage ({

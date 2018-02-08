@@ -5,13 +5,14 @@ import 'dart:io' show HttpClient, ContentType, Cookie;
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
+import 'package:hn_flutter/sdk/services/abstract/hn_item_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
-class HNItemService {
+class HNItemServiceMock implements HNItemService {
   final _config = new HNConfig();
   final _httpClient = new HttpClient();
   final _itemStore = new HNItemStore();

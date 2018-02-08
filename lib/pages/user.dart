@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
-import 'package:hn_flutter/sdk/hn_user_service.dart';
+import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 
 import 'package:hn_flutter/components/user_about_tab.dart';
 import 'package:hn_flutter/components/user_comments_tab.dart';
 import 'package:hn_flutter/components/user_submitted_tab.dart';
 
 class UserPage extends StoreWatcher {
+  final HNUserService _hnUserService = new Injector().hnUserService;
+
   final String userId;
 
   UserPage ({
@@ -45,8 +48,7 @@ class UserPage extends StoreWatcher {
 
     if (user == null) {
       print('getting user $userId');
-      final HNUserService _hnStoryService = new HNUserService();
-      _hnStoryService.getUserByID(this.userId);
+      this._hnUserService.getUserByID(this.userId);
     }
 
     return new DefaultTabController(

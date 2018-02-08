@@ -5,7 +5,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 
-import 'package:hn_flutter/sdk/hn_story_service.dart';
+import 'package:hn_flutter/sdk/services/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 
