@@ -12,6 +12,7 @@ import 'package:throttle_debounce/throttle_debounce.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:tuple/tuple.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
@@ -39,7 +40,7 @@ class StoryPage extends StatefulWidget {
 }
 
 class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage> {
-  final _hnItemService = new HNItemService();
+  final _hnItemService = new Injector().hnItemService;
 
   HNAccountStore _accountStore;
   HNItemStore _itemStore;

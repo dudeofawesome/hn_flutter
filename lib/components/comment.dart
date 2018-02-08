@@ -8,6 +8,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
@@ -53,7 +54,7 @@ class Comment extends StatefulWidget {
 class _CommentState extends State<Comment>
   with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin {
 
-  final _hnItemService = new HNItemService();
+  final _hnItemService = new Injector().hnItemService;
   HNItemStore _itemStore;
   UIStore _selectedItemStore;
   HNAccountStore _accountStore;

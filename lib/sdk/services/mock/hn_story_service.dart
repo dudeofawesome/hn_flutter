@@ -9,9 +9,10 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 class HNStoryServiceMock implements HNStoryService {
   HNConfig _config = new HNConfig();
-  HNItemService _hnItemService = new HNItemService();
+  HNItemService _hnItemService = new Injector().hnItemService;
 
   Future<List<int>> _getStories (
     String sort,

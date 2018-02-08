@@ -8,6 +8,7 @@ import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBro
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
@@ -19,7 +20,7 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryCard extends StoreWatcher {
-  final _hnItemService = new HNItemService();
+  final _hnItemService = new Injector().hnItemService;
 
   final int storyId;
 
@@ -125,7 +126,7 @@ class StoryCard extends StoreWatcher {
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
-        final HNItemService _hnItemService = new HNItemService();
+        final HNItemService _hnItemService = new Injector().hnItemService;
         _hnItemService.getItemByID(storyId, account?.accessCookie);
       }
 
