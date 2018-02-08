@@ -96,20 +96,19 @@ class _ImagePreviewState extends State<ImagePreview> {
         style: new TextStyle(
           color: Colors.white,
         ),
-        child: new DecoratedBox(
-          decoration: new BoxDecoration(
-            color: Colors.grey[800],
-          ),
+        child: new Material(
+          color: Colors.grey[800],
           child: new SafeArea(
             top: false,
-            child: new DecoratedBox(
-              decoration: new BoxDecoration(
-                color: Colors.grey[850],
-              ),
-              child: new Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  new Row(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Material(
+                  color: Colors.grey[850],
+                  textStyle: new TextStyle(
+                    color: Colors.white,
+                  ),
+                  child: new Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       new Expanded(
@@ -130,38 +129,33 @@ class _ImagePreviewState extends State<ImagePreview> {
                       ),
                     ],
                   ),
-                  new DecoratedBox(
-                    decoration: new BoxDecoration(
-                      color: Colors.grey[800],
+                ),
+                new Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    new IconButton(
+                      icon: const Icon(Icons.open_in_browser),
+                      tooltip: 'Open in Browser',
+                      onPressed: () => this._openInBrowser(context),
                     ),
-                    child: new Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        new IconButton(
-                          icon: const Icon(Icons.open_in_browser),
-                          tooltip: 'Open in Browser',
-                          onPressed: () => this._openInBrowser(context),
-                        ),
-                        new IconButton(
-                          icon: const Icon(Icons.content_copy),
-                          tooltip: 'Copy URL',
-                          onPressed: this._copyUrl,
-                        ),
-                        new IconButton(
-                          icon: const Icon(Icons.share),
-                          tooltip: 'Share',
-                          onPressed: this._shareImage,
-                        ),
-                        // new IconButton(
-                        //   icon: const Icon(Icons.file_download),
-                        //   tooltip: 'Download',
-                        //   onPressed: this._download,
-                        // ),
-                      ],
+                    new IconButton(
+                      icon: const Icon(Icons.content_copy),
+                      tooltip: 'Copy URL',
+                      onPressed: this._copyUrl,
                     ),
-                  ),
-                ],
-              ),
+                    new IconButton(
+                      icon: const Icon(Icons.share),
+                      tooltip: 'Share',
+                      onPressed: this._shareImage,
+                    ),
+                    // new IconButton(
+                    //   icon: const Icon(Icons.file_download),
+                    //   tooltip: 'Download',
+                    //   onPressed: this._download,
+                    // ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
