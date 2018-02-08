@@ -22,7 +22,7 @@ import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 Future<Null> main () async {
   Injector.configure(Flavor.PROD);
 
-  await new LocalStorageService().init();
+  await new Injector().localStorageService.init();
 
   runApp(new HNApp());
 }

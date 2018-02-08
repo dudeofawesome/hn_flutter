@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tuple/tuple.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/sqflite_vals.dart';
 import 'package:hn_flutter/sdk/services/local_storage_service.dart';
@@ -14,7 +15,7 @@ import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 class UIStore extends Store {
   static final UIStore _singleton = new UIStore._internal();
 
-  final LocalStorageService _localStorage = new LocalStorageService();
+  final LocalStorageService _localStorage = new Injector().localStorageService;
 
   UIStore._internal () {
     new Future(() async {
