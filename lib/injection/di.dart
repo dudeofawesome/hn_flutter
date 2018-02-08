@@ -3,6 +3,7 @@ import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 import 'package:hn_flutter/sdk/services/hn_story_service.dart';
 import 'package:hn_flutter/sdk/services/hn_comment_service.dart';
 import 'package:hn_flutter/sdk/services/hn_auth_service.dart';
+import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 
 enum Flavor {
   PROD,
@@ -106,5 +107,21 @@ class Injector {
       _instances[_flavor]['HNAuthService'] = instance;
     }
     return _instances[_flavor]['HNAuthService'];
+  }
+
+  LocalStorageService get localStorageService {
+    if (!_instances[_flavor].containsKey('LocalStorageService')) {
+      LocalStorageService instance;
+      switch (_flavor) {
+        case Flavor.PROD:
+          instance = new LocalStorageServiceProd();
+          break;
+        case Flavor.MOCK:
+          instance = new LocalStorageServiceMock();
+          break;
+      }
+      _instances[_flavor]['LocalStorageService'] = instance;
+    }
+    return _instances[_flavor]['LocalStorageService'];
   }
 }
