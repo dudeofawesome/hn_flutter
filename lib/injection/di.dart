@@ -1,5 +1,6 @@
 import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 import 'package:hn_flutter/sdk/services/hn_story_service.dart';
+import 'package:hn_flutter/sdk/services/hn_comment_service.dart';
 
 enum Flavor {
   PROD,
@@ -55,5 +56,21 @@ class Injector {
       _instances[_flavor]['HNStoryService'] = instance;
     }
     return _instances[_flavor]['HNStoryService'];
+  }
+
+  HNCommentService get hnCommentService {
+    if (!_instances[_flavor].containsKey('HNCommentService')) {
+      HNCommentService instance;
+      switch (_flavor) {
+        case Flavor.PROD:
+          instance = new HNCommentServiceProd();
+          break;
+        case Flavor.MOCK:
+          instance = new HNCommentServiceMock();
+          break;
+      }
+      _instances[_flavor]['HNCommentService'] = instance;
+    }
+    return _instances[_flavor]['HNCommentService'];
   }
 }
