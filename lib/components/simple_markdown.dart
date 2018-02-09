@@ -24,7 +24,7 @@ class SimpleMarkdown extends StatelessWidget {
     if (await UrlLauncher.canLaunch(url)) {
       if (await this._isImage(url)) {
         print('''That's an image!!!''');
-        this._showImage(ctx, 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png');
+        this._showImage(ctx, url);
       } else {
         await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
       }
@@ -32,7 +32,6 @@ class SimpleMarkdown extends StatelessWidget {
   }
 
   Future<bool> _isImage (String url) async {
-    return true;
     final head = await http.head(url);
 
     String contentType;
@@ -47,12 +46,6 @@ class SimpleMarkdown extends StatelessWidget {
   }
 
   void _showImage (BuildContext ctx, String url) {
-    // Navigator.push(ctx, new MaterialPageRoute<Null>(
-    //   fullscreenDialog: true,
-    //   builder: (BuildContext context) {
-    //     return new ImagePreview(imageUrl: url);
-    //   }
-    // ));
     showOverlay(
       context: ctx,
       imageUrl: url,
