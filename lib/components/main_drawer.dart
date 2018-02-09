@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/animation.dart';
@@ -150,7 +151,11 @@ class _MainDrawerState extends State<MainDrawer>
                       leading: const Icon(Icons.book),
                       title: const Text('View Story'),
                       onTap: () async {
-                        await this._showStoryDialog(context);
+                        final storyId = await this._showStoryDialog(context);
+                        if (storyId != null) {
+                          print(storyId);
+                          await Navigator.pushNamed(context, '/${Routes.STORIES}:$storyId');
+                        }
                         this._closeDrawer(context);
                       },
                     ),
@@ -158,7 +163,11 @@ class _MainDrawerState extends State<MainDrawer>
                       leading: const Icon(Icons.account_circle),
                       title: const Text('View User'),
                       onTap: () async {
-                        await this._showUserDialog(context);
+                        final userId = await this._showUserDialog(context);
+                        if (userId != null) {
+                          print(userId);
+                          await Navigator.pushNamed(context, '/${Routes.USERS}:$userId');
+                        }
                         this._closeDrawer(context);
                       },
                     ),
@@ -202,10 +211,10 @@ class _MainDrawerState extends State<MainDrawer>
     }
   }
 
-  _showStoryDialog (BuildContext ctx) async {
+  Future<int> _showStoryDialog (BuildContext ctx) async {
     String storyId;
 
-    storyId = await showDialog(
+    return await showDialog(
       context: ctx,
       child: new SimpleDialog(
         title: const Text('Enter story ID'),
@@ -242,17 +251,12 @@ class _MainDrawerState extends State<MainDrawer>
         ],
       )
     );
-
-    if (storyId != null) {
-      print(storyId);
-      Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
-    }
   }
 
-  _showUserDialog (BuildContext ctx) async {
+  Future<String> _showUserDialog (BuildContext ctx) async {
     String userId;
 
-    userId = await showDialog(
+    return await showDialog(
       context: ctx,
       child: new SimpleDialog(
         title: const Text('Enter user ID'),
