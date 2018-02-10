@@ -11,20 +11,26 @@ import 'package:hn_flutter/sdk/models/hn_user.dart';
 import 'package:hn_flutter/sdk/actions/hn_user_actions.dart';
 
 class HNUserServiceProd implements HNUserService {
-  final _config = new HNConfig();
+  static final _config = new HNConfig();
   final _receivePort = new ReceivePort();
   SendPort _sendPort;
-
-  HNUserServiceProd () {
-    this._init();
-  }
+  bool _initializing = false;
 
   Future<Null> _init () async {
-    await Isolate.spawn(this._onMessage, this._receivePort.sendPort);
-    this._sendPort = await _receivePort.first;
+    if (this._sendPort == null && !this._initializing) {
+      this._initializing = true;
+      await Isolate.spawn(_onMessage, this._receivePort.sendPort);
+      this._sendPort = await _receivePort.first;
+      this._initializing = false;
+    } else if (this._initializing) {
+      // TODO: figure out how to properly `await`
+      do {
+        await new Future.delayed(const Duration(milliseconds: 1));
+      } while (this._initializing);
+    }
   }
 
-  Future<Null> _onMessage (SendPort sendPort) async {
+  static Future<Null> _onMessage (SendPort sendPort) async {
     final port = new ReceivePort();
     sendPort.send(port.sendPort);
 
@@ -35,7 +41,7 @@ class HNUserServiceProd implements HNUserService {
 
       switch (data.type) {
         case _IsolateMessageType.GET_USER_BY_ID:
-          final user = await http.get('${this._config.url}/user/${data.data}.json')
+          final user = await http.get('${_config.url}/user/${data.data}.json')
             .then((res) => JSON.decode(res.body))
             .then((user) => new HNUser.fromMap(user));
           replyTo.send(user);
@@ -47,6 +53,8 @@ class HNUserServiceProd implements HNUserService {
   }
 
   Future<HNUser> getUserByID (String id) async {
+    await this._init();
+
     addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
 
     final response = new ReceivePort();
