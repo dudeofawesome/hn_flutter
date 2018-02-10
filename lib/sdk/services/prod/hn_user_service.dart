@@ -14,20 +14,12 @@ class HNUserServiceProd implements HNUserService {
   static final _config = new HNConfig();
   final _receivePort = new ReceivePort();
   SendPort _sendPort;
-  bool _initializing = false;
 
-  Future<Null> _init () async {
-    if (this._sendPort == null && !this._initializing) {
-      this._initializing = true;
-      await Isolate.spawn(_onMessage, this._receivePort.sendPort);
-      this._sendPort = await _receivePort.first;
-      this._initializing = false;
-    } else if (this._initializing) {
-      // TODO: figure out how to properly `await`
-      do {
-        await new Future.delayed(const Duration(milliseconds: 1));
-      } while (this._initializing);
-    }
+  Future<Null> init () async {
+    assert(this._sendPort == null, 'HNUserServiceProd::init has already been called');
+
+    await Isolate.spawn(_onMessage, this._receivePort.sendPort);
+    this._sendPort = await _receivePort.first;
   }
 
   static Future<Null> _onMessage (SendPort sendPort) async {
@@ -46,15 +38,14 @@ class HNUserServiceProd implements HNUserService {
             .then((user) => new HNUser.fromMap(user));
           replyTo.send(user);
           break;
+        case _IsolateMessageType.DESTRUCT:
+          port.close();
+          break;
       }
-
-      // if (data == 'bar') port.close();
     }
   }
 
   Future<HNUser> getUserByID (String id) async {
-    await this._init();
-
     addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
 
     final response = new ReceivePort();
@@ -81,4 +72,5 @@ class _IsolateMessage {
 
 enum _IsolateMessageType {
   GET_USER_BY_ID,
+  DESTRUCT,
 }
