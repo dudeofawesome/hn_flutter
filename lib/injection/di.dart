@@ -35,9 +35,11 @@ class Injector {
     // construct and initialize all services with an init method
       switch (_flavor) {
         case Flavor.PROD:
+          _instances[_flavor]['HNItemService'] = new HNItemServiceProd();
           _instances[_flavor]['HNUserService'] = new HNUserServiceProd();
           _instances[_flavor]['LocalStorageService'] = new LocalStorageServiceProd();
           await Future.wait<dynamic>([
+            _instances[_flavor]['HNItemService'].init(),
             _instances[_flavor]['HNUserService'].init(),
             _instances[_flavor]['LocalStorageService'].init(),
           ]);

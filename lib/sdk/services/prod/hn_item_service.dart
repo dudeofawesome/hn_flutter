@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:convert' show JSON, UTF8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
+import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
@@ -13,33 +15,74 @@ import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 class HNItemServiceProd implements HNItemService {
-  final _config = new HNConfig();
-  final _httpClient = new HttpClient();
+  static final _config = new HNConfig();
+  final _receivePort = new ReceivePort();
+  SendPort _sendPort;
+
+  static final _httpClient = new HttpClient();
   final _itemStore = new HNItemStore();
 
-  Future<HNItem> getItemByID (int id, [Cookie accessCookie]) {
+  Future<Null> init () async {
+    assert(this._sendPort == null, 'HNItemServiceProd::init has already been called');
+
+    await Isolate.spawn(_onMessage, this._receivePort.sendPort);
+    this._sendPort = await _receivePort.first;
+  }
+
+  static Future<Null> _onMessage (SendPort sendPort) async {
+    final port = new ReceivePort();
+    sendPort.send(port.sendPort);
+
+    // handle message passing
+    await for (final msg in port) {
+      final _IsolateMessage data = msg[0];
+      final SendPort replyTo = msg[1];
+
+      switch (data.type) {
+        case _IsolateMessageType.GET_ITEM_BY_ID:
+          final int id = data.params['id'];
+          final Cookie accessCookie = data.params['accessCookie'];
+
+          List<HNItemStatus> statusUpdates;
+
+          if (accessCookie != null) {
+            statusUpdates = _parseAllItems(await _getItemPageById(id, accessCookie));
+          }
+
+          final item = await http.get('${_config.url}/item/$id.json')
+            .then((res) => JSON.decode(res.body))
+            .then((item) => new HNItem.fromMap(item));
+
+          replyTo.send([item, statusUpdates]);
+          break;
+        case _IsolateMessageType.DESTRUCT:
+          port.close();
+          break;
+      }
+    }
+  }
+
+  Future<HNItem> getItemByID (int id, [Cookie accessCookie]) async {
     if (_itemStore.items[id] == null) {
       addHNItem(new HNItem(id: id));
       patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
     }
 
-    if (accessCookie != null) {
-      this._getItemPageById(id, accessCookie).then((page) async {
-        this._parseAllItems(page).forEach((patch) {
-          patchItemStatus(patch);
-        });
-      });
-    }
+    final response = new ReceivePort();
+    this._sendPort.send([new _IsolateMessage(
+      type: _IsolateMessageType.GET_ITEM_BY_ID,
+      params: {'id': id, 'accessCookie': accessCookie},
+    ), response.sendPort]);
 
-    return http.get('${this._config.url}/item/$id.json')
-      .then((res) => JSON.decode(res.body))
-      .then((item) => new HNItem.fromMap(item))
-      .then((item) {
-        addHNItem(item);
-        patchItemStatus(new HNItemStatus.patch(id: id, loading: false));
+    final List<dynamic> res = await response.first;
+    final HNItem item = res[0];
+    final List<HNItemStatus> statusUpdates = res[1];
 
-        return item;
-      });
+    statusUpdates?.forEach((patch) => patchItemStatus(patch));
+    addHNItem(item);
+    patchItemStatus(new HNItemStatus.patch(id: id, loading: false));
+
+    return item;
   }
 
   Future<List<HNItemStatus>> getStoryItemAuthById (int id, Cookie accessCookie) async {
@@ -48,8 +91,8 @@ class HNItemServiceProd implements HNItemService {
       patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
     }
 
-    final page = await this._getItemPageById(id, accessCookie);
-    return this._parseAllItems(page)
+    final page = await _getItemPageById(id, accessCookie);
+    return _parseAllItems(page)
       ..forEach((patch) {
         patchItemStatus(patch);
       });
@@ -61,16 +104,16 @@ class HNItemServiceProd implements HNItemService {
       patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
     }
 
-    final replyPage = await this._getItemReplyPageById(id, accessCookie);
-    return this._parseAllItems(replyPage)
+    final replyPage = await _getItemReplyPageById(id, accessCookie);
+    return _parseAllItems(replyPage)
       ..forEach((patch) {
         patchItemStatus(patch);
       });
   }
 
-  Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
+  static Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
     final req = await (await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/item'
+        '${_config.apiHost}/item'
         '?id=$itemId'
       ))
       ..cookies.add(accessCookie))
@@ -85,9 +128,9 @@ class HNItemServiceProd implements HNItemService {
     return body;
   }
 
-  Future<String> _getItemReplyPageById (int itemId, Cookie accessCookie) async {
+  static Future<String> _getItemReplyPageById (int itemId, Cookie accessCookie) async {
     final req = await (await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/reply'
+        '${_config.apiHost}/reply'
         '?id=$itemId'
       ))
       ..cookies.add(accessCookie))
@@ -102,7 +145,7 @@ class HNItemServiceProd implements HNItemService {
     return body;
   }
 
-  HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
+  static HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
     return new HNItemAuthTokens(
       // logout: new RegExp(r'''<a.*?id=(?:"|')logout(?:"|').*?href=(?:"|')logout\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
       //   .firstMatch(itemPage)[1],
@@ -115,7 +158,7 @@ class HNItemServiceProd implements HNItemService {
     );
   }
 
-  HNItemStatus _parseItemStatus (int itemId, String itemPage) {
+  static HNItemStatus _parseItemStatus (int itemId, String itemPage) {
     return new HNItemStatus.patch(
       id: itemId,
       upvoted: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
@@ -128,7 +171,7 @@ class HNItemServiceProd implements HNItemService {
     );
   }
 
-  List<HNItemStatus> _parseAllItems (String itemPage) {
+  static List<HNItemStatus> _parseAllItems (String itemPage) {
     final document = parse(itemPage);
 
     final upvoteLinks = document.querySelectorAll('''a[id^='up_']''');
@@ -191,7 +234,7 @@ class HNItemServiceProd implements HNItemService {
 
     try {
       final req = await (await _httpClient.getUrl(Uri.parse(
-          '${this._config.apiHost}/fave'
+          '${_config.apiHost}/fave'
           '?id=${status.id}'
           '&un=${save ? 'f' : 't'}'
           '${status?.authTokens?.save != null ? '&auth=' + status.authTokens.save : ''}'
@@ -236,7 +279,7 @@ class HNItemServiceProd implements HNItemService {
     }
 
     return http.post(
-        '${this._config.apiHost}/vote',
+        '${_config.apiHost}/vote',
         body: {
           'id': '${status.id}',
           'how': how,
@@ -263,7 +306,7 @@ class HNItemServiceProd implements HNItemService {
   }
 
   Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
+    final req = await (await _httpClient.postUrl(Uri.parse('${_config.apiHost}/comment'))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
@@ -305,7 +348,7 @@ class HNItemServiceProd implements HNItemService {
       String text, String url,
     }
   ) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r'))
+    final req = await (await _httpClient.postUrl(Uri.parse('${_config.apiHost}/r'))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
@@ -338,3 +381,27 @@ class HNItemServiceProd implements HNItemService {
     return null;
   }
 }
+
+class _IsolateMessage {
+  _IsolateMessageType type;
+  dynamic params;
+
+  _IsolateMessage ({
+    @required this.type,
+    @required this.params,
+  });
+}
+
+enum _IsolateMessageType {
+  GET_ITEM_BY_ID,
+  GET_STORY_ITEM_AUTH_BY_ID,
+  GET_COMMENT_ITEM_AUTH_BY_ID,
+  // GET_ITEM_PAGE_BY_ID,
+  // GET_ITEM_REPLY_PAGE_BY_ID,
+  FAVE_ITEM,
+  VOTE_ITEM,
+  REPLY_TO_ITEM_BY_ID,
+  POST_ITEM,
+  DESTRUCT,
+}
+
