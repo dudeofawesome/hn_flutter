@@ -20,7 +20,7 @@ class SimpleMarkdownConversion {
         new RegExp(r'^([0-9]+)\.', caseSensitive: false),
         (match) => '${match[1]}\\.'
       )
-      .replaceAllMapped(looseUrl, (match) {
+      .replaceAllMapped(gfmAutolinkUrl, (match) {
         try {
           Uri.parse(match[0]);
           return '[${match[0]}](${match[0]})';
