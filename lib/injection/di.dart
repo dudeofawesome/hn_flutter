@@ -36,13 +36,17 @@ class Injector {
       switch (_flavor) {
         case Flavor.PROD:
           _instances[_flavor]['HNUserService'] = new HNUserServiceProd();
-          await _instances[_flavor]['HNUserService'].init();
           _instances[_flavor]['LocalStorageService'] = new LocalStorageServiceProd();
-          await _instances[_flavor]['LocalStorageService'].init();
+          await Future.wait<dynamic>([
+            _instances[_flavor]['HNUserService'].init(),
+            _instances[_flavor]['LocalStorageService'].init(),
+          ]);
           break;
         case Flavor.MOCK:
           _instances[_flavor]['LocalStorageService'] = new LocalStorageServiceMock();
-          await _instances[_flavor]['LocalStorageService'].init();
+          await Future.wait<dynamic>([
+            _instances[_flavor]['LocalStorageService'].init(),
+          ]);
           break;
       }
   }
