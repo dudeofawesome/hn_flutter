@@ -33,7 +33,7 @@ class HNUserServiceProd implements HNUserService {
 
       switch (data.type) {
         case _IsolateMessageType.GET_USER_BY_ID:
-          final user = await http.get('${_config.url}/user/${data.data}.json')
+          final user = await http.get('${_config.url}/user/${data.params}.json')
             .then((res) => JSON.decode(res.body))
             .then((user) => new HNUser.fromMap(user));
           replyTo.send(user);
@@ -51,10 +51,10 @@ class HNUserServiceProd implements HNUserService {
     final response = new ReceivePort();
     this._sendPort.send([new _IsolateMessage(
       type: _IsolateMessageType.GET_USER_BY_ID,
-      data: id,
+      params: id,
     ), response.sendPort]);
 
-    final user = await response.first;
+    final HNUser user = await response.first;
     addHNUser(user);
     return user;
   }
@@ -62,11 +62,11 @@ class HNUserServiceProd implements HNUserService {
 
 class _IsolateMessage {
   _IsolateMessageType type;
-  dynamic data;
+  dynamic params;
 
   _IsolateMessage ({
     @required this.type,
-    @required this.data,
+    @required this.params,
   });
 }
 
