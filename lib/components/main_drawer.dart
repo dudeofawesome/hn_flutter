@@ -1,9 +1,13 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
-import 'package:hn_flutter/sdk/hn_auth_service.dart';
+import 'package:hn_flutter/sdk/services/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 
@@ -20,7 +24,7 @@ class _MainDrawerState extends State<MainDrawer>
   Animation<double> _animation;
   AnimationController _controller;
 
-  final HNAuthService _hnAuthService = new HNAuthService();
+  final HNAuthService _hnAuthService = new Injector().hnAuthService;
   HNAccountStore _accountStore;
 
   void initState () {
@@ -52,86 +56,137 @@ class _MainDrawerState extends State<MainDrawer>
 
   @override
   Widget build (BuildContext context) {
-    return new ListView(
-      children: <Widget>[
-        new UserAccountsDrawerHeader(
-          accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
-            new Text(this._accountStore.primaryAccount.email) : null,
-          accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
-          onDetailsPressed: this._toggleAccounts,
-        ),
-        new ClipRect(
-          child: new Align(
-            heightFactor: _animation.value,
-            child: new Container(
-              // color: Colors.grey[700],
-              child: new Column(
-                children: this._accountStore.accounts.values
-                  // .where((account) => account.id != this._accountStore.primaryAccountId)
-                  .map<Widget>((account) =>
-                    new ListTile(
-                      title: new Text(account.id),
-                      trailing: new IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => _showRemoveAccountDialog(context, account.id),
-                      ),
-                      onTap: () async {
-                        this._switchAccount(context, account.id);
-                        this._toggleAccounts();
-                      },
-                    )).toList()
-                    ..addAll([
+    return new MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: new ListView(
+        children: <Widget>[
+          new UserAccountsDrawerHeader(
+            accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
+              new Text(this._accountStore.primaryAccount.email) : null,
+            accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
+            onDetailsPressed: this._toggleAccounts,
+          ),
+          new ClipRect(
+            child: new Align(
+              heightFactor: _animation.value,
+              child: new Container(
+                // color: Colors.grey[700],
+                child: new Column(
+                  children: this._accountStore.accounts.values
+                    // .where((account) => account.id != this._accountStore.primaryAccountId)
+                    .map<Widget>((account) =>
                       new ListTile(
-                        title: new Text('Add account'),
-                        trailing: const IconButton(
-                          icon: const Icon(Icons.add),
+                        title: new Text(account.id),
+                        trailing: new IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => _showRemoveAccountDialog(context, account.id),
                         ),
                         onTap: () async {
-                          if (await this._showAddAccountDialog(context) ?? false) {
-                            this._closeDrawer(context);
-                          }
+                          this._switchAccount(context, account.id);
+                          this._toggleAccounts();
                         },
-                      ),
-                      const Divider(),
-                    ]),
+                      )).toList()
+                      ..addAll([
+                        new ListTile(
+                          title: new Text('Add account'),
+                          trailing: new IconButton(
+                            disabledColor: Colors.black45,
+                            icon: const Icon(Icons.add),
+                          ),
+                          onTap: () async {
+                            if (await this._showAddAccountDialog(context) ?? false) {
+                              this._closeDrawer(context);
+                            }
+                          },
+                        ),
+                        const Divider(),
+                      ]),
+                ),
               ),
             ),
           ),
-        ),
-        new MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          child: new Column(
-            children: <Widget>[
-              new ListTile(
-                leading: const Icon(Icons.book),
-                title: const Text('Open Story'),
-                onTap: () async {
-                  await this._showStoryDialog(context);
-                  this._closeDrawer(context);
-                },
-              ),
-              new ListTile(
-                leading: const Icon(Icons.account_circle),
-                title: const Text('Open User'),
-                onTap: () async {
-                  await this._showUserDialog(context);
-                  this._closeDrawer(context);
-                },
-              ),
-              const Divider(),
-              new ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
-                onTap: () async {
-                  this._closeDrawer(context);
-                  this._openSettings(context);
-                }
-              ),
-            ],
+          new MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: new Column(
+              children: <Widget>[
+                this._accountStore.primaryAccountId != null
+                  ? new Column(
+                    children: <Widget>[
+                      new ListTile(
+                        leading: const Icon(Icons.account_circle),
+                        title: const Text('Profile'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                        },
+                      ),
+                      new ListTile(
+                        leading: const Icon(Icons.star),
+                        title: const Text('Stared'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.STARRED}');
+                        },
+                      ),
+                      new ListTile(
+                        leading: new Transform.rotate(
+                          angle: math.PI,
+                          child: const Icon(Icons.arrow_drop_down_circle),
+                        ),
+                        title: const Text('Voted'),
+                        onTap: () async {
+                          this._closeDrawer(context);
+                          await Navigator.pushNamed(context, '/${Routes.VOTED}');
+                        },
+                      ),
+                      const Divider(),
+                    ],
+                  )
+                  : new Container(),
+                new Column(
+                  children: <Widget>[
+                    new ListTile(
+                      leading: const Icon(Icons.book),
+                      title: const Text('View Story'),
+                      onTap: () async {
+                        final storyId = await this._showStoryDialog(context);
+                        if (storyId != null) {
+                          print(storyId);
+                          await Navigator.pushNamed(context, '/${Routes.STORIES}:$storyId');
+                        }
+                        this._closeDrawer(context);
+                      },
+                    ),
+                    new ListTile(
+                      leading: const Icon(Icons.account_circle),
+                      title: const Text('View User'),
+                      onTap: () async {
+                        final userId = await this._showUserDialog(context);
+                        if (userId != null) {
+                          print(userId);
+                          await Navigator.pushNamed(context, '/${Routes.USERS}:$userId');
+                        }
+                        this._closeDrawer(context);
+                      },
+                    ),
+                    const Divider(),
+                    new ListTile(
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () async {
+                        this._closeDrawer(context);
+                        this._openSettings(context);
+                      }
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        )
-      ],
+        ],
+      ),
     );
   }
 
@@ -156,10 +211,10 @@ class _MainDrawerState extends State<MainDrawer>
     }
   }
 
-  _showStoryDialog (BuildContext ctx) async {
+  Future<int> _showStoryDialog (BuildContext ctx) async {
     String storyId;
 
-    storyId = await showDialog(
+    return await showDialog(
       context: ctx,
       child: new SimpleDialog(
         title: const Text('Enter story ID'),
@@ -196,17 +251,12 @@ class _MainDrawerState extends State<MainDrawer>
         ],
       )
     );
-
-    if (storyId != null) {
-      print(storyId);
-      Navigator.pushNamed(ctx, '/${Routes.STORIES}:$storyId');
-    }
   }
 
-  _showUserDialog (BuildContext ctx) async {
+  Future<String> _showUserDialog (BuildContext ctx) async {
     String userId;
 
-    userId = await showDialog(
+    return await showDialog(
       context: ctx,
       child: new SimpleDialog(
         title: const Text('Enter user ID'),

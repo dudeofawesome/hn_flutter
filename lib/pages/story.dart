@@ -12,6 +12,7 @@ import 'package:throttle_debounce/throttle_debounce.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:tuple/tuple.dart';
 
+import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
@@ -20,7 +21,7 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
-import 'package:hn_flutter/sdk/hn_item_service.dart';
+import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
@@ -39,12 +40,13 @@ class StoryPage extends StatefulWidget {
 }
 
 class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage> {
-  final _hnItemService = new HNItemService();
+  final _hnItemService = new Injector().hnItemService;
 
   HNAccountStore _accountStore;
   HNItemStore _itemStore;
 
   ScrollController _scrollController;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState () {
@@ -65,7 +67,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       debouncer.debounce();
     });
 
-    this.refreshStory(_accountStore.primaryAccount?.accessCookie);
+    this._refreshStory(_accountStore.primaryAccount?.accessCookie);
   }
 
   Future<Null> _scrollToTop () async {
@@ -226,7 +228,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     List<Widget> cardContent;
     if (item?.url != null) {
       cardContent = <Widget>[
-        new GestureDetector(
+        new InkWell(
           onTap: () => this._openStoryUrl(context, item.url),
           child: new Stack(
             alignment: AlignmentDirectional.bottomStart,
@@ -328,10 +330,20 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         flexibleSpace: new GestureDetector(
           onTap: () => this._scrollToTop(),
         ),
-        actions: <Widget>[],
+        actions: <Widget>[
+          new IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () {
+              this._refreshIndicatorKey.currentState.show();
+              this._refreshStory();
+            }
+          ),
+        ],
       ),
       body: new RefreshIndicator(
-        onRefresh: () => this.refreshStory(account?.accessCookie),
+        key: this._refreshIndicatorKey,
+        onRefresh: () => this._refreshStory(account?.accessCookie),
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
@@ -360,13 +372,15 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        tooltip: 'Reply',
-        child: const Icon(Icons.reply),
-        onPressed: itemStatus?.authTokens?.reply != null ?
-          () => this._reply(context, itemStatus, account) :
-          null,
-      ),
+      floatingActionButton: account != null ?
+        new FloatingActionButton(
+          tooltip: 'Reply',
+          child: const Icon(Icons.reply),
+          onPressed: itemStatus?.authTokens?.reply != null ?
+            () => this._reply(context, itemStatus, account) :
+            null,
+        ) :
+        null,
     );
   }
 
@@ -462,7 +476,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
   }
 
-  Future<Null> refreshStory ([Cookie accessCookie]) async {
+  Future<Null> _refreshStory ([Cookie accessCookie]) async {
     await this._hnItemService.getItemByID(widget.itemId, accessCookie);
   }
 

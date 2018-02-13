@@ -36,8 +36,8 @@ android {
         applicationId "io.orleans.hnflutter"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 002
-        versionName "0.0.2"
+        versionCode 007
+        versionName "0.0.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -54,9 +54,7 @@ android {
         release {
             signingConfig signingConfigs.release
         }
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+        debug {
             signingConfig signingConfigs.debug
         }
 

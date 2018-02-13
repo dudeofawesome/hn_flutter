@@ -7,3 +7,11 @@ build/
 ios/.generated/
 packages
 .flutter-plugins
+
+# keystores
+**/*.jks
+**/*.p12
+**/*.pem
+
+# error logs
+flutter_*.log
