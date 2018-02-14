@@ -106,7 +106,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
 
     final comments = this._buildCommentTree(widget.itemId);
-    print(comments.map((comment) => comment.depth));
 
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
@@ -350,17 +349,19 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
-            itemCount: (item?.kids?.length ?? 1) + 2,
+            itemCount: (comments.length ?? 1) + 2,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return storyCard;
-              } else if (index == (item?.kids?.length ?? 1) + 1) {
+              } else if (index == comments.length + 1) {
                 return const FABBottomPadding();
               } else {
-                if (item?.kids != null && item.kids.length > 0) {
+                if (comments.length > 0) {
                   return new Comment(
-                    itemId: item.kids[index - 1],
+                    itemId: comments[index - 1].comment.id,
                     op: item.by,
+                    depth: comments[index - 1].depth,
+                    loadChildren: false,
                   );
                 } else {
                   return const Padding(
