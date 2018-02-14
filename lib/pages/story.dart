@@ -402,7 +402,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
     return new _CommentTreeNode(
       commentId: itemId,
-      children: !(itemStatus?.hidden ?? false)
+      children: !hideCollapsed || !(itemStatus?.hidden ?? false)
         ? item?.kids?.map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
         : null,
     );
