@@ -105,6 +105,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       markAsSeen(widget.itemId);
     }
 
+    final comments = this._buildCommentTree(widget.itemId);
+    print(comments.map((comment) => comment.id));
+
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
       child: new Column(
@@ -384,6 +387,36 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
   }
 
+  List<HNItem> _buildCommentTree (int storyId) {
+    final story = this._itemStore.items[storyId];
+    final commentTree = story.kids
+      .map((kid) => this._itemToCommentTreeNode(kid))
+      .where((comment) => comment != null);
+    return this._flattenCommentTree(commentTree).toList();
+  }
+
+  _CommentTreeNode _itemToCommentTreeNode (int itemId) {
+    final item = this._itemStore.items[itemId];
+
+    if (item == null) return null;
+
+    return new _CommentTreeNode(
+      comment: item,
+      children: item?.kids?.map((kid) => this._itemToCommentTreeNode(kid)),
+    );
+  }
+
+  Iterable<HNItem> _flattenCommentTree (Iterable<_CommentTreeNode> commentTree, [List<HNItem> list]) {
+    return commentTree.fold<List<HNItem>>(list ?? new List(), (val, el) {
+      if (el == null) return val;
+
+      val.add(el.comment);
+      if (el.comment.kids != null && el.comment.kids.length > 0)
+        this._flattenCommentTree(el.children, val);
+      return val;
+    });
+  }
+
   void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
     this._hnItemService.voteItem(true, status, account)
       .catchError((err) {
@@ -495,4 +528,14 @@ enum OverflowMenuItems {
   SHARE,
   COPY_TEXT,
   VIEW_PROFILE,
+}
+
+class _CommentTreeNode {
+  Iterable<_CommentTreeNode> children;
+  HNItem comment;
+
+  _CommentTreeNode ({
+    @required this.comment,
+    this.children,
+  });
 }
