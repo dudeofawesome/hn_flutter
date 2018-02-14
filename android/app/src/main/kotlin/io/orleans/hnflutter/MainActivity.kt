@@ -58,8 +58,9 @@ class MainActivity: FlutterActivity() {
       if (pushRoute) {
         // val passedObjs = mutableMapOf<String, Any>("route" to route)
         // deepLinkChannel?.invokeMethod("linkReceived", passedObjs)
+        // Log.d(LOG_TAG, "Sent message to flutter: linkReceived=$route")
         flutterView.pushRoute(route)
-        Log.d(LOG_TAG, "Sent message to flutter: linkReceived=$route")
+        Log.d(LOG_TAG, "Pushed route to flutter: $route")
       }
 
       return route
