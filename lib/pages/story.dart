@@ -388,20 +388,23 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
   }
 
-  List<_CommentInfo> _buildCommentTree (int storyId) {
+  List<_CommentInfo> _buildCommentTree (int storyId, [bool hideCollapsed = true]) {
     final story = this._itemStore.items[storyId];
     final commentTree = story.kids
-      .map((kid) => this._itemToCommentTreeNode(kid))
+      .map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
       .where((comment) => comment != null);
     return this._flattenCommentTree(commentTree).toList();
   }
 
-  _CommentTreeNode _itemToCommentTreeNode (int itemId) {
+  _CommentTreeNode _itemToCommentTreeNode (int itemId, bool hideCollapsed) {
     final item = this._itemStore.items[itemId];
+    final itemStatus = this._itemStore.itemStatuses[itemId];
 
     return new _CommentTreeNode(
       commentId: itemId,
-      children: item?.kids?.map((kid) => this._itemToCommentTreeNode(kid)),
+      children: !(itemStatus?.hidden ?? false)
+        ? item?.kids?.map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
+        : null,
     );
   }
 
