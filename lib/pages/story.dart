@@ -390,6 +390,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
   List<_CommentInfo> _buildCommentTree (int storyId, [bool hideCollapsed = true]) {
     final story = this._itemStore.items[storyId];
+    if (story == null || story.kids == null) return new List();
+
     final commentTree = story.kids
       .map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
       .where((comment) => comment != null);
