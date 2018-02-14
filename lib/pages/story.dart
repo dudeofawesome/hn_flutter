@@ -414,7 +414,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
 
       val.add(new _CommentInfo(comment: el.comment, depth: depth));
       if (el.comment.kids != null && el.comment.kids.length > 0)
-        this._flattenCommentTree(el.children, depth++, val);
+        this._flattenCommentTree(el.children, depth + 1, val);
       return val;
     });
   }
