@@ -358,7 +358,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               } else {
                 if (comments.length > 0) {
                   return new Comment(
-                    itemId: comments[index - 1].comment.id,
+                    itemId: comments[index - 1].commentId,
                     op: item.by,
                     depth: comments[index - 1].depth,
                     loadChildren: false,
@@ -399,10 +399,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   _CommentTreeNode _itemToCommentTreeNode (int itemId) {
     final item = this._itemStore.items[itemId];
 
-    if (item == null) return null;
-
     return new _CommentTreeNode(
-      comment: item,
+      commentId: itemId,
       children: item?.kids?.map((kid) => this._itemToCommentTreeNode(kid)),
     );
   }
@@ -413,8 +411,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     return commentTree.fold<List<_CommentInfo>>(list ?? new List(), (val, el) {
       if (el == null) return val;
 
-      val.add(new _CommentInfo(comment: el.comment, depth: depth));
-      if (el.comment.kids != null && el.comment.kids.length > 0)
+      val.add(new _CommentInfo(commentId: el.commentId, depth: depth));
+      if (el.children != null && el.children.length > 0)
         this._flattenCommentTree(el.children, depth + 1, val);
       return val;
     });
@@ -535,20 +533,20 @@ enum OverflowMenuItems {
 
 class _CommentTreeNode {
   Iterable<_CommentTreeNode> children;
-  HNItem comment;
+  int commentId;
 
   _CommentTreeNode ({
-    @required this.comment,
+    @required this.commentId,
     this.children,
   });
 }
 
 class _CommentInfo {
-  HNItem comment;
+  int commentId;
   int depth;
 
   _CommentInfo ({
-    @required this.comment,
+    @required this.commentId,
     @required this.depth,
   });
 }
