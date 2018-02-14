@@ -105,6 +105,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       markAsSeen(widget.itemId);
     }
 
+    final comments = this._buildCommentTree(widget.itemId);
+
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
       child: new Column(
@@ -347,17 +349,19 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         child: new Scrollbar(
           child: new ListView.builder(
             controller: this._scrollController,
-            itemCount: (item?.kids?.length ?? 1) + 2,
+            itemCount: (comments.length ?? 1) + 2,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return storyCard;
-              } else if (index == (item?.kids?.length ?? 1) + 1) {
+              } else if (index == comments.length + 1) {
                 return const FABBottomPadding();
               } else {
-                if (item?.kids != null && item.kids.length > 0) {
+                if (comments.length > 0) {
                   return new Comment(
-                    itemId: item.kids[index - 1],
+                    itemId: comments[index - 1].commentId,
                     op: item.by,
+                    depth: comments[index - 1].depth,
+                    loadChildren: false,
                   );
                 } else {
                   return const Padding(
@@ -382,6 +386,39 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         ) :
         null,
     );
+  }
+
+  List<_CommentInfo> _buildCommentTree (int storyId, [bool hideCollapsed = true]) {
+    final story = this._itemStore.items[storyId];
+    final commentTree = story.kids
+      .map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
+      .where((comment) => comment != null);
+    return this._flattenCommentTree(commentTree).toList();
+  }
+
+  _CommentTreeNode _itemToCommentTreeNode (int itemId, bool hideCollapsed) {
+    final item = this._itemStore.items[itemId];
+    final itemStatus = this._itemStore.itemStatuses[itemId];
+
+    return new _CommentTreeNode(
+      commentId: itemId,
+      children: !hideCollapsed || !(itemStatus?.hidden ?? false)
+        ? item?.kids?.map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
+        : null,
+    );
+  }
+
+  Iterable<_CommentInfo> _flattenCommentTree (
+    Iterable<_CommentTreeNode> commentTree, [int depth = 0, List<_CommentInfo> list]
+  ) {
+    return commentTree.fold<List<_CommentInfo>>(list ?? new List(), (val, el) {
+      if (el == null) return val;
+
+      val.add(new _CommentInfo(commentId: el.commentId, depth: depth));
+      if (el.children != null && el.children.length > 0)
+        this._flattenCommentTree(el.children, depth + 1, val);
+      return val;
+    });
   }
 
   void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
@@ -495,4 +532,24 @@ enum OverflowMenuItems {
   SHARE,
   COPY_TEXT,
   VIEW_PROFILE,
+}
+
+class _CommentTreeNode {
+  Iterable<_CommentTreeNode> children;
+  int commentId;
+
+  _CommentTreeNode ({
+    @required this.commentId,
+    this.children,
+  });
+}
+
+class _CommentInfo {
+  int commentId;
+  int depth;
+
+  _CommentInfo ({
+    @required this.commentId,
+    @required this.depth,
+  });
 }
