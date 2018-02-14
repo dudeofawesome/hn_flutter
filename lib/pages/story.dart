@@ -106,7 +106,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
 
     final comments = this._buildCommentTree(widget.itemId);
-    print(comments.map((comment) => comment.id));
+    print(comments.map((comment) => comment.depth));
 
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
@@ -387,7 +387,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
   }
 
-  List<HNItem> _buildCommentTree (int storyId) {
+  List<_CommentInfo> _buildCommentTree (int storyId) {
     final story = this._itemStore.items[storyId];
     final commentTree = story.kids
       .map((kid) => this._itemToCommentTreeNode(kid))
@@ -406,13 +406,15 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     );
   }
 
-  Iterable<HNItem> _flattenCommentTree (Iterable<_CommentTreeNode> commentTree, [List<HNItem> list]) {
-    return commentTree.fold<List<HNItem>>(list ?? new List(), (val, el) {
+  Iterable<_CommentInfo> _flattenCommentTree (
+    Iterable<_CommentTreeNode> commentTree, [int depth = 0, List<_CommentInfo> list]
+  ) {
+    return commentTree.fold<List<_CommentInfo>>(list ?? new List(), (val, el) {
       if (el == null) return val;
 
-      val.add(el.comment);
+      val.add(new _CommentInfo(comment: el.comment, depth: depth));
       if (el.comment.kids != null && el.comment.kids.length > 0)
-        this._flattenCommentTree(el.children, val);
+        this._flattenCommentTree(el.children, depth++, val);
       return val;
     });
   }
@@ -537,5 +539,15 @@ class _CommentTreeNode {
   _CommentTreeNode ({
     @required this.comment,
     this.children,
+  });
+}
+
+class _CommentInfo {
+  HNItem comment;
+  int depth;
+
+  _CommentInfo ({
+    @required this.comment,
+    @required this.depth,
   });
 }
