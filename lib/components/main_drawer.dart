@@ -193,7 +193,8 @@ class _MainDrawerState extends State<MainDrawer>
   void _closeDrawer (BuildContext ctx) {
     final scaffold = Scaffold.of(ctx);
     if (scaffold.hasDrawer) {
-      Navigator.pop(ctx);
+      final DrawerControllerState drawer = ctx.ancestorStateOfType(new TypeMatcher<DrawerControllerState>());
+      drawer?.close();
     }
   }
 
@@ -235,14 +236,12 @@ class _MainDrawerState extends State<MainDrawer>
                   child: new Text('Cancel'.toUpperCase()),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    this._closeDrawer(ctx);
                   },
                 ),
                 new FlatButton(
                   child: new Text('View'.toUpperCase()),
                   onPressed: () {
-                    Navigator.pop(ctx, storyId);
-                    this._closeDrawer(ctx);
+                    Navigator.pop(ctx, int.parse(storyId, onError: (err) => null));
                   },
                 ),
               ],
