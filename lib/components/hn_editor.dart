@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 class HackerNewsEditor extends StatefulWidget {
+  HackerNewsEditor ({
+    Key key,
+  }): super(key: key);
+
   @override
-  createState () => new _HackerNewsEditorState();
+  createState () => new HackerNewsEditorState();
 }
 
-class _HackerNewsEditorState extends State<HackerNewsEditor> {
+class HackerNewsEditorState extends State<HackerNewsEditor> {
   final TextEditingController _controller = new TextEditingController();
+
+  String get value => this._controller.text ?? '';
 
   void _padSelection (String padding) {
     final selection = this._controller.selection.textInside(this._controller.text);
@@ -59,16 +65,19 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
               ],
             ),
           ),
-          new TabBar(
-            tabs: <Tab>[
-              new Tab(
-                icon: const Icon(Icons.edit),
-              ),
-              new Tab(
-                icon: const Icon(Icons.remove_red_eye),
-              ),
-            ],
-          )
+          new Container(
+            color: Theme.of(context).primaryColor,
+            child: new TabBar(
+              tabs: <Tab>[
+                new Tab(
+                  icon: const Icon(Icons.edit),
+                ),
+                new Tab(
+                  icon: const Icon(Icons.remove_red_eye),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -78,15 +87,18 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
     return new Column(
       children: <Widget>[
         new Expanded(
-          child: new TextField(
-            controller: this._controller,
-            autofocus: true,
-            keyboardType: TextInputType.text,
-            decoration: new InputDecoration(hintText: 'Story text'),
+          child: new Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            child: new TextField(
+              controller: this._controller,
+              autofocus: true,
+              keyboardType: TextInputType.text,
+              decoration: new InputDecoration(hintText: 'Story text'),
+            ),
           ),
         ),
         new SizedBox(
-          height: 44.0,
+          height: 48.0,
           child: new ListView(
             scrollDirection: Axis.horizontal,
             children: <Widget>[
