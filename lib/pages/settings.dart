@@ -13,10 +13,6 @@ class SettingsPage extends StoreWatcher {
     listenToStore(uiStoreToken);
   }
 
-  Future<Null> _changeSortMode (SortModes sortMode) async {
-    setStorySortMode(sortMode);
-  }
-
   @override
   Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
@@ -25,9 +21,6 @@ class SettingsPage extends StoreWatcher {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    final UIStore uiStore = stores[uiStoreToken];
-
-    final sortMode = uiStore.sortMode;
 
     return new Scaffold(
       appBar: new AppBar(
