@@ -7,6 +7,8 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
+import 'package:hn_flutter/components/hn_editor.dart';
+
 class SubmitStoryPage extends StoreWatcher {
   SubmitStoryPage ({
     Key key,
@@ -31,11 +33,12 @@ class SubmitStoryPage extends StoreWatcher {
           horizontal: 16.0,
           vertical: 8.0,
         ),
-        child: new Column(
+        child: /* new Column(
           children: <Widget>[
-            new Text('test'),
-          ],
-        ),
+            new Text('test'), */
+            new HackerNewsEditor(),
+        //   ],
+        // ),
       )
     );
   }
