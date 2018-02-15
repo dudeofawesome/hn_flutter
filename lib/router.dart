@@ -6,8 +6,10 @@ import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/starred.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
+import 'package:hn_flutter/pages/submit_story.dart';
 import 'package:hn_flutter/pages/user.dart';
 import 'package:hn_flutter/pages/voted.dart';
+
 import 'package:hn_flutter/utils/channels.dart';
 
 class Routes {
@@ -15,6 +17,7 @@ class Routes {
   static const USERS = 'user';
   static const STARRED = 'starred';
   static const VOTED = 'voted';
+  static const SUBMIT_STORY = 'submit_story';
   static const SETTINGS = 'settings';
 }
 
@@ -75,6 +78,14 @@ Route<Null> getRoute (RouteSettings settings) {
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new VotedPage(),
+    );
+  } else if (path[1].startsWith('${Routes.SUBMIT_STORY}')) {
+    if (path.length != 2) return null;
+
+    return new MaterialPageRoute<Null>(
+      settings: settings,
+      fullscreenDialog: true,
+      builder: (BuildContext context) => new SubmitStoryPage(),
     );
   }
   // The other paths we support are in the routes table.
