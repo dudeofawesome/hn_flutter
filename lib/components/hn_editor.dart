@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
+
 class HackerNewsEditor extends StatefulWidget {
   @override
   createState () => new _HackerNewsEditorState();
@@ -53,7 +55,7 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
             child: new TabBarView(
               children: <Widget>[
                 this._buildEditor(context),
-                new Text('Render'),
+                new MarkdownBody(data: this._controller.text),
               ],
             ),
           ),
