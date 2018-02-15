@@ -6,7 +6,7 @@ homepage: https://github.com/dudeofawesome/hn_flutter
 
 environment:
   sdk: '>=2.0.0-dev.16.0 <3.0.0'
-  flutter: ^0.0.21-pre.325
+  flutter: ^0.1.2-pre.21
 dependencies:
   flutter:
     sdk: flutter
