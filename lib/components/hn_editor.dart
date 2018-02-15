@@ -14,11 +14,13 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
       length: 2,
       child: new Column(
         children: <Widget>[
-          new TabBarView(
-            children: <Widget>[
-              // this._buildEditor(context),
-              new Text('Render'),
-            ],
+          new Expanded(
+            child: new TabBarView(
+              children: <Widget>[
+                this._buildEditor(context),
+                new Text('Render'),
+              ],
+            ),
           ),
           new TabBar(
             tabs: <Tab>[
@@ -26,7 +28,7 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
                 icon: const Icon(Icons.edit),
               ),
               new Tab(
-                icon: const Icon(Icons.panorama_fish_eye),
+                icon: const Icon(Icons.remove_red_eye),
               ),
             ],
           )
@@ -38,11 +40,13 @@ class _HackerNewsEditorState extends State<HackerNewsEditor> {
   Widget _buildEditor (BuildContext context) {
     return new Column(
       children: <Widget>[
-        new TextField(
-          controller: this._controller,
-          autofocus: true,
-          keyboardType: TextInputType.text,
-          decoration: new InputDecoration(hintText: 'Story text'),
+        new Expanded(
+          child: new TextField(
+            controller: this._controller,
+            autofocus: true,
+            keyboardType: TextInputType.text,
+            decoration: new InputDecoration(hintText: 'Story text'),
+          ),
         ),
         new SizedBox(
           height: 44.0,
