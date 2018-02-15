@@ -305,7 +305,7 @@ class HNItemServiceProd implements HNItemService {
       String text, String url,
     }
   ) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r'))
+    final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r')))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
