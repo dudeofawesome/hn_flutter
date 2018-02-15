@@ -263,7 +263,7 @@ class HNItemServiceProd implements HNItemService {
   }
 
   Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
+    final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment')))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
