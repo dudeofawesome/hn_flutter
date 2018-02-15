@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart' show MethodChannel, MethodCall;
+import 'package:flutter/services.dart' show MethodChannel;
 
 import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/starred.dart';
