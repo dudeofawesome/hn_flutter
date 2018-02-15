@@ -23,7 +23,11 @@ class SubmitStoryPage extends StatefulWidget {
 
 class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixin<SubmitStoryPage> {
   final _formKey = new GlobalKey<FormState>();
+  final _storyTitleKey = new GlobalKey<FormFieldState>();
+  final _storyURLKey = new GlobalKey<FormFieldState>();
   final _storyTextKey = new GlobalKey<HackerNewsEditorState>();
+
+  StoryTypes _storyType = StoryTypes.URL;
 
   @override
   void initState () {
@@ -32,7 +36,15 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   }
 
   Future<bool> _onWillPop (BuildContext context) async {
-    if (this._storyTextKey.currentState.value == '') return true;
+    if (
+      this._storyTitleKey.currentState.value == '' &&
+      ((storyType) {
+        switch (storyType) {
+          case StoryTypes.TEXT: return this._storyTextKey.currentState.value == '';
+          case StoryTypes.URL: return this._storyURLKey.currentState.value == '';
+        }
+      })(this._storyType)
+    ) return true;
 
     return await showDialog(
       context: context,
@@ -46,7 +58,8 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
 
   @override
   Widget build (BuildContext context) {
-    return new WillPopScope(
+    return new Form(
+      key: this._formKey,
       onWillPop: () => this._onWillPop(context),
       child: new Scaffold(
         appBar: new AppBar(
@@ -55,24 +68,72 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
             new IconButton(
               icon: const Icon(Icons.send),
               onPressed: this._submit,
-            )
+            ),
           ],
         ),
         body: new SafeArea(
           bottom: true,
-          child: new Form(
-            key: this._formKey,
-            child: new Column(
-              children: <Widget>[
-                new FormField<String>(
-                  builder: (builder) => new Expanded(
-                    child: new HackerNewsEditor(
-                      key: _storyTextKey,
+          child: new Column(
+            children: <Widget>[
+              new Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0.0),
+                child: new Column(
+                  children: <Widget>[
+                    new TextFormField(
+                      key: this._storyTitleKey,
+                      autofocus: true,
+                      keyboardType: TextInputType.text,
+                      decoration: new InputDecoration(labelText: 'Title'),
                     ),
-                  ),
+                    new FormField<StoryTypes>(
+                      builder: (builder) => new Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: StoryTypes.values.map((val) =>
+                          new SizedBox(
+                            width: 130.0,
+                            child: new RadioListTile<StoryTypes>(
+                              groupValue: _storyType,
+                              value: val,
+                              onChanged: (val) => setState(() => this._storyType = val),
+                              title: new Text(
+                                ((val) {
+                                  switch (val) {
+                                    case StoryTypes.TEXT: return 'Text';
+                                    case StoryTypes.URL: return 'URL';
+                                  }
+                                })(val),
+                              ),
+                            ),
+                          ),
+                        ).toList(),
+                      ),
+                    ),
+                    const Divider()
+                  ],
                 ),
-              ],
-            ),
+              ),
+              ((storyType) {
+                switch (this._storyType) {
+                  case StoryTypes.TEXT:
+                    return new FormField<String>(
+                      builder: (builder) => new Expanded(
+                        child: new HackerNewsEditor(
+                          key: _storyTextKey,
+                        ),
+                      ),
+                    );
+                  case StoryTypes.URL:
+                    return new Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+                      child: new TextFormField(
+                        key: this._storyURLKey,
+                        keyboardType: TextInputType.url,
+                        decoration: new InputDecoration(labelText: 'URL'),
+                      ),
+                    );
+                }
+              })(this._storyType),
+            ],
           ),
         ),
       ),
@@ -94,4 +155,9 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
       ],
     );
   }
+}
+
+enum StoryTypes {
+  URL,
+  TEXT,
 }

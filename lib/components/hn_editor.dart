@@ -93,7 +93,10 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
               controller: this._controller,
               autofocus: true,
               keyboardType: TextInputType.text,
-              decoration: new InputDecoration(hintText: 'Story text'),
+              decoration: new InputDecoration(
+                labelText: 'Text',
+                border: const OutlineInputBorder(),
+              ),
             ),
           ),
         ),
