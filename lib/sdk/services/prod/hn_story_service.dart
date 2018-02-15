@@ -18,7 +18,7 @@ class HNStoryServiceProd implements HNStoryService {
     }
   ) {
     return http.get('${this._config.url}/$sort.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => JSON.decode(res.body) as List<int>)
       .then((List<int> itemIds) {
         setStorySort(itemIds);
         return itemIds;
