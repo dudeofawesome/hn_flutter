@@ -90,9 +90,15 @@ class _MainDrawerState extends State<MainDrawer>
                       ..addAll([
                         new ListTile(
                           title: new Text('Add account'),
-                          trailing: new IconButton(
-                            disabledColor: Colors.black45,
-                            icon: const Icon(Icons.add),
+                          trailing: new Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8.0,
+                              horizontal: 12.0
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.black45
+                            ),
                           ),
                           onTap: () async {
                             if (await this._showAddAccountDialog(context) ?? false) {
