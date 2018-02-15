@@ -298,7 +298,7 @@ class HNItemServiceMock implements HNItemService {
     return null;
   }
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
@@ -336,5 +336,21 @@ class HNItemServiceMock implements HNItemService {
     }
 
     return null;
+  }
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/submit'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    final fnid = new RegExp(r'''<input .*?value="([a-zA-Z0-9])*?".*?>''').allMatches(body);
+
+    if (fnid.first == null) throw 'New submission FNID not found';
+
+    return fnid.first[1];
   }
 }

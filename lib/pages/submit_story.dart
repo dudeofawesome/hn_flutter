@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
+import 'package:hn_flutter/injection/di.dart';
+import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
-import 'package:hn_flutter/sdk/services/hn_item_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/hn_editor.dart';
 
@@ -22,6 +24,8 @@ class SubmitStoryPage extends StatefulWidget {
 }
 
 class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixin<SubmitStoryPage> {
+  final _hnItemService = new Injector().hnItemService;
+
   final _formKey = new GlobalKey<FormState>();
   final _storyTitleKey = new GlobalKey<FormFieldState>();
   final _storyURLKey = new GlobalKey<FormFieldState>();
@@ -29,10 +33,20 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
 
   StoryTypes _storyType = StoryTypes.URL;
 
+  HNAccountStore _accountStore;
+  String _submissionAuthToken;
+
   @override
   void initState () {
     super.initState();
-    // listenToStore(userStoreToken);
+    this._accountStore = listenToStore(accountStoreToken);
+    this._getFNID();
+  }
+
+  void _getFNID () async {
+    this._submissionAuthToken = null;
+    this._submissionAuthToken =
+      await this._hnItemService.getSubmissionAuthToken(this._accountStore.primaryAccount.accessCookie);
   }
 
   Future<bool> _onWillPop (BuildContext context) async {
@@ -52,8 +66,26 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
     );
   }
 
-  void _submit () async {
+  void _submit (BuildContext context) async {
     print(this._storyTextKey.currentState.value);
+
+    try {
+      final itemId = await this._hnItemService.postItem(
+        this._submissionAuthToken, this._accountStore.primaryAccount.accessCookie,
+        this._storyTitleKey.currentState.value,
+        url: this._storyURLKey?.currentState?.value,
+        text: this._storyTextKey?.currentState?.value,
+      );
+
+      Navigator.pushReplacementNamed(context, '/${Routes.STORIES}:$itemId');
+    } catch (err) {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+        content: new Text(err ?? 'Unknown error'),
+        duration: const Duration(seconds: 3),
+      ));
+
+      this._getFNID();
+    }
   }
 
   @override
@@ -65,9 +97,13 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
         appBar: new AppBar(
           title: const Text('Submit Story'),
           actions: <Widget>[
-            new IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: this._submit,
+            new Builder(
+              builder: (context) => new IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: this._submissionAuthToken != null
+                  ? () => this._submit(context)
+                  : null,
+              ),
             ),
           ],
         ),
@@ -83,6 +119,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                       key: this._storyTitleKey,
                       autofocus: true,
                       keyboardType: TextInputType.text,
+                      // maxLength: 80,
                       decoration: new InputDecoration(labelText: 'Title'),
                     ),
                     new FormField<StoryTypes>(

@@ -298,7 +298,7 @@ class HNItemServiceProd implements HNItemService {
     return null;
   }
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
@@ -310,12 +310,13 @@ class HNItemServiceProd implements HNItemService {
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
       // ..headers.add('content-type', 'application/x-www-form-urlencoded')
+      // fnid=63IJ3jjm893aKBY55QnktO&fnop=submit-page&title=test+post&url=&text=please+ignore
       ..write(
-        'fnop=submit-page'
-        '&fnid=$authToken'
+        'fnid=$authToken'
+        '&fnop=submit-page'
         '&title=$title'
-        '&url=$url'
-        '&text=$text'
+        '&url=${url != null ? Uri.encodeQueryComponent(url) : ''}'
+        '&text=${text != null ? Uri.encodeQueryComponent(text) : ''}'
       ))
       .close();
 
@@ -323,7 +324,7 @@ class HNItemServiceProd implements HNItemService {
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
     print(body);
 
-    if (body.contains('Bad login')) {
+    if (body.contains('Bad login'))
       throw 'Bad login.';
     // } else if (
     //   body.contains('<title>Add Comment | Hacker News</title>') &&
@@ -331,10 +332,49 @@ class HNItemServiceProd implements HNItemService {
     // ) {
     //   // Looks like we need to submit the comment again
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
-    } else if (body.contains('''You're posting too fast. Please slow down. Thanks.''')) {
+    else if (body.contains('''You're posting too fast. Please slow down. Thanks.'''))
       throw '''You're posting too fast. Please slow down. Thanks.''';
-    }
+    else if (req.statusCode != 302) throw 'Unknown error';
+    else if (req.headers.value('location') == null) throw 'Unknown error';
+    else if (req.headers.value('location') == 'deadlink') throw 'Outdated fnid (I think)';
+    else if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
 
-    return null;
+    print('''req.headers->location''');
+    print(req.headers.value('location'));
+
+    final newestReq = await ((await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/${req.headers.value('location')}'
+      )))
+      ..cookies.add(accessCookie))
+      .close();
+    final newestBody = await newestReq.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    if (!newestBody.contains('<font color="#ff6600">*</font>'))
+      throw 'Submission not created';
+
+    final itemId = int.parse(
+      new RegExp(r'''<tr class="athing" id="([0-9]*?)">.*?<font color="#ff6600">*</font>''')
+        .firstMatch(newestBody)?.group(1),
+    );
+
+    // TODO: add new itemId to top of new stories list
+
+    return itemId;
+  }
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/submit'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    final fnid = new RegExp(r'''<input .*?name="fnid" .*?value="([a-zA-Z0-9]*?)".*?>''').allMatches(body);
+
+    if (fnid.first == null) throw 'New submission FNID not found';
+
+    return fnid.first[1];
   }
 }

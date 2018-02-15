@@ -22,11 +22,13 @@ abstract class HNItemService {
     Cookie accessCookie,
   );
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
       String text, String url,
     }
   );
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie);
 }
