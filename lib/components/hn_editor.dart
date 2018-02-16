@@ -61,7 +61,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
             child: new TabBarView(
               children: <Widget>[
                 this._buildEditor(context),
-                new MarkdownBody(data: this._controller.text),
+                this._buildPreview(context),
               ],
             ),
           ),
@@ -139,6 +139,13 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPreview (BuildContext context) {
+    return new Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: new MarkdownBody(data: this._controller.text),
     );
   }
 }
