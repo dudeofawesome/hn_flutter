@@ -117,14 +117,13 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                             maxHeight: 200.0,
                           ),
                           child: new ListView(
+                            padding: const EdgeInsets.only(bottom: 4.0),
+                            shrinkWrap: true,
                             children: <Widget>[
-                              new Padding(
-                                padding: const EdgeInsets.only(bottom: 4.0),
-                                child: new Text(
-                                  parent.by,
-                                  style: new TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              new Text(
+                                parent.by,
+                                style: new TextStyle(
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               new SimpleMarkdown(parent.computed.markdown),
