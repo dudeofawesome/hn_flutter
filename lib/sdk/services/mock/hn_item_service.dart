@@ -262,7 +262,7 @@ class HNItemServiceMock implements HNItemService {
       });
   }
 
-  Future<Null> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
+  Future<int> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
     final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
@@ -271,7 +271,7 @@ class HNItemServiceMock implements HNItemService {
       ..write(
         'parent=$parentId'
         '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
-        '&hmac=${authTokens.reply}'
+        '&hmac=$authToken'
         '&text=${Uri.encodeQueryComponent(comment)}'
       ))
       // ..write({
@@ -295,7 +295,7 @@ class HNItemServiceMock implements HNItemService {
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
     }
 
-    return null;
+    return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
 
   Future<int> postItem (

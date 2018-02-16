@@ -262,7 +262,7 @@ class HNItemServiceProd implements HNItemService {
       });
   }
 
-  Future<Null> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
+  Future<int> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
     final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment')))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
@@ -296,7 +296,7 @@ class HNItemServiceProd implements HNItemService {
     //   // Looks like we need to submit the comment again
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
 
-    return null;
+    return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
 
   Future<int> postItem (

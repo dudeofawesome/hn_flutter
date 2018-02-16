@@ -15,7 +15,7 @@ abstract class HNItemService {
 
   Future<Null> voteItem (bool up, HNItemStatus status, HNAccount account);
 
-  Future<Null> replyToItemById (
+  Future<int> replyToItemById (
     int parentId,
     String comment,
     String authToken,
