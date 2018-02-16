@@ -93,7 +93,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
               controller: this._controller,
               autofocus: true,
               autocorrect: true,
-              keyboardType: TextInputType.text,
+              keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: new InputDecoration(
                 labelText: 'Text',
