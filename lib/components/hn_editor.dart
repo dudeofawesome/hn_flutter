@@ -94,6 +94,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
               autofocus: true,
               autocorrect: true,
               keyboardType: TextInputType.text,
+              maxLines: null,
               decoration: new InputDecoration(
                 labelText: 'Text',
                 border: const OutlineInputBorder(),
