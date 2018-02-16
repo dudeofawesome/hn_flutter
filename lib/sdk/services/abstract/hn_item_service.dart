@@ -18,7 +18,7 @@ abstract class HNItemService {
   Future<Null> replyToItemById (
     int parentId,
     String comment,
-    HNItemAuthTokens authTokens,
+    String authToken,
     Cookie accessCookie,
   );
 

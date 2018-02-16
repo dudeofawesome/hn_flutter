@@ -262,7 +262,7 @@ class HNItemServiceProd implements HNItemService {
       });
   }
 
-  Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
+  Future<Null> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
     final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment')))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
@@ -271,7 +271,7 @@ class HNItemServiceProd implements HNItemService {
       ..write(
         'parent=$parentId'
         '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
-        '&hmac=${authTokens.reply}'
+        '&hmac=$authToken'
         '&text=${Uri.encodeQueryComponent(comment)}'
       ))
       // ..write({
@@ -285,15 +285,16 @@ class HNItemServiceProd implements HNItemService {
     print(req.headers);
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
     print(body);
-    if (body.contains('Bad login')) {
-      throw 'Bad login.';
+    if (body.contains('Bad login')) throw 'Bad login.';
+    else if (req.headers.value('location') == null) throw 'Unknown error';
+    else if (req.headers.value('location') == 'deadlink') throw 'Outdated hmac (I think)';
+    else if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
     // } else if (
     //   body.contains('<title>Add Comment | Hacker News</title>') &&
     //   body.contains('Please confirm that this is your comment')
     // ) {
     //   // Looks like we need to submit the comment again
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
-    }
 
     return null;
   }

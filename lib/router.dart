@@ -6,6 +6,7 @@ import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/starred.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/story.dart';
+import 'package:hn_flutter/pages/submit_comment.dart';
 import 'package:hn_flutter/pages/submit_story.dart';
 import 'package:hn_flutter/pages/user.dart';
 import 'package:hn_flutter/pages/voted.dart';
@@ -18,6 +19,7 @@ class Routes {
   static const STARRED = 'starred';
   static const VOTED = 'voted';
   static const SUBMIT_STORY = 'submit_story';
+  static const SUBMIT_COMMENT = 'submit_comment';
   static const SETTINGS = 'settings';
 }
 
@@ -86,6 +88,17 @@ Route<Null> getRoute (RouteSettings settings) {
       settings: settings,
       fullscreenDialog: true,
       builder: (BuildContext context) => new SubmitStoryPage(),
+    );
+  } else if (path[1].startsWith('${Routes.SUBMIT_COMMENT}')) {
+    final parsed = Uri.parse(settings.name);
+
+    return new MaterialPageRoute<Null>(
+      settings: settings,
+      fullscreenDialog: true,
+      builder: (BuildContext context) => new SubmitCommentPage(
+        parentId: int.parse(parsed.queryParameters['parentId']),
+        authToken: parsed.queryParameters['authToken'],
+      ),
     );
   }
   // The other paths we support are in the routes table.

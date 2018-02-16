@@ -31,7 +31,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   final _storyURLKey = new GlobalKey<FormFieldState>();
   final _storyTextKey = new GlobalKey<HackerNewsEditorState>();
 
-  StoryTypes _storyType = StoryTypes.URL;
+  _StoryTypes _storyType = _StoryTypes.URL;
 
   HNAccountStore _accountStore;
   String _submissionAuthToken;
@@ -54,8 +54,8 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
       this._storyTitleKey.currentState.value == '' &&
       ((storyType) {
         switch (storyType) {
-          case StoryTypes.TEXT: return this._storyTextKey.currentState.value == '';
-          case StoryTypes.URL: return this._storyURLKey.currentState.value == '';
+          case _StoryTypes.TEXT: return this._storyTextKey.currentState.value == '';
+          case _StoryTypes.URL: return this._storyURLKey.currentState.value == '';
         }
       })(this._storyType)
     ) return true;
@@ -80,7 +80,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
       Navigator.pushReplacementNamed(context, '/${Routes.STORIES}:$itemId');
     } catch (err) {
       Scaffold.of(context).showSnackBar(new SnackBar(
-        content: new Text(err ?? 'Unknown error'),
+        content: new Text(err.toString() ?? 'Unknown error'),
         duration: const Duration(seconds: 3),
       ));
 
@@ -122,21 +122,21 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                       // maxLength: 80,
                       decoration: new InputDecoration(labelText: 'Title'),
                     ),
-                    new FormField<StoryTypes>(
+                    new FormField<_StoryTypes>(
                       builder: (builder) => new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: StoryTypes.values.map((val) =>
+                        children: _StoryTypes.values.map((val) =>
                           new SizedBox(
                             width: 130.0,
-                            child: new RadioListTile<StoryTypes>(
+                            child: new RadioListTile<_StoryTypes>(
                               groupValue: _storyType,
                               value: val,
                               onChanged: (val) => setState(() => this._storyType = val),
                               title: new Text(
                                 ((val) {
                                   switch (val) {
-                                    case StoryTypes.TEXT: return 'Text';
-                                    case StoryTypes.URL: return 'URL';
+                                    case _StoryTypes.TEXT: return 'Text';
+                                    case _StoryTypes.URL: return 'URL';
                                   }
                                 })(val),
                               ),
@@ -151,7 +151,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
               ),
               ((storyType) {
                 switch (this._storyType) {
-                  case StoryTypes.TEXT:
+                  case _StoryTypes.TEXT:
                     return new FormField<String>(
                       builder: (builder) => new Expanded(
                         child: new HackerNewsEditor(
@@ -159,7 +159,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                         ),
                       ),
                     );
-                  case StoryTypes.URL:
+                  case _StoryTypes.URL:
                     return new Padding(
                       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
                       child: new TextFormField(
@@ -194,7 +194,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   }
 }
 
-enum StoryTypes {
+enum _StoryTypes {
   URL,
   TEXT,
 }
