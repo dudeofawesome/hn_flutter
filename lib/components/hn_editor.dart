@@ -92,6 +92,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
             child: new TextField(
               controller: this._controller,
               autofocus: true,
+              autocorrect: true,
               keyboardType: TextInputType.text,
               decoration: new InputDecoration(
                 labelText: 'Text',
