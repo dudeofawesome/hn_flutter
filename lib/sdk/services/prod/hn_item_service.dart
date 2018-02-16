@@ -286,15 +286,19 @@ class HNItemServiceProd implements HNItemService {
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
     print(body);
     if (body.contains('Bad login')) throw 'Bad login.';
-    else if (req.headers.value('location') == null) throw 'Unknown error';
-    else if (req.headers.value('location') == 'deadlink') throw 'Outdated hmac (I think)';
-    else if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
+    if (req.headers.value('location') == null) throw 'Unknown error';
+    if (req.headers.value('location') == 'deadlink') throw 'Outdated hmac (I think)';
+    if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
     // } else if (
     //   body.contains('<title>Add Comment | Hacker News</title>') &&
     //   body.contains('Please confirm that this is your comment')
     // ) {
     //   // Looks like we need to submit the comment again
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    if (!req.headers.value('location').startsWith('item?id=')) {
+      if (req.headers.value('location').contains('fnop=commconfirm')) throw 'Submission failed';
+      else throw 'Unknown error';
+    }
 
     return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
