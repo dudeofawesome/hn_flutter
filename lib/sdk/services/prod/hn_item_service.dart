@@ -300,6 +300,8 @@ class HNItemServiceProd implements HNItemService {
       else throw 'Unknown error';
     }
 
+    this.getItemByID(parentId);
+
     return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
 
