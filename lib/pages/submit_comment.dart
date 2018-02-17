@@ -135,7 +135,9 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                     ],
                   ),
                 )
-                : new Container(),
+                : const Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                ),
               // new TextFormField(
               //   key: this._commentTextKey,
               //   autofocus: true,
