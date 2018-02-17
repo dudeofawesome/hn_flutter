@@ -123,6 +123,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                       // maxLength: 80,
                       decoration: new InputDecoration(labelText: 'Title'),
                     ),
+                    const Divider(),
                     new FormField<_StoryTypes>(
                       builder: (builder) => new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +147,6 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                         ).toList(),
                       ),
                     ),
-                    const Divider()
                   ],
                 ),
               ),
