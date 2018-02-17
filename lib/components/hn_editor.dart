@@ -26,6 +26,16 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
     super.initState();
 
     this._controller.text = widget.initialValue;
+    this._controller.addListener(() {
+      setState(() {});
+      if (widget.onChanged != null) widget.onChanged(this._controller.text);
+    });
+  }
+
+  @override
+  void dispose () {
+    super.dispose();
+    this._controller.dispose();
   }
 
   String get value => this._controller.text ?? '';
