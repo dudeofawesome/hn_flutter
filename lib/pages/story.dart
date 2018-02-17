@@ -66,7 +66,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       debouncer.debounce();
     });
 
-    this._refreshStory(_accountStore.primaryAccount?.accessCookie);
+    this._refreshStory(cookie: _accountStore.primaryAccount?.accessCookie);
   }
 
   Future<Null> _scrollToTop () async {
@@ -332,46 +332,50 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           onTap: () => this._scrollToTop(),
         ),
         actions: <Widget>[
-          new IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () {
-              this._refreshIndicatorKey.currentState.show();
-              this._refreshStory();
-            }
+          new Builder(
+            builder: (context) => new IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh',
+              onPressed: () {
+                this._refreshIndicatorKey.currentState.show();
+                this._refreshStory(context: context);
+              }
+            ),
           ),
         ],
       ),
-      body: new RefreshIndicator(
-        key: this._refreshIndicatorKey,
-        onRefresh: () => this._refreshStory(account?.accessCookie),
-        child: new Scrollbar(
-          child: new ListView.builder(
-            controller: this._scrollController,
-            itemCount: (comments.length ?? 1) + 2,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return storyCard;
-              } else if (index == comments.length + 1) {
-                return const FABBottomPadding();
-              } else {
-                if (comments.length > 0) {
-                  return new Comment(
-                    itemId: comments[index - 1].commentId,
-                    op: item.by,
-                    depth: comments[index - 1].depth,
-                    loadChildren: false,
-                  );
+      body: new Builder(
+        builder: (context) => new RefreshIndicator(
+          key: this._refreshIndicatorKey,
+          onRefresh: () => this._refreshStory(context: context, cookie: account?.accessCookie),
+          child: new Scrollbar(
+            child: new ListView.builder(
+              controller: this._scrollController,
+              itemCount: (comments.length ?? 1) + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return storyCard;
+                } else if (index == comments.length + 1) {
+                  return const FABBottomPadding();
                 } else {
-                  return const Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: const Center(
-                      child: const Text('No comments'),
-                    ),
-                  );
+                  if (comments.length > 0) {
+                    return new Comment(
+                      itemId: comments[index - 1].commentId,
+                      op: item.by,
+                      depth: comments[index - 1].depth,
+                      loadChildren: false,
+                    );
+                  } else {
+                    return const Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: const Center(
+                        child: const Text('No comments'),
+                      ),
+                    );
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
         ),
       ),
@@ -440,13 +444,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       });
   }
 
-  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
-    this._hnItemService.faveItem(storyStatus, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) async {
+    try {
+      await this._hnItemService.faveItem(storyStatus, account);
+    } catch (err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    }
     // toggleSaveItem(this.storyId);
   }
 
@@ -455,67 +460,24 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
-    String comment;
-    comment = await showDialog(
-      context: ctx,
-      child: new SimpleDialog(
-        title: const Text('Reply'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        children: <Widget>[
-          new TextField(
-            maxLines: null,
-            autofocus: true,
-            autocorrect: true,
-            keyboardType: TextInputType.text,
-            decoration: new InputDecoration(
-              labelText: 'Comment',
-            ),
-            onChanged: (val) => comment = val,
-          ),
-          const Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-          ),
-          new ButtonTheme.bar(
-            child: new ButtonBar(
-              children: <Widget>[
-                new FlatButton(
-                  child: new Text('Cancel'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-                new FlatButton(
-                  child: new Text('Reply'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx, comment),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
+    Navigator.pushNamed(
+      ctx,
+      '/${Routes.SUBMIT_COMMENT}?parentId=${widget.itemId}&authToken=${status.authTokens.reply}'
     );
-
-    print(comment);
-
-    if (comment != null) {
-      await this._hnItemService.replyToItemById(
-        widget.itemId,
-        comment,
-        status.authTokens,
-        account.accessCookie,
-      ).catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err),
-        ));
-        throw err;
-      });
-
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text('Comment added.'),
-      ));
-    }
   }
 
-  Future<Null> _refreshStory ([Cookie accessCookie]) async {
-    await this._hnItemService.getItemByID(widget.itemId, accessCookie);
+  Future<Null> _refreshStory ({BuildContext context, Cookie cookie}) async {
+    try {
+      await this._hnItemService.getItemByID(widget.itemId, cookie);
+    } catch (err) {
+      if (context != null) {
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      } else {
+        print(err);
+      }
+    }
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
