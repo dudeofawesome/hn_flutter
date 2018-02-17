@@ -4,9 +4,13 @@ import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 class HackerNewsEditor extends StatefulWidget {
   final String labelText;
+  final String initialValue;
+  final ValueChanged<String> onChanged;
 
   HackerNewsEditor ({
     this.labelText = 'Text',
+    this.initialValue,
+    this.onChanged,
     Key key,
   }): super(key: key);
 
@@ -16,6 +20,13 @@ class HackerNewsEditor extends StatefulWidget {
 
 class HackerNewsEditorState extends State<HackerNewsEditor> {
   final TextEditingController _controller = new TextEditingController();
+
+  @override
+  void initState () {
+    super.initState();
+
+    this._controller.text = widget.initialValue;
+  }
 
   String get value => this._controller.text ?? '';
 
