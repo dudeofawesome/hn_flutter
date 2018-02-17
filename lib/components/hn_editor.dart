@@ -43,13 +43,14 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
   void _padSelection (String padding) {
     final selection = this._controller.selection.textInside(this._controller.text);
     final modified = '$padding$selection$padding';
+    final modifiedOffset = this._controller.selection.extentOffset + padding.length * 2;
     this._controller.text =
       this._controller.selection.textBefore(this._controller.text) +
       modified +
       this._controller.selection.textAfter(this._controller.text);
-    // this._controller.selection = this._controller.selection.copyWith(
-    //   baseOffset: 0,
-    // );
+    this._controller.selection = new TextSelection.fromPosition(new TextPosition(
+      offset: modifiedOffset,
+    ));
   }
 
   void _createBlock (String blockString) {
