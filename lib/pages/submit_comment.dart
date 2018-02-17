@@ -150,6 +150,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                 builder: (builder) => new Expanded(
                   child: new HackerNewsEditor(
                     key: this._commentTextKey,
+                    labelText: 'Comment',
                   ),
                 ),
               )

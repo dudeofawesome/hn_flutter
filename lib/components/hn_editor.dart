@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 class HackerNewsEditor extends StatefulWidget {
+  final String labelText;
+
   HackerNewsEditor ({
+    this.labelText = 'Text',
     Key key,
   }): super(key: key);
 
@@ -96,7 +99,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: new InputDecoration(
-                labelText: 'Text',
+                labelText: widget.labelText,
                 border: const OutlineInputBorder(),
               ),
             ),
