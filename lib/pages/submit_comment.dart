@@ -80,6 +80,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
       key: this._formKey,
       onWillPop: () => this._onWillPop(context),
       child: new Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         appBar: new AppBar(
           title: new Text('Reply to ${parent.by}'),
           actions: <Widget>[

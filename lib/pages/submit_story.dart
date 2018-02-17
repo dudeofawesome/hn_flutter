@@ -94,6 +94,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
       key: this._formKey,
       onWillPop: () => this._onWillPop(context),
       child: new Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         appBar: new AppBar(
           title: const Text('Submit Story'),
           actions: <Widget>[
