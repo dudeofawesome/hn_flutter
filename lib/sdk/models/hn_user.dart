@@ -5,7 +5,7 @@ class HNUser {
   String id;
   /// Delay in minutes between a comment's creation and its visibility to other users.
   int delay;
-  /// Creation date of the user, in Unix Time.
+  /// Creation date of the user, in seconds since the epoch.
   int created;
   /// The user's karma.
   int karma;
