@@ -155,6 +155,11 @@ class StoryCard extends StoreWatcher {
           new Text(
             story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
+              color: Theme.of(context).textTheme.title.color.withOpacity(
+                !storyStatus.seen
+                  ? 1.0
+                  : 0.6
+              ),
               fontSize: 18.0,
             ),
           ),
@@ -318,10 +323,19 @@ class StoryCard extends StoreWatcher {
       child: new Card(
         child: new InkWell(
           onTap: () => this._openStory(context),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: cardContent
+          child: new DefaultTextStyle(
+            style: Theme.of(context).textTheme.body1.copyWith(
+              color: Theme.of(context).textTheme.body1.color.withOpacity(
+                !storyStatus.seen
+                  ? 1.0
+                  : 0.6
+              ),
+            ),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: cardContent
+            ),
           ),
         ),
       ),
