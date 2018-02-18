@@ -15,9 +15,40 @@ class HNUserServiceProd implements HNUserService {
 
     return http.get('${this._config.url}/user/$id.json')
       .then((res) => JSON.decode(res.body))
-      .then((user) => new HNUser.fromMap(user))
+      .then((body) async {
+        if (body != null) return new HNUser.fromMap(body);
+        else return this._getUserByIdFromSite(id);
+      })
       .then((user) {
         addHNUser(user);
       });
   }
+
+  Future _getUserByIdFromSite (String id) {
+    return http.get('${this._config.apiHost}/user?id=$id')
+      .then((res) {
+        if (res.statusCode != 200) throw 'User "$id" not found';
+        return res.body;
+      })
+      .then((body) {
+        if (body == 'No such user.') throw 'User "$id" not found';
+        else {
+          final created = (DateTime.parse(_createdRegExp.firstMatch(body)?.group(1)).millisecondsSinceEpoch / 1000).round();
+          final karma = int.parse(_karmaRegExp.firstMatch(body)?.group(1) ?? '1');
+          final about = _aboutRegExp.firstMatch(body)?.group(1);
+
+          return new HNUser(
+            id: id,
+            created: created,
+            karma: karma,
+            about: about,
+            submitted: [],
+          );
+        }
+      });
+  }
 }
+
+final _createdRegExp = new RegExp(r'''created:.*?<td><a href="front\?day=([0-9\-]+)&birth=''');
+final _karmaRegExp = new RegExp(r'''<td valign="top">karma:<\/td><td>\s*([0-9]+)\s*<\/td>''');
+final _aboutRegExp = new RegExp(r'''<td valign="top">about:<\/td><td>\s*(.*)\s*<\/td>''');
