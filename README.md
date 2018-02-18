@@ -1,6 +1,6 @@
 # Butterfly Reader for Hacker News
 
-<a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='50px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+<a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='65px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
 A [Hacker News](https://news.ycombinator.com) client. Ad free, open source, built with [Flutter](https://flutter.io).
 
