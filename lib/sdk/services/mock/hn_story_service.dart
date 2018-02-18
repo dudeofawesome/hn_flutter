@@ -5,14 +5,10 @@ import 'dart:convert' show JSON;
 
 import 'package:hn_flutter/sdk/services/abstract/hn_story_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
-import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
-import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
-import 'package:hn_flutter/injection/di.dart';
 class HNStoryServiceMock implements HNStoryService {
   HNConfig _config = new HNConfig();
-  HNItemService _hnItemService = new Injector().hnItemService;
 
   Future<List<int>> _getStories (
     String sort,
@@ -22,7 +18,7 @@ class HNStoryServiceMock implements HNStoryService {
     }
   ) {
     return http.get('${this._config.url}/$sort.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => JSON.decode(res.body) as List<int>)
       .then((List<int> itemIds) {
         setStorySort(itemIds);
         return itemIds;

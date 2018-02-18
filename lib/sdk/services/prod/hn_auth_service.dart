@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
 import 'dart:convert' show UTF8;
 
-import 'package:http/http.dart' as http;
-
 import 'package:hn_flutter/sdk/services/abstract/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';

@@ -15,18 +15,20 @@ abstract class HNItemService {
 
   Future<Null> voteItem (bool up, HNItemStatus status, HNAccount account);
 
-  Future<Null> replyToItemById (
+  Future<int> replyToItemById (
     int parentId,
     String comment,
-    HNItemAuthTokens authTokens,
+    String authToken,
     Cookie accessCookie,
   );
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
       String text, String url,
     }
   );
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie);
 }

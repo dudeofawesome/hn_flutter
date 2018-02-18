@@ -262,7 +262,7 @@ class HNItemServiceMock implements HNItemService {
       });
   }
 
-  Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
+  Future<int> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
     final req = await (await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment'))
       ..cookies.add(accessCookie)
       // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
@@ -271,7 +271,7 @@ class HNItemServiceMock implements HNItemService {
       ..write(
         'parent=$parentId'
         '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
-        '&hmac=${authTokens.reply}'
+        '&hmac=$authToken'
         '&text=${Uri.encodeQueryComponent(comment)}'
       ))
       // ..write({
@@ -295,10 +295,10 @@ class HNItemServiceMock implements HNItemService {
     //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
     }
 
-    return null;
+    return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
@@ -336,5 +336,21 @@ class HNItemServiceMock implements HNItemService {
     }
 
     return null;
+  }
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/submit'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+
+    final fnid = new RegExp(r'''<input .*?value="([a-zA-Z0-9])*?".*?>''').allMatches(body);
+
+    if (fnid.first == null) throw 'New submission FNID not found';
+
+    return fnid.first[1];
   }
 }
