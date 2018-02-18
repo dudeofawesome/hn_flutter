@@ -12,9 +12,6 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/components/hn_editor.dart';
 
 class SubmitStoryPage extends StatefulWidget {
-  final _formKey = new GlobalKey<FormState>();
-  final _storyTextKey = new GlobalKey<HackerNewsEditorState>();
-
   SubmitStoryPage ({
     Key key,
   }) : super(key: key);
@@ -27,9 +24,11 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   final _hnItemService = new Injector().hnItemService;
 
   final _formKey = new GlobalKey<FormState>();
-  final _storyTitleKey = new GlobalKey<FormFieldState>();
-  final _storyURLKey = new GlobalKey<FormFieldState>();
-  final _storyTextKey = new GlobalKey<HackerNewsEditorState>();
+
+  TextEditingController _storyTitleController = new TextEditingController();
+  TextEditingController _storyURLController = new TextEditingController();
+
+  String _storyTextVal = '';
 
   _StoryTypes _storyType = _StoryTypes.URL;
 
@@ -51,11 +50,11 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
 
   Future<bool> _onWillPop (BuildContext context) async {
     if (
-      this._storyTitleKey.currentState.value == '' &&
+      this._storyTitleController.text == '' &&
       ((storyType) {
         switch (storyType) {
-          case _StoryTypes.TEXT: return this._storyTextKey.currentState.value == '';
-          case _StoryTypes.URL: return this._storyURLKey.currentState.value == '';
+          case _StoryTypes.TEXT: return this._storyTextVal == '';
+          case _StoryTypes.URL: return this._storyURLController.text == '';
         }
       })(this._storyType)
     ) return true;
@@ -67,14 +66,14 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   }
 
   void _submit (BuildContext context) async {
-    print(this._storyTextKey.currentState.value);
+    print(this._storyTextVal);
 
     try {
       final itemId = await this._hnItemService.postItem(
         this._submissionAuthToken, this._accountStore.primaryAccount.accessCookie,
-        this._storyTitleKey.currentState.value,
-        url: this._storyURLKey?.currentState?.value,
-        text: this._storyTextKey?.currentState?.value,
+        this._storyTitleController.text,
+        url: this._storyURLController.text,
+        text: this._storyTextVal,
       );
 
       Navigator.pushReplacementNamed(context, '/${Routes.STORIES}:$itemId');
@@ -94,6 +93,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
       key: this._formKey,
       onWillPop: () => this._onWillPop(context),
       child: new Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         appBar: new AppBar(
           title: const Text('Submit Story'),
           actions: <Widget>[
@@ -115,13 +115,14 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                 padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0.0),
                 child: new Column(
                   children: <Widget>[
-                    new TextFormField(
-                      key: this._storyTitleKey,
+                    new TextField(
                       autofocus: true,
                       keyboardType: TextInputType.text,
-                      // maxLength: 80,
+                      maxLength: 80,
                       decoration: new InputDecoration(labelText: 'Title'),
+                      controller: this._storyTitleController,
                     ),
+                    const Divider(),
                     new FormField<_StoryTypes>(
                       builder: (builder) => new Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -145,7 +146,6 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                         ).toList(),
                       ),
                     ),
-                    const Divider()
                   ],
                 ),
               ),
@@ -155,17 +155,18 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                     return new FormField<String>(
                       builder: (builder) => new Expanded(
                         child: new HackerNewsEditor(
-                          key: _storyTextKey,
+                          initialValue: this._storyTextVal,
+                          onChanged: (val) => setState(() => this._storyTextVal = val),
                         ),
                       ),
                     );
                   case _StoryTypes.URL:
                     return new Padding(
                       padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-                      child: new TextFormField(
-                        key: this._storyURLKey,
+                      child: new TextField(
                         keyboardType: TextInputType.url,
                         decoration: new InputDecoration(labelText: 'URL'),
+                        controller: this._storyURLController,
                       ),
                     );
                 }

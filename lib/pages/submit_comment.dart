@@ -80,6 +80,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
       key: this._formKey,
       onWillPop: () => this._onWillPop(context),
       child: new Scaffold(
+        backgroundColor: Theme.of(context).cardColor,
         appBar: new AppBar(
           title: new Text('Reply to ${parent.by}'),
           actions: <Widget>[
@@ -135,7 +136,9 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                     ],
                   ),
                 )
-                : new Container(),
+                : const Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                ),
               // new TextFormField(
               //   key: this._commentTextKey,
               //   autofocus: true,
@@ -147,6 +150,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                 builder: (builder) => new Expanded(
                   child: new HackerNewsEditor(
                     key: this._commentTextKey,
+                    labelText: 'Comment',
                   ),
                 ),
               )

@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody;
 
 class HackerNewsEditor extends StatefulWidget {
+  final String labelText;
+  final String initialValue;
+  final ValueChanged<String> onChanged;
+
   HackerNewsEditor ({
+    this.labelText = 'Text',
+    this.initialValue,
+    this.onChanged,
     Key key,
   }): super(key: key);
 
@@ -14,18 +21,36 @@ class HackerNewsEditor extends StatefulWidget {
 class HackerNewsEditorState extends State<HackerNewsEditor> {
   final TextEditingController _controller = new TextEditingController();
 
+  @override
+  void initState () {
+    super.initState();
+
+    this._controller.text = widget.initialValue;
+    this._controller.addListener(() {
+      setState(() {});
+      if (widget.onChanged != null) widget.onChanged(this._controller.text);
+    });
+  }
+
+  @override
+  void dispose () {
+    super.dispose();
+    this._controller.dispose();
+  }
+
   String get value => this._controller.text ?? '';
 
   void _padSelection (String padding) {
     final selection = this._controller.selection.textInside(this._controller.text);
     final modified = '$padding$selection$padding';
+    final modifiedOffset = this._controller.selection.extentOffset + padding.length * 2;
     this._controller.text =
       this._controller.selection.textBefore(this._controller.text) +
       modified +
       this._controller.selection.textAfter(this._controller.text);
-    // this._controller.selection = this._controller.selection.copyWith(
-    //   baseOffset: 0,
-    // );
+    this._controller.selection = new TextSelection.fromPosition(new TextPosition(
+      offset: modifiedOffset,
+    ));
   }
 
   void _createBlock (String blockString) {
@@ -96,7 +121,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
               keyboardType: TextInputType.multiline,
               maxLines: null,
               decoration: new InputDecoration(
-                labelText: 'Text',
+                labelText: widget.labelText,
                 border: const OutlineInputBorder(),
               ),
             ),
