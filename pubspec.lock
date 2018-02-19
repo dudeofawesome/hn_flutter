@@ -117,9 +117,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "feat/upgrade-gradle"
-      resolved-ref: c381ed360923f15a99f663f83ed5fef221b5db6f
-      url: "git@github.com:dudeofawesome/flutter_web_browser.git"
+      ref: HEAD
+      resolved-ref: a1a113a65f98c7f316fbb3890b37a46b1e32f260
+      url: "git@github.com:victorbonnet/flutter_web_browser.git"
     source: git
     version: "0.0.1"
   front_end:
