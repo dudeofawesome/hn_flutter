@@ -124,7 +124,7 @@ class StoryCard extends StoreWatcher {
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
-    final storyTextOpacity = !storyStatus.seen ? 1.0 : 0.5;
+    final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
