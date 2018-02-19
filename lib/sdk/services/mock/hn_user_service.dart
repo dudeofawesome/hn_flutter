@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'package:http/http.dart' as http;
 import 'dart:convert' show JSON;
+import 'dart:io' show Cookie;
+
+import 'package:http/http.dart' as http;
 
 import 'package:hn_flutter/sdk/services/abstract/hn_user_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -19,5 +21,9 @@ class HNUserServiceMock implements HNUserService {
       .then((user) {
         addHNUser(user);
       });
+  }
+
+  Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
+    return new List();
   }
 }

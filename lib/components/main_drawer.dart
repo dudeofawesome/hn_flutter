@@ -130,7 +130,7 @@ class _MainDrawerState extends State<MainDrawer>
                       ),
                       new ListTile(
                         leading: const Icon(Icons.star),
-                        title: const Text('Stared'),
+                        title: const Text('Favorites'),
                         onTap: () async {
                           this._closeDrawer(context);
                           await Navigator.pushNamed(context, '/${Routes.STARRED}');

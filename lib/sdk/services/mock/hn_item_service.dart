@@ -78,7 +78,7 @@ class HNItemServiceMock implements HNItemService {
 
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -95,7 +95,7 @@ class HNItemServiceMock implements HNItemService {
 
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -104,27 +104,27 @@ class HNItemServiceMock implements HNItemService {
 
   HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
     return new HNItemAuthTokens(
-      // logout: new RegExp(r'''<a.*?id=(?:"|')logout(?:"|').*?href=(?:"|')logout\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      // logout: new RegExp(r'''<a.*?id=["']logout["'].*?href=["']logout\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
       //   .firstMatch(itemPage)[1],
-      upvote: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      upvote: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      downvote: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      downvote: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      hide: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
-      save: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>''').firstMatch(itemPage)?.group(1),
+      hide: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
+      save: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>''').firstMatch(itemPage)?.group(1),
     );
   }
 
   HNItemStatus _parseItemStatus (int itemId, String itemPage) {
     return new HNItemStatus.patch(
       id: itemId,
-      upvoted: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      upvoted: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      downvoted: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      downvoted: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-hide''').firstMatch(itemPage) != null,
-      saved: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage) != null,
-      // seen: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage)[1],
+      hidden: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-hide''').firstMatch(itemPage) != null,
+      saved: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage) != null,
+      // seen: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage)[1],
     );
   }
 
@@ -200,7 +200,7 @@ class HNItemServiceMock implements HNItemService {
         .close();
 
       final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-      var faved = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body) != null;
+      var faved = new RegExp(r'''href=["']fave\?.*?id=''' '${status.id}' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(body) != null;
       if (save == faved) {
         return;
       } else {
