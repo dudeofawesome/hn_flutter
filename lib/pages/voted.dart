@@ -6,22 +6,27 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
-import 'package:hn_flutter/sdk/services/hn_user_service.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
-class VotedPage extends StatefulWidget {
-  @override
-  _VotedPageState createState () => new _VotedPageState();
-}
+import 'package:hn_flutter/components/upvoted_items_tab.dart';
 
-class _VotedPageState extends State<VotedPage> with StoreWatcherMixin<VotedPage> {
+class VotedPage extends StoreWatcher {
+  VotedPage ({
+    Key key,
+  }) : super(key: key);
+
   @override
-  void initState () {
-    super.initState();
+  void initStores(ListenToStore listenToStore) {
+    listenToStore(accountStoreToken);
     listenToStore(userStoreToken);
   }
 
+  Future<Null> _shareUser (String userId) async {
+    await share('https://news.ycombinator.com/upvoted?id=$userId');
+  }
+
   @override
-  Widget build (BuildContext context) {
+  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -29,25 +34,68 @@ class _VotedPageState extends State<VotedPage> with StoreWatcherMixin<VotedPage>
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
 
-    // final HNUserStore userStore = stores[userStoreToken];
-    // final user = userStore.users[this.userId];
+    final HNAccountStore accountStore = stores[accountStoreToken];
 
-    // if (user == null) {
-    //   print('getting user $userId');
-    //   final HNUserService _hnStoryService = new HNUserService();
-    //   _hnStoryService.getUserByID(this.userId);
-    // }
+    bool userCanDownvote = false;
 
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('Voted'),
-        actions: <Widget>[],
-      ),
-      body: const Center(
-        child: const Text('Voted'),
+    return new DefaultTabController(
+      length: _choices.length,
+      child: new Scaffold(
+        appBar: new AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: new Text(userCanDownvote ? 'Voted' : 'Upvoted'),
+          actions: <Widget>[
+            new PopupMenuButton<_OverflowMenuItems>(
+              icon: const Icon(Icons.more_horiz),
+              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
+                const PopupMenuItem<_OverflowMenuItems>(
+                  value: _OverflowMenuItems.SHARE,
+                  child: const Text('Share'),
+                ),
+              ],
+              onSelected: (_OverflowMenuItems selection) async {
+                switch (selection) {
+                  case _OverflowMenuItems.SHARE:
+                    return await this._shareUser(accountStore.primaryAccountId);
+                }
+              },
+            ),
+
+          ],
+          bottom: userCanDownvote
+            ? new TabBar(
+              // isScrollable: true,
+              tabs: _choices.map((choice) => new Tab(
+                text: choice.title.toUpperCase(),
+                icon: new Icon(choice.icon),
+              )).toList(),
+            )
+            : null,
+        ),
+        body: userCanDownvote ?
+          new TabBarView(
+            children: <Widget>[
+              new UpvotedItemsTab(accountStore.primaryAccountId),
+            ],
+          )
+          : new UpvotedItemsTab(accountStore.primaryAccountId),
       ),
     );
   }
 }
+
+enum _OverflowMenuItems {
+  SHARE,
+}
+
+class _Choice {
+  const _Choice({ this.title, this.icon });
+  final String title;
+  final IconData icon;
+}
+
+const List<_Choice> _choices = const <_Choice>[
+  const _Choice(title: 'Upvoted', icon: Icons.arrow_upward),
+  const _Choice(title: 'Downvoted', icon: Icons.arrow_downward),
+];
