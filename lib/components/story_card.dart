@@ -124,6 +124,8 @@ class StoryCard extends StoreWatcher {
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
+    final storyTextOpacity = !storyStatus.seen ? 1.0 : 0.5;
+
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
@@ -155,11 +157,7 @@ class StoryCard extends StoreWatcher {
           new Text(
             story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
-              color: Theme.of(context).textTheme.title.color.withOpacity(
-                !storyStatus.seen
-                  ? 1.0
-                  : 0.6
-              ),
+              color: Theme.of(context).textTheme.title.color.withOpacity(storyTextOpacity),
               fontSize: 18.0,
             ),
           ),
@@ -325,11 +323,7 @@ class StoryCard extends StoreWatcher {
           onTap: () => this._openStory(context),
           child: new DefaultTextStyle(
             style: Theme.of(context).textTheme.body1.copyWith(
-              color: Theme.of(context).textTheme.body1.color.withOpacity(
-                !storyStatus.seen
-                  ? 1.0
-                  : 0.6
-              ),
+              color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),
             ),
             child: new Column(
               mainAxisSize: MainAxisSize.min,
