@@ -12,19 +12,19 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 
-class StaredCommentsTab extends StatefulWidget {
+class StarredCommentsTab extends StatefulWidget {
   final String userId;
 
-  const StaredCommentsTab (
+  const StarredCommentsTab (
     this.userId, {
     Key key,
   }) : super(key: key);
 
   @override
-  createState () => new _StaredCommentsTab();
+  createState () => new _StarredCommentsTab();
 }
 
-class _StaredCommentsTab extends State<StaredCommentsTab> with StoreWatcherMixin<StaredCommentsTab> {
+class _StarredCommentsTab extends State<StarredCommentsTab> with StoreWatcherMixin<StarredCommentsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
@@ -48,14 +48,14 @@ class _StaredCommentsTab extends State<StaredCommentsTab> with StoreWatcherMixin
 
   @override
   Widget build (BuildContext context) {
-    final staredStories = this._hnItemStore.itemStatuses.values
+    final starredStories = this._hnItemStore.itemStatuses.values
       .where((itemStatus) => itemStatus.saved);
 
     return (!this._loading)
       ? new Scrollbar(
-        child: staredStories.length > 0
+        child: starredStories.length > 0
           ? new ListView(
-            children: staredStories.map((itemStatus) => new Comment(
+            children: starredStories.map((itemStatus) => new Comment(
               itemId: itemStatus.id,
               loadChildren: false,
               buttons: <BarButtons>[
