@@ -18,11 +18,15 @@ class UserSubmittedTab extends StatelessWidget {
   @override
   Widget build (BuildContext context) {
     return new Scrollbar(
-      child: new ListView(
-        children: this.user.submitted.map((itemId) => new StoryCard(
-          storyId: itemId,
-        )).toList(),
-      ),
+      child: (this.user?.submitted?.length ?? 0) > 0
+        ? new ListView(
+          children: this.user?.submitted?.map((itemId) => new StoryCard(
+            storyId: itemId,
+          ))?.toList(),
+        )
+        : new Center(
+          child: new Text('No stories'),
+        ),
     );
   }
 }
