@@ -8,8 +8,8 @@ import 'package:share/share.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
-import 'package:hn_flutter/components/stared_submissions_tab.dart';
-import 'package:hn_flutter/components/stared_comments_tab.dart';
+import 'package:hn_flutter/components/starred_submissions_tab.dart';
+import 'package:hn_flutter/components/starred_comments_tab.dart';
 
 class StarredPage extends StoreWatcher {
   StarredPage ({
@@ -72,8 +72,8 @@ class StarredPage extends StoreWatcher {
         ),
         body: new TabBarView(
           children: <Widget>[
-            new StaredSubmissionsTab(accountStore.primaryAccountId),
-            new StaredCommentsTab(accountStore.primaryAccountId),
+            new StarredSubmissionsTab(accountStore.primaryAccountId),
+            new StarredCommentsTab(accountStore.primaryAccountId),
           ],
         ),
       ),
