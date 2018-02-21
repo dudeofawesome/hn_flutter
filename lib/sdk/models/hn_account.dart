@@ -11,12 +11,14 @@ class HNAccount {
   String email;
   String password;
   Cookie accessCookie;
+  bool canDownvote;
 
   HNAccount ({
     this.id,
     this.email,
     this.password,
     this.accessCookie,
+    this.canDownvote,
   });
 
   HNAccount.fromMap (Map map) {
@@ -41,6 +43,7 @@ class HNAccount {
         '${(jsonCookie['secure'] ?? false) ? '; Secure' : ''}'
       );
     }
+    this.canDownvote = map['canDownvote'] ?? false;
   }
 
   String toString () {
@@ -50,6 +53,7 @@ class HNAccount {
         email: $email
         password: ${password[0]}***
         accessCookie.value: ${accessCookie.value}
+        canDownvote: $canDownvote
     ''');
   }
 }
