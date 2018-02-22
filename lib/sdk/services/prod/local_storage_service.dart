@@ -32,22 +32,50 @@ class LocalStorageServiceProd implements LocalStorageService {
   }
 
   Future<Null> _initTableKeys () async {
-    String keysPath = join(this._documentsDirectory.path, KEYS_DB);
-    this._databases[KEYS_DB] = await openDatabase(keysPath, version: 1, onCreate: (Database db, int version) async {
-      print('CREATING KEYS TABLE');
-      await db.execute('CREATE TABLE $KEYS_TABLE ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)');
-    });
+    final path = join(this._documentsDirectory.path, KEYS_DB);
+    this._databases[KEYS_DB] = await openDatabase(
+      path, version: KEYS_TABLE_VERSION,
+      onCreate: (Database db, int version) async {
+        print('CREATING KEYS TABLE');
+        await db.execute('''
+          CREATE TABLE $KEYS_TABLE
+            ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)
+        ''');
+      }
+    );
   }
 
   Future<Null> _initTableAccounts () async {
-    String accountsPath = join(this._documentsDirectory.path, ACCOUNTS_DB);
-    this._databases[ACCOUNTS_DB] = await openDatabase(accountsPath, version: 1, onCreate: (Database db, int version) async {
-      print('CREATING ACCOUNTS TABLE');
-      await db.execute('''
-        CREATE TABLE $ACCOUNTS_TABLE
-          ($ACCOUNTS_ID TEXT PRIMARY KEY, $ACCOUNTS_EMAIL TEXT, $ACCOUNTS_PASSWORD TEXT, $ACCOUNTS_ACCESS_COOKIE TEXT)
-      ''');
-    });
+    final path = join(this._documentsDirectory.path, ACCOUNTS_DB);
+
+    this._databases[ACCOUNTS_DB] = await openDatabase(
+      path, version: ACCOUNTS_TABLE_VERSION,
+      onCreate: (Database db, int version) async {
+        print('CREATING ACCOUNTS TABLE');
+        await db.execute('''
+          CREATE TABLE $ACCOUNTS_TABLE
+            (
+              $ACCOUNTS_ID TEXT PRIMARY KEY, $ACCOUNTS_EMAIL TEXT,
+              $ACCOUNTS_PASSWORD TEXT, $ACCOUNTS_ACCESS_COOKIE TEXT,
+              $ACCOUNTS_PERMISSIONS TEXT, $ACCOUNTS_PREFERENCES TEXT
+            )
+        ''');
+      },
+      onUpgrade: (db, old, curr) async {
+        switch (old) {
+          case 1:
+            await Future.wait([
+              db.execute('''
+                ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PERMISSIONS TEXT
+              '''),
+              db.execute('''
+                ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PREFERENCES TEXT
+              '''),
+            ]);
+            break;
+        }
+      }
+    );
   }
 
   Map<String, Database> get databases => new Map.unmodifiable(this._databases);
@@ -77,20 +105,33 @@ class LocalStorageServiceProd implements LocalStorageService {
     print('Adding ${account.id} to SQLite');
 
     final cookieJson = JSON.encode({
-      'name': account.accessCookie.name,
-      'value': account.accessCookie.value,
-      'expires': account.accessCookie.expires.millisecondsSinceEpoch,
-      'domain': account.accessCookie.domain,
-      'httpOnly': account.accessCookie.httpOnly,
-      'secure': account.accessCookie.secure,
+      'name': account.accessCookie?.name,
+      'value': account.accessCookie?.value,
+      'expires': account.accessCookie?.expires?.millisecondsSinceEpoch,
+      'domain': account.accessCookie?.domain,
+      'httpOnly': account.accessCookie?.httpOnly,
+      'secure': account.accessCookie?.secure,
     });
+
+    final permissionsJson = JSON.encode({
+      'canDownvote': account.permissions?.canDownvote,
+    });
+
+    final preferencesJson = JSON.encode({});
 
     await this._databases[ACCOUNTS_DB].rawInsert(
       '''
-      INSERT OR REPLACE INTO $ACCOUNTS_TABLE ($ACCOUNTS_ID, $ACCOUNTS_EMAIL, $ACCOUNTS_PASSWORD, $ACCOUNTS_ACCESS_COOKIE)
-        VALUES (?, ?, ?, ?);
+      INSERT OR REPLACE INTO $ACCOUNTS_TABLE
+        (
+          $ACCOUNTS_ID, $ACCOUNTS_EMAIL, $ACCOUNTS_PASSWORD,
+          $ACCOUNTS_ACCESS_COOKIE, $ACCOUNTS_PERMISSIONS, $ACCOUNTS_PREFERENCES
+        )
+        VALUES (?, ?, ?, ?, ?, ?);
       ''',
-      [account.id, account.email, account.password, cookieJson]
+      [
+        account.id, account.email, account.password, cookieJson,
+        permissionsJson, preferencesJson
+      ]
     );
 
     print('Added ${account.id} to SQLite');

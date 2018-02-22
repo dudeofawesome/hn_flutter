@@ -6,7 +6,6 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
-import 'package:hn_flutter/sdk/sqflite_vals.dart';
 import 'package:hn_flutter/sdk/services/local_storage_service.dart';
 
 class HNAccountStore extends Store {
