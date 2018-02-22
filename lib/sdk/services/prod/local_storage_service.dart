@@ -23,12 +23,21 @@ class LocalStorageServiceProd implements LocalStorageService {
   Future<Null> init () async {
     this._documentsDirectory = await getApplicationDocumentsDirectory();
 
+    await Future.wait([
+      this._initTableKeys(),
+      this._initTableAccounts(),
+    ]);
+  }
+
+  Future<Null> _initTableKeys () async {
     String keysPath = join(this._documentsDirectory.path, KEYS_DB);
     this._databases[KEYS_DB] = await openDatabase(keysPath, version: 1, onCreate: (Database db, int version) async {
       print('CREATING KEYS TABLE');
       await db.execute('CREATE TABLE $KEYS_TABLE ($KEYS_ID TEXT PRIMARY KEY, $KEYS_VALUE TEXT)');
     });
+  }
 
+  Future<Null> _initTableAccounts () async {
     String accountsPath = join(this._documentsDirectory.path, ACCOUNTS_DB);
     this._databases[ACCOUNTS_DB] = await openDatabase(accountsPath, version: 1, onCreate: (Database db, int version) async {
       print('CREATING ACCOUNTS TABLE');
