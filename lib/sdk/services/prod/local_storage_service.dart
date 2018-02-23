@@ -107,14 +107,7 @@ class LocalStorageServiceProd implements LocalStorageService {
   Future<Null> addHNAccount (HNAccount account) async {
     print('Adding ${account.id} to SQLite');
 
-    final cookieJson = JSON.encode({
-      'name': account.accessCookie?.name,
-      'value': account.accessCookie?.value,
-      'expires': account.accessCookie?.expires?.millisecondsSinceEpoch,
-      'domain': account.accessCookie?.domain,
-      'httpOnly': account.accessCookie?.httpOnly,
-      'secure': account.accessCookie?.secure,
-    });
+    final cookieJson = JSON.encode(account.cookieToJson());
 
     final permissionsJson = JSON.encode({
       'canDownvote': account.permissions?.canDownvote,

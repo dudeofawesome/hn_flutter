@@ -46,6 +46,10 @@ class HNAccount {
         '${(jsonCookie['secure'] ?? false) ? '; Secure' : ''}'
       );
     }
+    this.permissions =
+      new HNAccountPermissions.fromMap(JSON.decode(map['permissions']));
+    this.preferences =
+      new HNAccountPreferences.fromMap(JSON.decode(map['preferences']));
   }
 
   @override
@@ -108,6 +112,13 @@ class HNAccountPermissions {
     this.canPoll = false,
   });
 
+  HNAccountPermissions.fromMap (Map map) {
+    this.canDownvote = map['canDownvote'];
+    this.canFlag = map['canFlag'];
+    this.canVouch = map['canVouch'];
+    this.canPoll = map['canPoll'];
+  }
+
   @override
   String toString ({
     int indent = 0,
@@ -160,6 +171,15 @@ class HNAccountPreferences {
     this.delay = const Duration(minutes: 0),
   });
 
+  HNAccountPreferences.fromMap (Map map) {
+    this.showDead = map['showDead'];
+    this.noProcrastinate = map['noProcrastinate'];
+    this.maxVisit = map['maxVisit'];
+    this.minAway = map['minAway'];
+    this.topColor = map['topColor'];
+    this.delay = map['delay'];
+  }
+
   @override
   String toString ({
     int indent = 0,
@@ -178,9 +198,9 @@ class HNAccountPreferences {
   Map<String, dynamic> toJson () => {
     'showDead': this.showDead,
     'noProcrastinate': this.noProcrastinate,
-    'maxVisit': this.maxVisit.inMinutes,
-    'minAway': this.minAway.inMinutes,
-    'topColor': this.topColor.value,
-    'delay': this.delay.inMinutes,
+    'maxVisit': this.maxVisit?.inMinutes,
+    'minAway': this.minAway?.inMinutes,
+    'topColor': this.topColor?.value,
+    'delay': this.delay?.inMinutes,
   };
 }
