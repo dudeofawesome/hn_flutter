@@ -48,6 +48,7 @@ class HNAccount {
     }
   }
 
+  @override
   String toString () {
     return dedent('''
       HNAccount:
@@ -82,6 +83,7 @@ class HNAccountPermissions {
     this.canPoll = false,
   });
 
+  @override
   String toString ({
     int indent = 0,
   }) {
@@ -126,6 +128,7 @@ class HNAccountPreferences {
     this.delay = const Duration(minutes: 0),
   });
 
+  @override
   String toString ({
     int indent = 0,
   }) {
