@@ -29,21 +29,18 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
 
-  bool _loading = false;
-
   @override
   initState () {
     super.initState();
     this._hnItemStore = listenToStore(itemStoreToken);
     this._hnAccountStore = listenToStore(accountStoreToken);
 
-    this._loading = true;
     this._refresh();
   }
 
   Future<Null> _refresh () async {
-    await this._hnUserService.getVotedByUserID(widget.userId, this._hnAccountStore.primaryAccount.accessCookie);
-    setState(() => this._loading = false);
+    await this._hnUserService.getVotedByUserID(
+      widget.userId, this._hnAccountStore.primaryAccount.accessCookie);
   }
 
   @override
@@ -51,20 +48,23 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
     final upvotedItems = this._hnItemStore.itemStatuses.values
       .where((itemStatus) => itemStatus.saved);
 
-    return (!this._loading)
-      ? new Scrollbar(
-        child: upvotedItems.length > 0
+    return new RefreshIndicator(
+      // key: this._refreshIndicatorKey,
+      onRefresh: () => this._refresh(),
+      child: new Scrollbar(
+        child: (upvotedItems.length > 0)
           ? new ListView(
             children: upvotedItems.map((itemStatus) => new StoryCard(
               storyId: itemStatus.id,
             ))?.toList(),
           )
-          : new Center(
-            child: new Text('No submissions'),
+          : new ListView(
+            padding: const EdgeInsets.symmetric(vertical: 32.0),
+            children: [
+              new Center(child: new Text('No submissions'))
+            ],
           ),
       )
-      : new Center(
-        child: new CircularProgressIndicator(),
-      );
+    );
   }
 }
