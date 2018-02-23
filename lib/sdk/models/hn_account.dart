@@ -167,17 +167,17 @@ class HNAccountPreferences {
     this.noProcrastinate = false,
     this.maxVisit = const Duration(minutes: 20),
     this.minAway = const Duration(minutes: 180),
-    this.topColor = const Color(4294927872),
+    this.topColor = const Color(_defaultTopColor),
     this.delay = const Duration(minutes: 0),
   });
 
   HNAccountPreferences.fromMap (Map map) {
     this.showDead = map['showDead'];
     this.noProcrastinate = map['noProcrastinate'];
-    this.maxVisit = map['maxVisit'];
-    this.minAway = map['minAway'];
-    this.topColor = map['topColor'];
-    this.delay = map['delay'];
+    this.maxVisit = new Duration(minutes: map['maxVisit']);
+    this.minAway = new Duration(minutes: map['minAway']);
+    this.topColor = new Color(map['topColor'] ?? _defaultTopColor);
+    this.delay = new Duration(minutes: map['delay']);
   }
 
   @override
@@ -204,3 +204,5 @@ class HNAccountPreferences {
     'delay': this.delay?.inMinutes,
   };
 }
+
+const _defaultTopColor = 4294927872;
