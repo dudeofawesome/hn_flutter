@@ -62,17 +62,15 @@ class LocalStorageServiceProd implements LocalStorageService {
         ''');
       },
       onUpgrade: (db, old, curr) async {
-        switch (old) {
-          case 1:
-            await Future.wait([
-              db.execute('''
-                ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PERMISSIONS TEXT
-              '''),
-              db.execute('''
-                ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PREFERENCES TEXT
-              '''),
-            ]);
-            break;
+        if (old <= 1) {
+          await Future.wait([
+            db.execute('''
+              ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PERMISSIONS TEXT
+            '''),
+            db.execute('''
+              ALTER TABLE $ACCOUNTS_TABLE ADD COLUMN $ACCOUNTS_PREFERENCES TEXT
+            '''),
+          ]);
         }
       }
     );
