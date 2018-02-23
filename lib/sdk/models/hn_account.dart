@@ -62,6 +62,31 @@ class HNAccount {
       ${preferences?.toString(indent: 4)}
     ''');
   }
+
+  Map<String, dynamic> toJson () => {
+    'id': this.id,
+    'email': this.email,
+    'password': this.password,
+    'accessCookie': {
+      'name': this.accessCookie?.name,
+      'value': this.accessCookie?.value,
+      'expires': this.accessCookie?.expires?.millisecondsSinceEpoch,
+      'domain': this.accessCookie?.domain,
+      'httpOnly': this.accessCookie?.httpOnly,
+      'secure': this.accessCookie?.secure,
+    },
+    'permissions': this.permissions.toJson(),
+    'preferences': this.preferences.toJson(),
+  };
+
+  Map<String, dynamic> cookieToJson () => {
+    'name': this.accessCookie?.name,
+    'value': this.accessCookie?.value,
+    'expires': this.accessCookie?.expires?.millisecondsSinceEpoch,
+    'domain': this.accessCookie?.domain,
+    'httpOnly': this.accessCookie?.httpOnly,
+    'secure': this.accessCookie?.secure,
+  };
 }
 
 class HNAccountPermissions {
@@ -95,6 +120,13 @@ class HNAccountPermissions {
       ''')
       .replaceAll('\n', '\n'.padLeft(indent));
   }
+
+  Map<String, dynamic> toJson () => {
+    'canDownvote': this.canDownvote,
+    'canFlag': this.canFlag,
+    'canVouch': this.canVouch,
+    'canPoll': this.canPoll,
+  };
 }
 
 class HNAccountPreferences {
@@ -142,4 +174,13 @@ class HNAccountPreferences {
       ''')
       .replaceAll('\n', '\n'.padLeft(indent));
   }
+
+  Map<String, dynamic> toJson () => {
+    'showDead': this.showDead,
+    'noProcrastinate': this.noProcrastinate,
+    'maxVisit': this.maxVisit.inMinutes,
+    'minAway': this.minAway.inMinutes,
+    'topColor': this.topColor.value,
+    'delay': this.delay.inMinutes,
+  };
 }
