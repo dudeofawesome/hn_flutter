@@ -78,6 +78,32 @@ class HNUserServiceProd implements HNUserService {
 
     return items;
   }
+
+  Future<List<int>> getVotedByUserID (String id, Cookie accessCookie) async {
+    final req = await ((await _httpClient.getUrl(Uri.parse(
+        '${this._config.apiHost}/upvoted?id=$id'
+      )))
+      ..cookies.add(accessCookie)
+      ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
+      .close();
+
+    print(req.headers);
+    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    print(body);
+    if (body.contains('Bad login')) throw 'Bad login.';
+    if (req.headers.value('location') != null) throw 'Unknown error';
+
+    final items = _itemIdRegExp.allMatches(body)
+      .map((match) => match?.group(1))
+      .where((id) => id != null)
+      .map((id) => int.parse(id))
+      .toList();
+
+    items.forEach((itemId) =>
+      patchItemStatus(new HNItemStatus.patch(id: itemId, upvoted: true)));
+
+    return items;
+  }
 }
 
 final _itemIdRegExp = new RegExp(r'''<tr class=["']athing["'] id=["']([0-9]+)["']>''');

@@ -43,16 +43,21 @@ class HNAuthServiceMock implements HNAuthService {
           ..cookies.add(accessCookie)).close();
         final body = await userReq.transform(UTF8.decoder).toList().then((body) => body.join());
 
-        final emailMatch = new RegExp(r'<input.*?name="uemail".*?value="(.*?)".*?>').firstMatch(body);
+        final emailMatch = _emailRegExp.firstMatch(body);
         if (emailMatch != null) {
           email = emailMatch[1];
         }
+
+        final canDownvote = _canDownvoteRegExp.hasMatch(body);
 
         return new HNAccount(
           id: userId,
           email: email,
           password: userPassword,
           accessCookie: accessCookie,
+          permissions: new HNAccountPermissions(
+            canDownvote: canDownvote,
+          ),
         );
       })
       .then((account) {
@@ -90,3 +95,6 @@ class HNAuthServiceMock implements HNAuthService {
     return true;
   }
 }
+
+final _emailRegExp = new RegExp(r'''<input.*?name="uemail".*?value="(.*?)".*?>''');
+final _canDownvoteRegExp = new RegExp(r'''<u>downvoted submissions</u>''');

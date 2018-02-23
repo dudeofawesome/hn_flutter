@@ -26,4 +26,8 @@ class HNUserServiceMock implements HNUserService {
   Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
     return new List();
   }
+
+  Future<List<int>> getVotedByUserID (String id, Cookie accessCookie) async {
+    return new List();
+  }
 }
