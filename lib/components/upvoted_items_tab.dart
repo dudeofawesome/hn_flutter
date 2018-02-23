@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show HandshakeException;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,28 +36,35 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
     this._hnItemStore = listenToStore(itemStoreToken);
     this._hnAccountStore = listenToStore(accountStoreToken);
 
-    this._refresh();
+    this._refresh(context);
   }
 
-  Future<Null> _refresh () async {
-    await this._hnUserService.getVotedByUserID(
-      widget.userId, this._hnAccountStore.primaryAccount.accessCookie);
+  Future<Null> _refresh (BuildContext context) async {
+    try {
+      await this._hnUserService.getVotedByUserID(
+        widget.userId, this._hnAccountStore.primaryAccount.accessCookie);
+    } on HandshakeException catch (err) {
+      Scaffold.of(context).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    }
   }
 
   @override
   Widget build (BuildContext context) {
     final upvotedItems = this._hnItemStore.itemStatuses.values
-      .where((itemStatus) => itemStatus.saved);
+      .where((itemStatus) => itemStatus.upvoted)
+      .toList();
 
     return new RefreshIndicator(
-      // key: this._refreshIndicatorKey,
-      onRefresh: () => this._refresh(),
+      onRefresh: () => this._refresh(context),
       child: new Scrollbar(
         child: (upvotedItems.length > 0)
-          ? new ListView(
-            children: upvotedItems.map((itemStatus) => new StoryCard(
-              storyId: itemStatus.id,
-            ))?.toList(),
+          ? new ListView.builder(
+            itemCount: upvotedItems.length,
+            itemBuilder: (context, index) => new StoryCard(
+              storyId: upvotedItems[index].id,
+            ),
           )
           : new ListView(
             padding: const EdgeInsets.symmetric(vertical: 32.0),
