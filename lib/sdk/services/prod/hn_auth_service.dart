@@ -1,6 +1,10 @@
 import 'dart:async';
-import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
 import 'dart:convert' show UTF8;
+import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
+import 'dart:ui' show Color;
+
+// import 'package:html/dom.dart' show ;
+import 'package:html/parser.dart' show parse;
 
 import 'package:hn_flutter/sdk/services/abstract/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -36,19 +40,45 @@ class HNAuthServiceProd implements HNAuthService {
         }
       })
       .then((res) async {
-        String email;
-        Cookie accessCookie = res.cookies.firstWhere((cookie) => cookie.name == 'user');
+        final accessCookie = res.cookies.firstWhere((cookie) => cookie.name == 'user');
 
         final userReq = await (await _httpClient.getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
           ..cookies.add(accessCookie)).close();
         final body = await userReq.transform(UTF8.decoder).toList().then((body) => body.join());
 
-        final emailMatch = _emailRegExp.firstMatch(body);
-        if (emailMatch != null) {
-          email = emailMatch[1];
-        }
+        final doc = parse(body);
 
-        final canDownvote = _canDownvoteRegExp.hasMatch(body);
+        final email = doc.querySelector('input[name=uemail]')
+          ?.attributes['value'];
+
+        final canDownvote = doc.querySelector('a[href*=downvoted]') != null;
+
+        final topColorEl = doc.querySelector('input[name=topcolor]');
+        final topColor = topColorEl != null
+          ? new Color(int.parse('0xFF${topColorEl.attributes['value']}'))
+          : null;
+        final showDeadEl = doc.querySelector('select[name=showd]')
+          ?.querySelector('option[selected]');
+        final showDead = showDeadEl != null
+          ? (showDeadEl.attributes['value'] == 'yes')
+          : null;
+        final noProcrastinateEl = doc.querySelector('select[name=nopro]')
+          ?.querySelector('option[selected]');
+        final noProcrastinate = noProcrastinateEl != null
+          ? (noProcrastinateEl.attributes['value'] == 'yes')
+          : null;
+        final maxVisitEl = doc.querySelector('input[name=maxv]');
+        final maxVisit = maxVisitEl != null
+          ? new Duration(minutes: int.parse(maxVisitEl.attributes['value']))
+          : null;
+        final minAwayEl = doc.querySelector('input[name=mina]');
+        final minAway = minAwayEl != null
+          ? new Duration(minutes: int.parse(minAwayEl.attributes['value']))
+          : null;
+        final delayEl = doc.querySelector('input[name=delay]');
+        final delay = delayEl != null
+          ? new Duration(minutes: int.parse(delayEl.attributes['value']))
+          : null;
 
         return new HNAccount(
           id: userId,
@@ -59,6 +89,12 @@ class HNAuthServiceProd implements HNAuthService {
             canDownvote: canDownvote,
           ),
           preferences: new HNAccountPreferences(
+            topColor: topColor,
+            showDead: showDead,
+            noProcrastinate: noProcrastinate,
+            maxVisit: maxVisit,
+            minAway: minAway,
+            delay: delay,
           )
         );
       })
@@ -97,6 +133,3 @@ class HNAuthServiceProd implements HNAuthService {
     return true;
   }
 }
-
-final _emailRegExp = new RegExp(r'''<input.*?name="uemail".*?value="(.*?)".*?>''');
-final _canDownvoteRegExp = new RegExp(r'''<u>downvoted submissions</u>''');
