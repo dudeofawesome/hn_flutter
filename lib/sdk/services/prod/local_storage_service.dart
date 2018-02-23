@@ -97,9 +97,13 @@ class LocalStorageServiceProd implements LocalStorageService {
   Future<List<HNAccount>> get accounts {
     return this._databases[ACCOUNTS_DB].query(
         ACCOUNTS_TABLE,
-        columns: [ACCOUNTS_ID, ACCOUNTS_EMAIL, ACCOUNTS_PASSWORD, ACCOUNTS_ACCESS_COOKIE],
+        columns: [
+          ACCOUNTS_ID, ACCOUNTS_EMAIL, ACCOUNTS_PASSWORD,
+          ACCOUNTS_ACCESS_COOKIE, ACCOUNTS_PERMISSIONS, ACCOUNTS_PREFERENCES,
+        ],
       )
-      .then((accounts) => accounts.map((accountMap) => new HNAccount.fromMap(accountMap))
+      .then((accounts) => accounts
+        .map((accountMap) => new HNAccount.fromMap(accountMap))
         .toList())
       .then((accounts) => new List.unmodifiable(accounts));
   }
@@ -109,11 +113,9 @@ class LocalStorageServiceProd implements LocalStorageService {
 
     final cookieJson = JSON.encode(account.cookieToJson());
 
-    final permissionsJson = JSON.encode({
-      'canDownvote': account.permissions?.canDownvote,
-    });
+    final permissionsJson = JSON.encode(account.permissions?.toJson());
 
-    final preferencesJson = JSON.encode({});
+    final preferencesJson = JSON.encode(account.preferences?.toJson());
 
     await this._databases[ACCOUNTS_DB].rawInsert(
       '''
