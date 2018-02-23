@@ -1,5 +1,6 @@
 import 'dart:convert' show JSON;
 import 'dart:io' show Cookie;
+import 'dart:ui' show Color;
 
 import 'package:intl/intl.dart' show DateFormat;
 
@@ -11,14 +12,16 @@ class HNAccount {
   String email;
   String password;
   Cookie accessCookie;
-  bool canDownvote;
+  HNAccountPermissions permissions;
+  HNAccountPreferences preferences;
 
   HNAccount ({
     this.id,
     this.email,
     this.password,
     this.accessCookie,
-    this.canDownvote,
+    this.permissions,
+    this.preferences,
   });
 
   HNAccount.fromMap (Map map) {
@@ -43,17 +46,97 @@ class HNAccount {
         '${(jsonCookie['secure'] ?? false) ? '; Secure' : ''}'
       );
     }
-    this.canDownvote = map['canDownvote'] ?? false;
   }
 
   String toString () {
     return dedent('''
-      HNAccount
+      HNAccount:
         id: $id
         email: $email
         password: ${password[0]}***
         accessCookie.value: ${accessCookie.value}
-        canDownvote: $canDownvote
+        permissions:
+      ${permissions?.toString(indent: 4)}
+        preferences:
+      ${preferences?.toString(indent: 4)}
     ''');
+  }
+}
+
+class HNAccountPermissions {
+  /// Currently, you need 500 Karma to downvote
+  bool canDownvote;
+  /// flags act as a "super" downvote and enough flags will strongly reduce the
+  /// rank of the submission, or kill it entirely. Currently, you need 30 Karma
+  bool canFlag;
+  /// A vouched submission/comment has its rank restored, but it can be flagged
+  /// again at which point it can't be re-vouched.
+  bool canVouch;
+  /// you need over 200 Karma to create a poll
+  bool canPoll;
+
+  HNAccountPermissions ({
+    this.canDownvote,
+    this.canFlag,
+    this.canVouch,
+    this.canPoll,
+  });
+
+  String toString ({
+    int indent = 0,
+  }) {
+    return dedent('''
+        canDownvote: $canDownvote
+        canFlag: $canFlag
+        canVouch: $canVouch
+        canPoll: $canPoll
+      ''')
+      .replaceAll('\n', '\n'.padLeft(indent));
+  }
+}
+
+class HNAccountPreferences {
+  /// Enable to see all stories and comments that have been killed by software,
+  /// moderators, or user flags.
+  bool showDead;
+  /// Help you prevent yourself from spending too much time on HN. If enabled,
+  /// you'll only be allowed to visit the site for `maxVisit` minutes at a
+  /// time, with gaps of `minAway` minutes in between. You can override
+  /// `noProcrastinate` if you want, in which case your visit clock starts over
+  /// at zero.
+  bool noProcrastinate;
+  /// Max visit duration. Defaults to 20 minutes
+  Duration maxVisit;
+  /// Minimum time spent away from site after procrastinate timeout.
+  /// Defaults to 180 minutes
+  Duration minAway;
+  /// The color of the top bar in their profile settings.
+  /// Currently requires 250 Karma. Defaults is #ff6600.
+  Color topColor;
+  /// Delay gives you time to edit your comments before they appear to others.
+  /// Set it to the number of minutes you'd like. The maximum is 10 minutes.
+  Duration delay;
+
+  HNAccountPreferences ({
+    this.showDead,
+    this.noProcrastinate,
+    this.maxVisit,
+    this.minAway,
+    this.topColor,
+    this.delay,
+  });
+
+  String toString ({
+    int indent = 0,
+  }) {
+    return dedent('''
+        showDead: $showDead
+        noProcrastinate: $noProcrastinate
+        maxVisit: $maxVisit
+        minAway: $minAway
+        topColor: $topColor
+        delay: $delay
+      ''')
+      .replaceAll('\n', '\n'.padLeft(indent));
   }
 }
