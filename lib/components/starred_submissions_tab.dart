@@ -21,10 +21,10 @@ class StarredSubmissionsTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  createState () => new _StarredSubmissionsTab();
+  createState () => new _StarredSubmissionsTabState();
 }
 
-class _StarredSubmissionsTab extends State<StarredSubmissionsTab> with StoreWatcherMixin<StarredSubmissionsTab> {
+class _StarredSubmissionsTabState extends State<StarredSubmissionsTab> with StoreWatcherMixin<StarredSubmissionsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;

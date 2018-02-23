@@ -80,6 +80,7 @@ class HNItem {
     this.computed = new HNItemComputed.fromItem(this);
   }
 
+  @override
   String toString() => dedent('''
     HNItem:
       id: $id
@@ -139,6 +140,7 @@ class HNItemStatus {
     this.authTokens,
   });
 
+  @override
   String toString() => dedent('''
     HNItemStatus:
       id: $id

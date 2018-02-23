@@ -55,7 +55,9 @@ class HNAuthServiceMock implements HNAuthService {
           email: email,
           password: userPassword,
           accessCookie: accessCookie,
-          canDownvote: canDownvote,
+          permissions: new HNAccountPermissions(
+            canDownvote: canDownvote,
+          ),
         );
       })
       .then((account) {
