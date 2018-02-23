@@ -88,7 +88,10 @@ class LocalStorageServiceProd implements LocalStorageService {
         whereArgs: [KEY_PRIMARY_ACCOUNT_ID],
         limit: 1,
       )
-      .then((res) => res.first[KEYS_VALUE]);
+      .then((res) => (res.length > 0 && res.first.containsKey(KEYS_VALUE))
+        ? res.first[KEYS_VALUE]
+        : null
+      );
   }
 
   Future<List<HNAccount>> get accounts {
