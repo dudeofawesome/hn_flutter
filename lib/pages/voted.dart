@@ -36,15 +36,17 @@ class VotedPage extends StoreWatcher {
 
     final HNAccountStore accountStore = stores[accountStoreToken];
 
-    bool userCanDownvote = false;
-
     return new DefaultTabController(
       length: _choices.length,
       child: new Scaffold(
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: new Text(userCanDownvote ? 'Voted' : 'Upvoted'),
+          title: new Text(
+            (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+              ? 'Upvoted'
+              : 'Voted'
+          ),
           actions: <Widget>[
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
@@ -63,7 +65,7 @@ class VotedPage extends StoreWatcher {
             ),
 
           ],
-          bottom: userCanDownvote
+          bottom: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
             ? new TabBar(
               // isScrollable: true,
               tabs: _choices.map((choice) => new Tab(
@@ -73,8 +75,8 @@ class VotedPage extends StoreWatcher {
             )
             : null,
         ),
-        body: userCanDownvote ?
-          new TabBarView(
+        body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+          ? new TabBarView(
             children: <Widget>[
               new UpvotedItemsTab(accountStore.primaryAccountId),
             ],
