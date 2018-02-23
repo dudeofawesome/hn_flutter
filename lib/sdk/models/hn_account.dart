@@ -76,10 +76,10 @@ class HNAccountPermissions {
   bool canPoll;
 
   HNAccountPermissions ({
-    this.canDownvote,
-    this.canFlag,
-    this.canVouch,
-    this.canPoll,
+    this.canDownvote = false,
+    this.canFlag = false,
+    this.canVouch = false,
+    this.canPoll = false,
   });
 
   String toString ({
@@ -118,12 +118,12 @@ class HNAccountPreferences {
   Duration delay;
 
   HNAccountPreferences ({
-    this.showDead,
-    this.noProcrastinate,
-    this.maxVisit,
-    this.minAway,
-    this.topColor,
-    this.delay,
+    this.showDead = false,
+    this.noProcrastinate = false,
+    this.maxVisit = const Duration(minutes: 20),
+    this.minAway = const Duration(minutes: 180),
+    this.topColor = const Color(4294927872),
+    this.delay = const Duration(minutes: 0),
   });
 
   String toString ({
