@@ -10,8 +10,8 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/upvoted_items_tab.dart';
 
-class VotedPage extends StoreWatcher {
-  VotedPage ({
+class VotedStoriesPage extends StoreWatcher {
+  VotedStoriesPage ({
     Key key,
   }) : super(key: key);
 

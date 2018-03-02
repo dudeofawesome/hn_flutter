@@ -4,12 +4,13 @@ import 'package:flutter/services.dart' show MethodChannel;
 
 import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/starred.dart';
-import 'package:hn_flutter/pages/stories.dart';
+import 'package:hn_flutter/pages/main.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/submit_comment.dart';
 import 'package:hn_flutter/pages/submit_story.dart';
 import 'package:hn_flutter/pages/user.dart';
-import 'package:hn_flutter/pages/voted.dart';
+import 'package:hn_flutter/pages/voted_stories.dart';
+import 'package:hn_flutter/pages/voted_comments.dart';
 
 import 'package:hn_flutter/utils/channels.dart';
 
@@ -24,7 +25,7 @@ class Routes {
 }
 
 final staticRoutes = <String, WidgetBuilder>{
-  '/': (BuildContext context) => new StoriesPage(),
+  '/': (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
   '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage()
 };
 
@@ -79,7 +80,7 @@ Route<Null> getRoute (RouteSettings settings) {
 
     return new CupertinoPageRoute<Null>(
       settings: settings,
-      builder: (BuildContext context) => new VotedPage(),
+      builder: (BuildContext context) => new VotedStoriesPage(),
     );
   } else if (path[1].startsWith('${Routes.SUBMIT_STORY}')) {
     if (path.length != 2) return null;
@@ -128,4 +129,8 @@ registerDeepLinkChannel (BuildContext ctx) {
           break;
       }
     });
+}
+
+enum MainPageSubPages {
+  STORIES,
 }

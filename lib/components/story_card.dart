@@ -129,7 +129,12 @@ class StoryCard extends StoreWatcher {
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
-        _hnItemService.getItemByID(storyId, account?.accessCookie);
+        _hnItemService.getItemByID(storyId, account?.accessCookie)
+          .catchError((err) {
+            Scaffold.of(context).showSnackBar(new SnackBar(
+              content: new Text(err?.toString() ?? 'Unknown Error'),
+            ));
+          });
       }
 
       return new Padding(
