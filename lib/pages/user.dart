@@ -57,6 +57,12 @@ class UserPage extends StoreWatcher {
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
+          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
+            ? new IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            )
+            : null,
           title: new Text(user?.id ?? this.userId),
           actions: <Widget>[
             new IconButton(
