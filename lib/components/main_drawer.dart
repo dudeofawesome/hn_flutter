@@ -12,7 +12,12 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 
 class MainDrawer extends StatefulWidget {
-  MainDrawer ({Key key}) : super(key: key);
+  final MainPageSubPages page;
+
+  MainDrawer (
+    this.page, {
+    Key key,
+  }) : super(key: key);
 
   @override
   _MainDrawerState createState () => new _MainDrawerState();
@@ -140,6 +145,7 @@ class _MainDrawerState extends State<MainDrawer>
     menuItems.add(new ListTile(
       leading: const Icon(Icons.dashboard),
       title: const Text('Stories'),
+      selected: widget.page == MainPageSubPages.STORIES,
       onTap: () async {
         this._closeDrawer(context);
         await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');

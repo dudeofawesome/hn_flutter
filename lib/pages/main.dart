@@ -28,9 +28,7 @@ class MainPage extends StatelessWidget {
     }
 
     return new Scaffold(
-      drawer: new Drawer(
-        child: new MainDrawer(),
-      ),
+      drawer: new MainDrawer(this.page),
       body: pageWidget,
     );
   }
