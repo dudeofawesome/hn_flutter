@@ -148,7 +148,8 @@ class _MainDrawerState extends State<MainDrawer>
       selected: widget.page == MainPageSubPages.STORIES,
       onTap: () async {
         this._closeDrawer(context);
-        await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
+        await Navigator.pushReplacementNamed(
+          context, '/${Routes.MAIN}/${Routes.STORIES}');
       },
     ));
 
@@ -156,9 +157,12 @@ class _MainDrawerState extends State<MainDrawer>
       menuItems.add(new ListTile(
         leading: const Icon(Icons.account_circle),
         title: const Text('Profile'),
+        selected: widget.page == MainPageSubPages.PROFILE,
         onTap: () async {
           this._closeDrawer(context);
-          await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
+          await Navigator.pushReplacementNamed(
+            context, '/${Routes.MAIN}/${Routes.USERS}'
+          );
         },
       ));
       menuItems.add(new ListTile(
@@ -166,7 +170,8 @@ class _MainDrawerState extends State<MainDrawer>
         title: const Text('Favorites'),
         onTap: () async {
           this._closeDrawer(context);
-          await Navigator.pushNamed(context, '/${Routes.STARRED}');
+          await Navigator.pushReplacementNamed(
+            context, '/${Routes.MAIN}/${Routes.STARRED}');
         },
       ));
       menuItems.add(new ListTile(
@@ -177,7 +182,8 @@ class _MainDrawerState extends State<MainDrawer>
         title: const Text('Voted'),
         onTap: () async {
           this._closeDrawer(context);
-          await Navigator.pushNamed(context, '/${Routes.VOTED}');
+          await Navigator.pushReplacementNamed(
+            context, '/${Routes.MAIN}/${Routes.VOTED}');
         },
       ));
     }

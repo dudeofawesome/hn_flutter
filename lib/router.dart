@@ -15,6 +15,7 @@ import 'package:hn_flutter/pages/voted_comments.dart';
 import 'package:hn_flutter/utils/channels.dart';
 
 class Routes {
+  static const MAIN = 'main';
   static const STORIES = 'item';
   static const USERS = 'user';
   static const STARRED = 'starred';
@@ -35,56 +36,74 @@ Route<Null> getRoute (RouteSettings settings) {
 
   assert(parsed.path.startsWith('/'), 'Path must start with a /');
 
-  if (parsed.pathSegments[0] == Routes.STORIES) {
-    if (parsed.pathSegments.length == 1) {
+  switch (parsed.pathSegments[0]) {
+    case Routes.MAIN:
+      switch (parsed.pathSegments[1]) {
+        case Routes.USERS:
+          return new CupertinoPageRoute<Null>(
+            settings: settings,
+            builder: (BuildContext context) => new MainPage(MainPageSubPages.PROFILE),
+          );
+        case Routes.STORIES:
+        default:
+          return new CupertinoPageRoute<Null>(
+            settings: settings,
+            builder: (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
+          );
+      }
+      break;
+    case Routes.STORIES:
+      if (parsed.pathSegments.length == 1) {
+        return new CupertinoPageRoute<Null>(
+          settings: settings,
+          builder: (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
+        );
+      } else {
+        final itemId = int.parse(parsed.pathSegments[1]);
+        return new CupertinoPageRoute<Null>(
+          settings: settings,
+          builder: (BuildContext context) => new StoryPage(itemId: itemId),
+        );
+      }
+      break;
+    case Routes.USERS:
+      assert(parsed.pathSegments.length == 2, 'Path must be 2 segments');
+
+      final userId = parsed.pathSegments[1];
       return new CupertinoPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
+        builder: (BuildContext context) => new UserPage(userId: userId),
       );
-    } else {
-      final itemId = int.parse(parsed.pathSegments[1]);
+    case Routes.STARRED:
       return new CupertinoPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new StoryPage(itemId: itemId),
+        builder: (BuildContext context) => new StarredPage(),
       );
-    }
-  } else if (parsed.pathSegments[0] == Routes.USERS) {
-    assert(parsed.pathSegments.length == 2, 'Path must be 2 segments');
+    case Routes.VOTED:
+      return new CupertinoPageRoute<Null>(
+        settings: settings,
+        builder: (BuildContext context) => new VotedStoriesPage(),
+      );
+    case Routes.SUBMIT_STORY:
+      return new MaterialPageRoute<Null>(
+        settings: settings,
+        fullscreenDialog: true,
+        builder: (BuildContext context) => new SubmitStoryPage(),
+      );
+    case Routes.SUBMIT_COMMENT:
+      assert(parsed.queryParameters['parentId'] != null);
+      assert(parsed.queryParameters['authToken'] != null);
 
-    final userId = parsed.pathSegments[1];
-    return new CupertinoPageRoute<Null>(
-      settings: settings,
-      builder: (BuildContext context) => new UserPage(userId: userId),
-    );
-  } else if (parsed.pathSegments[0] == Routes.STARRED) {
-    return new CupertinoPageRoute<Null>(
-      settings: settings,
-      builder: (BuildContext context) => new StarredPage(),
-    );
-  } else if (parsed.pathSegments[0] == Routes.VOTED) {
-    return new CupertinoPageRoute<Null>(
-      settings: settings,
-      builder: (BuildContext context) => new VotedStoriesPage(),
-    );
-  } else if (parsed.pathSegments[0] == Routes.SUBMIT_STORY) {
-    return new MaterialPageRoute<Null>(
-      settings: settings,
-      fullscreenDialog: true,
-      builder: (BuildContext context) => new SubmitStoryPage(),
-    );
-  } else if (parsed.pathSegments[0] == Routes.SUBMIT_COMMENT) {
-    assert(parsed.queryParameters['parentId'] != null);
-    assert(parsed.queryParameters['authToken'] != null);
-
-    return new MaterialPageRoute<Null>(
-      settings: settings,
-      fullscreenDialog: true,
-      builder: (BuildContext context) => new SubmitCommentPage(
-        parentId: int.parse(parsed.queryParameters['parentId']),
-        authToken: parsed.queryParameters['authToken'],
-      ),
-    );
+      return new MaterialPageRoute<Null>(
+        settings: settings,
+        fullscreenDialog: true,
+        builder: (BuildContext context) => new SubmitCommentPage(
+          parentId: int.parse(parsed.queryParameters['parentId']),
+          authToken: parsed.queryParameters['authToken'],
+        ),
+      );
   }
+
   // The other paths we support are in the routes table.
   return null;
 }
@@ -116,4 +135,5 @@ registerDeepLinkChannel (BuildContext ctx) {
 
 enum MainPageSubPages {
   STORIES,
+  PROFILE,
 }
