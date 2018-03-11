@@ -40,15 +40,25 @@ Route<Null> getRoute (RouteSettings settings) {
     case Routes.MAIN:
       switch (parsed.pathSegments[1]) {
         case Routes.USERS:
-          return new CupertinoPageRoute<Null>(
+          return new PageRouteBuilder<Null>(
             settings: settings,
-            builder: (BuildContext context) => new MainPage(MainPageSubPages.PROFILE),
+            pageBuilder: (
+              BuildContext context,
+              Animation<double> animation, Animation<double> secondaryAnimation
+            ) => new MainPage(MainPageSubPages.PROFILE),
+            transitionDuration: const Duration(),
+            // transitionsBuilder: routeTransitionsBuilder,
           );
         case Routes.STORIES:
         default:
-          return new CupertinoPageRoute<Null>(
+          return new PageRouteBuilder<Null>(
             settings: settings,
-            builder: (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
+            pageBuilder: (
+              BuildContext context,
+              Animation<double> animation, Animation<double> secondaryAnimation
+            ) => new MainPage(MainPageSubPages.STORIES),
+            transitionDuration: const Duration(),
+            // transitionsBuilder: routeTransitionsBuilder,
           );
       }
       break;
