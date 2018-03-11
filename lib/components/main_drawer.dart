@@ -125,7 +125,7 @@ class _MainDrawerState extends State<MainDrawer>
                         title: const Text('Stories'),
                         onTap: () async {
                           this._closeDrawer(context);
-                          await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                          await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
                         },
                       ),
                       new ListTile(
@@ -133,7 +133,7 @@ class _MainDrawerState extends State<MainDrawer>
                         title: const Text('Profile'),
                         onTap: () async {
                           this._closeDrawer(context);
-                          await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
+                          await Navigator.pushNamed(context, '/${Routes.USERS}/${_accountStore.primaryAccountId}');
                         },
                       ),
                       new ListTile(
@@ -168,7 +168,7 @@ class _MainDrawerState extends State<MainDrawer>
                         final storyId = await this._showStoryDialog(context);
                         if (storyId != null) {
                           print(storyId);
-                          await Navigator.pushNamed(context, '/${Routes.STORIES}:$storyId');
+                          await Navigator.pushNamed(context, '/${Routes.STORIES}/$storyId');
                         }
                         this._closeDrawer(context);
                       },
@@ -180,7 +180,7 @@ class _MainDrawerState extends State<MainDrawer>
                         final userId = await this._showUserDialog(context);
                         if (userId != null) {
                           print(userId);
-                          await Navigator.pushNamed(context, '/${Routes.USERS}:$userId');
+                          await Navigator.pushNamed(context, '/${Routes.USERS}/$userId');
                         }
                         this._closeDrawer(context);
                       },

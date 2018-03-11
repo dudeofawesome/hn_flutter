@@ -31,67 +31,50 @@ final staticRoutes = <String, WidgetBuilder>{
 
 Route<Null> getRoute (RouteSettings settings) {
   // Routes, by convention, are split on slashes, like filesystem paths.
-  final List<String> path = settings.name.split('/');
-  print('PATH UPDATED!');
-  print(path);
-  // We only support paths that start with a slash, so bail if
-  // the first component is not empty:
-  if (path[0] != '') {
-    return null;
-  }
-  // If the path is "/stock:..." then show a stock page for the
-  // specified stock symbol.
-  if (path[1].startsWith('${Routes.STORIES}:')) {
-    // We don't yet support subpages of a stock, so bail if there's
-    // any more path components.
-    if (path.length != 2) {
-      return null;
-    }
-    // Extract the symbol part of "stock:..." and return a route
-    // for that symbol.
-    final int itemId = int.parse(path[1].substring(Routes.STORIES.length + 1));
-    return new CupertinoPageRoute<Null>(
-      settings: settings,
-      builder: (BuildContext context) => new StoryPage(itemId: itemId),
-    );
-  } else if (path[1].startsWith('${Routes.USERS}:')) {
-    if (path.length != 2) {
-      return null;
-    }
+  final parsed = Uri.parse(settings.name);
 
-    final String userId = path[1].substring(Routes.USERS.length + 1);
+  assert(parsed.path.startsWith('/'), 'Path must start with a /');
+
+  if (parsed.pathSegments[0] == Routes.STORIES) {
+    if (parsed.pathSegments.length == 1) {
+      return new CupertinoPageRoute<Null>(
+        settings: settings,
+        builder: (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
+      );
+    } else {
+      final itemId = int.parse(parsed.pathSegments[1]);
+      return new CupertinoPageRoute<Null>(
+        settings: settings,
+        builder: (BuildContext context) => new StoryPage(itemId: itemId),
+      );
+    }
+  } else if (parsed.pathSegments[0] == Routes.USERS) {
+    assert(parsed.pathSegments.length == 2, 'Path must be 2 segments');
+
+    final userId = parsed.pathSegments[1];
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new UserPage(userId: userId),
     );
-  } else if (path[1].startsWith('${Routes.STARRED}')) {
-    if (path.length != 2) {
-      return null;
-    }
-
+  } else if (parsed.pathSegments[0] == Routes.STARRED) {
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new StarredPage(),
     );
-  } else if (path[1].startsWith('${Routes.VOTED}')) {
-    if (path.length != 2) {
-      return null;
-    }
-
+  } else if (parsed.pathSegments[0] == Routes.VOTED) {
     return new CupertinoPageRoute<Null>(
       settings: settings,
       builder: (BuildContext context) => new VotedStoriesPage(),
     );
-  } else if (path[1].startsWith('${Routes.SUBMIT_STORY}')) {
-    if (path.length != 2) return null;
-
+  } else if (parsed.pathSegments[0] == Routes.SUBMIT_STORY) {
     return new MaterialPageRoute<Null>(
       settings: settings,
       fullscreenDialog: true,
       builder: (BuildContext context) => new SubmitStoryPage(),
     );
-  } else if (path[1].startsWith('${Routes.SUBMIT_COMMENT}')) {
-    final parsed = Uri.parse(settings.name);
+  } else if (parsed.pathSegments[0] == Routes.SUBMIT_COMMENT) {
+    assert(parsed.queryParameters['parentId'] != null);
+    assert(parsed.queryParameters['authToken'] != null);
 
     return new MaterialPageRoute<Null>(
       settings: settings,

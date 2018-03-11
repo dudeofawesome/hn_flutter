@@ -141,11 +141,11 @@ class _CommentState extends State<Comment>
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
   void _viewContext (BuildContext ctx, int parent) {
-    // Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    // Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
   Future<Null> _copyText (String text) async {

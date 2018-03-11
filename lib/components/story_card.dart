@@ -42,7 +42,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
   }
 
   Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
@@ -111,7 +111,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$by');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$by');
   }
 
   @override
