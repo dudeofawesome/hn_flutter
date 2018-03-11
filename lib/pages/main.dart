@@ -9,7 +9,7 @@ import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/components/main_drawer.dart';
 
-class MainPage extends StatelessWidget{
+class MainPage extends StatelessWidget {
   final MainPageSubPages page;
 
   MainPage (
