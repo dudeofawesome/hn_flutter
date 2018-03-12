@@ -165,26 +165,66 @@ class _MainDrawerState extends State<MainDrawer>
           );
         },
       ));
-      menuItems.add(new ListTile(
+      menuItems.add(new ExpansionTile(
         leading: const Icon(Icons.star),
         title: const Text('Favorites'),
-        onTap: () async {
-          this._closeDrawer(context);
-          await Navigator.pushReplacementNamed(
-            context, '/${Routes.MAIN}/${Routes.STARRED}');
-        },
+        initiallyExpanded:
+          widget.page == MainPageSubPages.STARRED_STORIES ||
+          widget.page == MainPageSubPages.STARRED_COMMENTS,
+        children: <Widget>[
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Stories'),
+            selected: widget.page == MainPageSubPages.STARRED_STORIES,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.STARRED}/stories');
+            },
+          ),
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Comments'),
+            selected: widget.page == MainPageSubPages.STARRED_COMMENTS,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.STARRED}/comments');
+            },
+          ),
+        ],
       ));
-      menuItems.add(new ListTile(
+      menuItems.add(new ExpansionTile(
         leading: new Transform.rotate(
           angle: math.PI,
           child: const Icon(Icons.arrow_drop_down_circle),
         ),
         title: const Text('Voted'),
-        onTap: () async {
-          this._closeDrawer(context);
-          await Navigator.pushReplacementNamed(
-            context, '/${Routes.MAIN}/${Routes.VOTED}');
-        },
+        initiallyExpanded:
+          widget.page == MainPageSubPages.VOTED_STORIES ||
+          widget.page == MainPageSubPages.VOTED_COMMENTS,
+        children: <Widget>[
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Stories'),
+            selected: widget.page == MainPageSubPages.VOTED_STORIES,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.VOTED}/stories');
+            },
+          ),
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Comments'),
+            selected: widget.page == MainPageSubPages.VOTED_COMMENTS,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.VOTED}/comments');
+            },
+          ),
+        ],
       ));
     }
 

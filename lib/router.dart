@@ -38,30 +38,30 @@ Route<Null> getRoute (RouteSettings settings) {
 
   switch (parsed.pathSegments[0]) {
     case Routes.MAIN:
+      MainPageSubPages subPage;
       switch (parsed.pathSegments[1]) {
         case Routes.USERS:
-          return new PageRouteBuilder<Null>(
-            settings: settings,
-            pageBuilder: (
-              BuildContext context,
-              Animation<double> animation, Animation<double> secondaryAnimation
-            ) => new MainPage(MainPageSubPages.PROFILE),
-            transitionDuration: const Duration(),
-            // transitionsBuilder: routeTransitionsBuilder,
-          );
+          subPage = MainPageSubPages.PROFILE;
+          break;
+        case Routes.STARRED:
+          subPage = MainPageSubPages.STARRED_STORIES;
+          break;
+        case Routes.VOTED:
+          subPage = MainPageSubPages.VOTED_STORIES;
+          break;
         case Routes.STORIES:
         default:
-          return new PageRouteBuilder<Null>(
-            settings: settings,
-            pageBuilder: (
-              BuildContext context,
-              Animation<double> animation, Animation<double> secondaryAnimation
-            ) => new MainPage(MainPageSubPages.STORIES),
-            transitionDuration: const Duration(),
-            // transitionsBuilder: routeTransitionsBuilder,
-          );
+          subPage = MainPageSubPages.STORIES;
       }
-      break;
+      return new PageRouteBuilder<Null>(
+        settings: settings,
+        pageBuilder: (
+          BuildContext context,
+          Animation<double> animation, Animation<double> secondaryAnimation
+        ) => new MainPage(subPage),
+        transitionDuration: const Duration(),
+        // transitionsBuilder: routeTransitionsBuilder,
+      );
     case Routes.STORIES:
       if (parsed.pathSegments.length == 1) {
         return new CupertinoPageRoute<Null>(
@@ -146,4 +146,8 @@ registerDeepLinkChannel (BuildContext ctx) {
 enum MainPageSubPages {
   STORIES,
   PROFILE,
+  STARRED_STORIES,
+  STARRED_COMMENTS,
+  VOTED_STORIES,
+  VOTED_COMMENTS,
 }
