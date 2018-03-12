@@ -55,7 +55,7 @@ class HNUserServiceProd implements HNUserService {
 
   Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
     final req = await ((await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/favorites?id=$id${stories ? '' : '&comments=t'}'
+        '${this._config.apiHost}/favorites?id=$id&comments=${stories ? 'f' : 't'}'
       )))
       ..cookies.add(accessCookie)
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
@@ -67,11 +67,12 @@ class HNUserServiceProd implements HNUserService {
     if (body.contains('Bad login')) throw 'Bad login.';
     if (req.headers.value('location') != null) throw 'Unknown error';
 
-    final items = _storyIdRegExp.allMatches(body)
-      .map((match) => match?.group(1))
-      .where((id) => id != null)
-      .map((id) => int.parse(id))
-      .toList();
+    final items = (stories ? _storyIdRegExp : _commentIdRegExp)
+      .allMatches(body)
+        .map((match) => match?.group(1))
+        .where((id) => id != null)
+        .map((id) => int.parse(id))
+        .toList();
 
     items.forEach((itemId) =>
       patchItemStatus(new HNItemStatus.patch(id: itemId, saved: true)));
