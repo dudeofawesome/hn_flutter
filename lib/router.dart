@@ -20,6 +20,8 @@ class Routes {
   static const USERS = 'user';
   static const STARRED = 'starred';
   static const VOTED = 'voted';
+  static const SUBPAGE_STORIES = 'stories';
+  static const SUBPAGE_COMMENTS = 'comments';
   static const SUBMIT_STORY = 'submit_story';
   static const SUBMIT_COMMENT = 'submit_comment';
   static const SETTINGS = 'settings';
@@ -44,10 +46,24 @@ Route<Null> getRoute (RouteSettings settings) {
           subPage = MainPageSubPages.PROFILE;
           break;
         case Routes.STARRED:
-          subPage = MainPageSubPages.STARRED_STORIES;
+          switch (parsed.pathSegments[2]) {
+            case Routes.SUBPAGE_STORIES:
+              subPage = MainPageSubPages.STARRED_STORIES;
+              break;
+            case Routes.SUBPAGE_COMMENTS:
+            default:
+              subPage = MainPageSubPages.STARRED_COMMENTS;
+          }
           break;
         case Routes.VOTED:
-          subPage = MainPageSubPages.VOTED_STORIES;
+          switch (parsed.pathSegments[2]) {
+            case Routes.SUBPAGE_STORIES:
+              subPage = MainPageSubPages.VOTED_STORIES;
+              break;
+            case Routes.SUBPAGE_COMMENTS:
+            default:
+              subPage = MainPageSubPages.VOTED_COMMENTS;
+          }
           break;
         case Routes.STORIES:
         default:

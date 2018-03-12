@@ -179,7 +179,7 @@ class _MainDrawerState extends State<MainDrawer>
             onTap: () async {
               this._closeDrawer(context);
               await Navigator.pushReplacementNamed(
-                context, '/${Routes.MAIN}/${Routes.STARRED}/stories');
+                context, '/${Routes.MAIN}/${Routes.STARRED}/${Routes.SUBPAGE_STORIES}');
             },
           ),
           new ListTile(
@@ -189,7 +189,7 @@ class _MainDrawerState extends State<MainDrawer>
             onTap: () async {
               this._closeDrawer(context);
               await Navigator.pushReplacementNamed(
-                context, '/${Routes.MAIN}/${Routes.STARRED}/comments');
+                context, '/${Routes.MAIN}/${Routes.STARRED}/${Routes.SUBPAGE_COMMENTS}');
             },
           ),
         ],
@@ -211,7 +211,7 @@ class _MainDrawerState extends State<MainDrawer>
             onTap: () async {
               this._closeDrawer(context);
               await Navigator.pushReplacementNamed(
-                context, '/${Routes.MAIN}/${Routes.VOTED}/stories');
+                context, '/${Routes.MAIN}/${Routes.VOTED}/${Routes.SUBPAGE_STORIES}');
             },
           ),
           new ListTile(
@@ -221,7 +221,7 @@ class _MainDrawerState extends State<MainDrawer>
             onTap: () async {
               this._closeDrawer(context);
               await Navigator.pushReplacementNamed(
-                context, '/${Routes.MAIN}/${Routes.VOTED}/comments');
+                context, '/${Routes.MAIN}/${Routes.VOTED}/${Routes.SUBPAGE_COMMENTS}');
             },
           ),
         ],

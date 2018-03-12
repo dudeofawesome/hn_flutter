@@ -12,12 +12,17 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 import 'package:hn_flutter/components/story_card.dart';
+import 'package:hn_flutter/components/comment.dart';
 
 class UpvotedItemsTab extends StatefulWidget {
   final String userId;
+  final bool showStories;
+  final bool showComments;
 
-  const UpvotedItemsTab (
-    this.userId, {
+  const UpvotedItemsTab ({
+    this.userId,
+    this.showStories = false,
+    this.showComments = false,
     Key key,
   }) : super(key: key);
 
@@ -41,8 +46,14 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
 
   Future<Null> _refresh (BuildContext context) async {
     try {
-      await this._hnUserService.getVotedByUserID(
-        widget.userId, this._hnAccountStore.primaryAccount.accessCookie);
+      if (widget.showStories) {
+        await this._hnUserService.getVotedByUserID(
+          widget.userId, true, this._hnAccountStore.primaryAccount.accessCookie);
+      }
+      if (widget.showComments) {
+        await this._hnUserService.getVotedByUserID(
+          widget.userId, false, this._hnAccountStore.primaryAccount.accessCookie);
+      }
     } on HandshakeException catch (err) {
       Scaffold.of(context).showSnackBar(new SnackBar(
         content: new Text(err.toString()),
@@ -54,6 +65,18 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
   Widget build (BuildContext context) {
     final upvotedItems = this._hnItemStore.itemStatuses.values
       .where((itemStatus) => itemStatus.upvoted)
+      .where((itemStatus) {
+        if (widget.showStories && widget.showComments) {
+          return true;
+        } else if (this._hnItemStore.items[itemStatus.id] != null) {
+          if (widget.showStories) {
+            return this._hnItemStore.items[itemStatus.id]?.type == 'story';
+          } else if (widget.showComments) {
+            return this._hnItemStore.items[itemStatus.id]?.type == 'comment';
+          }
+        }
+        return true;
+      })
       .toList();
 
     return new RefreshIndicator(
@@ -62,9 +85,15 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
         child: (upvotedItems.length > 0)
           ? new ListView.builder(
             itemCount: upvotedItems.length,
-            itemBuilder: (context, index) => new StoryCard(
-              storyId: upvotedItems[index].id,
-            ),
+            itemBuilder: (context, index) =>
+              (this._hnItemStore.items[upvotedItems[index].id]?.type == 'story')
+                ? new StoryCard(
+                  storyId: upvotedItems[index].id,
+                )
+                : new Comment(
+                  itemId: upvotedItems[index].id,
+                  loadChildren: false,
+                ),
           )
           : new ListView(
             padding: const EdgeInsets.symmetric(vertical: 32.0),

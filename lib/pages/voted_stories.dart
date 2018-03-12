@@ -84,10 +84,16 @@ class VotedStoriesPage extends StoreWatcher {
         body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
           ? new TabBarView(
             children: <Widget>[
-              new UpvotedItemsTab(accountStore.primaryAccountId),
+              new UpvotedItemsTab(
+                userId: accountStore.primaryAccountId,
+                showStories: true,
+              ),
             ],
           )
-          : new UpvotedItemsTab(accountStore.primaryAccountId),
+          : new UpvotedItemsTab(
+            userId: accountStore.primaryAccountId,
+            showStories: true,
+          ),
       ),
     );
   }
