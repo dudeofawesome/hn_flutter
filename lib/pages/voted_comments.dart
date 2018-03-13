@@ -22,7 +22,7 @@ class VotedCommentsPage extends StoreWatcher {
   }
 
   Future<Null> _shareUser (String userId) async {
-    await share('https://news.ycombinator.com/upvoted?id=$userId');
+    await share('https://news.ycombinator.com/upvoted?id=$userId&comments=t');
   }
 
   @override
