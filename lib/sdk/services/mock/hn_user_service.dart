@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:io' show Cookie;
 
 import 'package:http/http.dart' as http;
@@ -16,7 +16,7 @@ class HNUserServiceMock implements HNUserService {
     addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
 
     return http.get('${this._config.url}/user/$id.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => json.decode(res.body))
       .then((user) => new HNUser.fromMap(user))
       .then((user) {
         addHNUser(user);

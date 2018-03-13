@@ -279,7 +279,7 @@ class StoryCard extends StoreWatcher {
                 decoration: new BoxDecoration(
                   color: const Color.fromRGBO(0, 0, 0, 0.5),
                 ),
-                width: double.INFINITY,
+                width: double.infinity,
                 child: new Padding(
                   padding: new EdgeInsets.all(8.0),
                   child: new Column(

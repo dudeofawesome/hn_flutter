@@ -53,7 +53,7 @@ class Comment extends StatefulWidget {
 }
 
 class _CommentState extends State<Comment>
-  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin {
+  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin<Comment> {
 
   final _hnItemService = new Injector().hnItemService;
   HNItemStore _itemStore;
@@ -504,7 +504,7 @@ class _CommentState extends State<Comment>
               child: new Padding(
                 padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
                 child: new Container(
-                  width: double.INFINITY,
+                  width: double.infinity,
                   decoration: new BoxDecoration(
                     border: new Border(
                       left: widget.depth > 0 ? new BorderSide(

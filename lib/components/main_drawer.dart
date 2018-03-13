@@ -196,7 +196,7 @@ class _MainDrawerState extends State<MainDrawer>
       ));
       menuItems.add(new ExpansionTile(
         leading: new Transform.rotate(
-          angle: math.PI,
+          angle: math.pi,
           child: const Icon(Icons.arrow_drop_down_circle),
         ),
         title: const Text('Voted'),

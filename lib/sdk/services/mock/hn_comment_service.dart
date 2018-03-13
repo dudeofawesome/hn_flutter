@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/services/abstract/hn_comment_service.dart';
@@ -15,7 +15,7 @@ class HNCommentServiceMock implements HNCommentService {
 
   getChildComments (HNItem item) async {
     item.kids.forEach((child) => http.get('${this._config.url}/item/$child')
-      .then((res) => JSON.decode(res.body) as List<int>)
+      .then((res) => json.decode(res.body) as List<int>)
       .then((List<int> body) => body.sublist(0, 5))
       .then((List<int> body) => Future.wait(body.map((itemId) => this._itemService.getItemByID(itemId)).toList()))
       .then((List<HNItem> children) {

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show json, utf8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:http/http.dart' as http;
@@ -19,7 +19,7 @@ class HNUserServiceProd implements HNUserService {
     addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
 
     return http.get('${this._config.url}/user/$id.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => json.decode(res.body))
       .then((body) async {
         if (body != null) return new HNUser.fromMap(body);
         else return this._getUserByIdFromSite(id);
@@ -62,7 +62,7 @@ class HNUserServiceProd implements HNUserService {
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
     if (body.contains('Bad login')) throw 'Bad login.';
     if (req.headers.value('location') != null) throw 'Unknown error';
@@ -88,7 +88,7 @@ class HNUserServiceProd implements HNUserService {
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     if (body.contains('Bad login')) throw 'Bad login.';
     if (req.headers.value('location') != null) throw 'Unknown error';
 

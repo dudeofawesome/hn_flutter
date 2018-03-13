@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Directory;
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -109,11 +109,11 @@ class LocalStorageServiceProd implements LocalStorageService {
   Future<Null> addHNAccount (HNAccount account) async {
     print('Adding ${account.id} to SQLite');
 
-    final cookieJson = JSON.encode(account.cookieToJson());
+    final cookieJson = json.encode(account.cookieToJson());
 
-    final permissionsJson = JSON.encode(account.permissions?.toJson());
+    final permissionsJson = json.encode(account.permissions?.toJson());
 
-    final preferencesJson = JSON.encode(account.preferences?.toJson());
+    final preferencesJson = json.encode(account.preferences?.toJson());
 
     await this._databases[ACCOUNTS_DB].rawInsert(
       '''

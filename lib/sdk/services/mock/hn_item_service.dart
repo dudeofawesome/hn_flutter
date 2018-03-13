@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show json, utf8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:html/parser.dart' show parse;
@@ -32,7 +32,7 @@ class HNItemServiceMock implements HNItemService {
     }
 
     return http.get('${this._config.url}/item/$id.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => json.decode(res.body))
       .then((item) => new HNItem.fromMap(item))
       .then((item) {
         addHNItem(item);
@@ -76,7 +76,7 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
     if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
@@ -93,7 +93,7 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
     if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
@@ -199,7 +199,7 @@ class HNItemServiceMock implements HNItemService {
         ..cookies.add(account.accessCookie))
         .close();
 
-      final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+      final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
       var faved = new RegExp(r'''href=["']fave\?.*?id=''' '${status.id}' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(body) != null;
       if (save == faved) {
         return;
@@ -283,7 +283,7 @@ class HNItemServiceMock implements HNItemService {
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
     if (body.contains('Bad login')) {
       throw 'Bad login.';
@@ -320,7 +320,7 @@ class HNItemServiceMock implements HNItemService {
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
 
     if (body.contains('Bad login')) {
@@ -345,7 +345,7 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
     final fnid = new RegExp(r'''<input .*?value="([a-zA-Z0-9])*?".*?>''').allMatches(body);
 

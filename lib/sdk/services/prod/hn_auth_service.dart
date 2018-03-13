@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show UTF8;
+import 'dart:convert' show utf8;
 import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
 import 'dart:ui' show Color;
 
@@ -44,7 +44,7 @@ class HNAuthServiceProd implements HNAuthService {
 
         final userReq = await (await _httpClient.getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
           ..cookies.add(accessCookie)).close();
-        final body = await userReq.transform(UTF8.decoder).toList().then((body) => body.join());
+        final body = await userReq.transform(utf8.decoder).toList().then((body) => body.join());
 
         final doc = parse(body);
 

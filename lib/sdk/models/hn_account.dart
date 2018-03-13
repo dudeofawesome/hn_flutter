@@ -1,4 +1,4 @@
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 import 'dart:io' show Cookie;
 import 'dart:ui' show Color;
 
@@ -31,7 +31,7 @@ class HNAccount {
     if (map['accessCookie'] is Cookie) {
       this.accessCookie = map['accessCookie'];
     } else if (map['accessCookie'] is String) {
-      final jsonCookie = JSON.decode(map['accessCookie']);
+      final jsonCookie = json.decode(map['accessCookie']);
 
       // TODO: figure out how to format the actual TZ
       final rfc2616 = new DateFormat("E, d MMM yyyy HH:mm:ss 'GMT'");
@@ -47,9 +47,9 @@ class HNAccount {
       );
     }
     this.permissions =
-      new HNAccountPermissions.fromMap(JSON.decode(map['permissions']));
+      new HNAccountPermissions.fromMap(json.decode(map['permissions']));
     this.preferences =
-      new HNAccountPreferences.fromMap(JSON.decode(map['preferences']));
+      new HNAccountPreferences.fromMap(json.decode(map['preferences']));
   }
 
   @override
