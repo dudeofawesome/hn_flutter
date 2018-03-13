@@ -364,7 +364,7 @@ class _CommentState extends State<Comment>
         }
       }).toList();
 
-      if (widget.overflowButtons?.length > 0) {
+      if (widget.overflowButtons != null && widget.overflowButtons.length > 0) {
         buttons.add(
           new PopupMenuButton<BarButtons>(
             icon: const Icon(
