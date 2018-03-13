@@ -23,12 +23,6 @@ class HNStoryServiceProd implements HNStoryService {
         setStorySort(itemIds);
         return itemIds;
       });
-      // .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
-      // .then((List<List<int>> body) =>
-      //   [body[0], Future.wait(body[1].map((itemId) => _hnItemService.getItemByID(itemId, accessCookie)).toList())])
-      // .then((stories) {
-      //   setStorySort(stories[0]);
-      // });
   }
 
   Future<List<int>> getTopStories ({

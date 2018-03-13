@@ -11,6 +11,5 @@ class HNConfig {
 
   final String path = 'https://hacker-news.firebaseio.com';
   final String version = 'v0';
-  // final String url = '${HNConfig._singleton.path}/${HNConfig._singleton.version}';
   String get url => '$path/$version';
 }

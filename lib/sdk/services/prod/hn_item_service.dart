@@ -265,21 +265,13 @@ class HNItemServiceProd implements HNItemService {
   Future<int> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
     final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/comment')))
       ..cookies.add(accessCookie)
-      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
       ..write(
         'parent=$parentId'
         '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
         '&hmac=$authToken'
         '&text=${Uri.encodeQueryComponent(comment)}'
       ))
-      // ..write({
-      //   'parent': '$parentId',
-      //   'goto': Uri.encodeQueryComponent('item?id=$parentId'),
-      //   'hmac': authTokens.reply,
-      //   'text': Uri.encodeQueryComponent(comment),
-      // }))
       .close();
 
     print(req.headers);
@@ -289,12 +281,6 @@ class HNItemServiceProd implements HNItemService {
     if (req.headers.value('location') == null) throw 'Unknown error';
     if (req.headers.value('location') == 'deadlink') throw 'Outdated hmac (I think)';
     if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
-    // } else if (
-    //   body.contains('<title>Add Comment | Hacker News</title>') &&
-    //   body.contains('Please confirm that this is your comment')
-    // ) {
-    //   // Looks like we need to submit the comment again
-    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
     if (!req.headers.value('location').startsWith('item?id=')) {
       if (req.headers.value('location').contains('fnop=commconfirm')) throw 'Submission failed';
       else throw 'Unknown error';
@@ -314,10 +300,7 @@ class HNItemServiceProd implements HNItemService {
   ) async {
     final req = await ((await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/r')))
       ..cookies.add(accessCookie)
-      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
-      // fnid=63IJ3jjm893aKBY55QnktO&fnop=submit-page&title=test+post&url=&text=please+ignore
       ..write(
         'fnid=$authToken'
         '&fnop=submit-page'
@@ -333,12 +316,6 @@ class HNItemServiceProd implements HNItemService {
 
     if (body.contains('Bad login'))
       throw 'Bad login.';
-    // } else if (
-    //   body.contains('<title>Add Comment | Hacker News</title>') &&
-    //   body.contains('Please confirm that this is your comment')
-    // ) {
-    //   // Looks like we need to submit the comment again
-    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
     else if (body.contains('''You're posting too fast. Please slow down. Thanks.'''))
       throw '''You're posting too fast. Please slow down. Thanks.''';
     else if (req.statusCode != 302) throw 'Unknown error';

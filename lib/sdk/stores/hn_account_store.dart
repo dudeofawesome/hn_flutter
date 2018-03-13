@@ -22,7 +22,6 @@ class HNAccountStore extends Store {
       (await this._localStorage.accounts)
         .forEach((account) {
           print(account);
-          // this._accounts[account.id] = account;
           // TODO: this causes the DB to get rewritten every launch
           addHNAccount(account);
         });
@@ -30,9 +29,6 @@ class HNAccountStore extends Store {
       if (primaryUserId != null) {
         print('primary account was $primaryUserId');
         setPrimaryHNAccount(primaryUserId);
-
-        // final primaryUser = accounts.firstWhere((account) => account[''] == this._primaryAccountId);
-        // this._primaryUserPassword = primaryUser[ACCOUNTS_PASSWORD];
       }
     }).then((a) {});
 
