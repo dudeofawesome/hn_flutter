@@ -72,8 +72,16 @@ Route<Null> getRoute (RouteSettings settings) {
           BuildContext context,
           Animation<double> animation, Animation<double> secondaryAnimation
         ) => new MainPage(subPage),
-        transitionDuration: const Duration(),
-        // transitionsBuilder: routeTransitionsBuilder,
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (
+          BuildContext context, Animation<double> animation,
+          Animation<double> secondaryAnimation, Widget child
+        ) {
+          return new FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
       );
     case Routes.STORIES:
       if (parsed.pathSegments.length == 1) {
