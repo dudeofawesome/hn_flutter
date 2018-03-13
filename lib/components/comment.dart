@@ -25,6 +25,7 @@ class Comment extends StatefulWidget {
   final int depth;
   final bool loadChildren;
   final String op;
+  final bool indicateSelf;
   final List<BarButtons> buttons;
   final List<BarButtons> overflowButtons;
 
@@ -44,6 +45,7 @@ class Comment extends StatefulWidget {
       BarButtons.COPY_TEXT,
     ],
     this.op,
+    this.indicateSelf = true,
   }) : super(key: key);
 
   @override
@@ -187,29 +189,52 @@ class _CommentState extends State<Comment>
         fontWeight: FontWeight.w500,
       );
 
+      Widget byline;
+
+      if (comment.by != null && comment.by == widget.op) {
+        byline = new Container(
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+            color: Colors.blue,
+          ),
+          child: new Text(
+            comment.by,
+            style: bylineStyle.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        );
+      } else if (
+        comment.by != null && widget.indicateSelf &&
+        comment.by == account.id
+      ) {
+        byline = new Container(
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+            color: Colors.amber[600],
+          ),
+          child: new Text(
+            comment.by,
+            style: bylineStyle.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        );
+      } else {
+        byline = new Text(
+          comment.by ?? (comment.computed.markdown != null ? '…' : '[deleted]'),
+          style: bylineStyle,
+        );
+      }
+
       if (!commentStatus.loading) {
         topRow = new Row(
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
-              child: (comment.by != null && comment.by == widget.op) ?
-                new Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
-                  decoration: new BoxDecoration(
-                    borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
-                    color: Colors.blue,
-                  ),
-                  child: new Text(
-                    comment.by,
-                    style: bylineStyle.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ) :
-                new Text(
-                  comment.by ?? (comment.computed.markdown != null ? '…' : '[deleted]'),
-                  style: bylineStyle,
-                ),
+              child: byline,
             ),
             comment.score != null ? new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
