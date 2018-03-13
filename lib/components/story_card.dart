@@ -42,7 +42,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
   }
 
   Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
@@ -111,7 +111,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$by');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$by');
   }
 
   @override
@@ -129,7 +129,12 @@ class StoryCard extends StoreWatcher {
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
-        _hnItemService.getItemByID(storyId, account?.accessCookie);
+        _hnItemService.getItemByID(storyId, account?.accessCookie)
+          .catchError((err) {
+            Scaffold.of(context).showSnackBar(new SnackBar(
+              content: new Text(err?.toString() ?? 'Unknown Error'),
+            ));
+          });
       }
 
       return new Padding(

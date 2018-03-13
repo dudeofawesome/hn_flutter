@@ -55,7 +55,7 @@ class HNUserServiceProd implements HNUserService {
 
   Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
     final req = await ((await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/favorites?id=$id${stories ? '' : '&comments=t'}'
+        '${this._config.apiHost}/favorites?id=$id&comments=${stories ? 'f' : 't'}'
       )))
       ..cookies.add(accessCookie)
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
@@ -67,11 +67,12 @@ class HNUserServiceProd implements HNUserService {
     if (body.contains('Bad login')) throw 'Bad login.';
     if (req.headers.value('location') != null) throw 'Unknown error';
 
-    final items = _itemIdRegExp.allMatches(body)
-      .map((match) => match?.group(1))
-      .where((id) => id != null)
-      .map((id) => int.parse(id))
-      .toList();
+    final items = (stories ? _storyIdRegExp : _commentIdRegExp)
+      .allMatches(body)
+        .map((match) => match?.group(1))
+        .where((id) => id != null)
+        .map((id) => int.parse(id))
+        .toList();
 
     items.forEach((itemId) =>
       patchItemStatus(new HNItemStatus.patch(id: itemId, saved: true)));
@@ -79,25 +80,24 @@ class HNUserServiceProd implements HNUserService {
     return items;
   }
 
-  Future<List<int>> getVotedByUserID (String id, Cookie accessCookie) async {
+  Future<List<int>> getVotedByUserID (String id, bool stories, Cookie accessCookie) async {
     final req = await ((await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/upvoted?id=$id'
+        '${this._config.apiHost}/upvoted?id=$id&comments=${stories ? 'f' : 't'}'
       )))
       ..cookies.add(accessCookie)
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
       .close();
 
-    print(req.headers);
     final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-    print(body);
     if (body.contains('Bad login')) throw 'Bad login.';
     if (req.headers.value('location') != null) throw 'Unknown error';
 
-    final items = _itemIdRegExp.allMatches(body)
-      .map((match) => match?.group(1))
-      .where((id) => id != null)
-      .map((id) => int.parse(id))
-      .toList();
+    final items = (stories ? _storyIdRegExp : _commentIdRegExp)
+      .allMatches(body)
+        .map((match) => match?.group(1))
+        .where((id) => id != null)
+        .map((id) => int.parse(id))
+        .toList();
 
     items.forEach((itemId) =>
       patchItemStatus(new HNItemStatus.patch(id: itemId, upvoted: true)));
@@ -106,7 +106,8 @@ class HNUserServiceProd implements HNUserService {
   }
 }
 
-final _itemIdRegExp = new RegExp(r'''<tr class=["']athing["'] id=["']([0-9]+)["']>''');
+final _storyIdRegExp = new RegExp(r'''<tr class=["']athing["'] id=["']([0-9]+)["']>''');
+final _commentIdRegExp = new RegExp(r'''<tr class=["']athing["'] id=["']([0-9]+)["']>''');
 
 final _createdRegExp = new RegExp(r'''created:.*?<td><a href="front\?day=([0-9\-]+)&birth=''');
 final _karmaRegExp = new RegExp(r'''<td valign="top">karma:<\/td><td>\s*([0-9]+)\s*<\/td>''');

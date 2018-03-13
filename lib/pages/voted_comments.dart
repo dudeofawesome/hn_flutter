@@ -8,11 +8,10 @@ import 'package:share/share.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
-import 'package:hn_flutter/components/starred_submissions_tab.dart';
-import 'package:hn_flutter/components/starred_comments_tab.dart';
+import 'package:hn_flutter/components/upvoted_items_tab.dart';
 
-class StarredPage extends StoreWatcher {
-  StarredPage ({
+class VotedCommentsPage extends StoreWatcher {
+  VotedCommentsPage ({
     Key key,
   }) : super(key: key);
 
@@ -23,7 +22,7 @@ class StarredPage extends StoreWatcher {
   }
 
   Future<Null> _shareUser (String userId) async {
-    await share('https://news.ycombinator.com/favorites?id=$userId');
+    await share('https://news.ycombinator.com/upvoted?id=$userId&comments=t');
   }
 
   @override
@@ -43,7 +42,17 @@ class StarredPage extends StoreWatcher {
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: new Text('Favorites'),
+          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
+            ? new IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            )
+            : null,
+          title: new Text(
+            (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+              ? 'Upvoted'
+              : 'Voted'
+          ),
           actions: <Widget>[
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
@@ -62,20 +71,29 @@ class StarredPage extends StoreWatcher {
             ),
 
           ],
-          bottom: new TabBar(
-            // isScrollable: true,
-            tabs: _choices.map((choice) => new Tab(
-              text: choice.title.toUpperCase(),
-              icon: new Icon(choice.icon),
-            )).toList(),
+          bottom: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+            ? new TabBar(
+              // isScrollable: true,
+              tabs: _choices.map((choice) => new Tab(
+                text: choice.title.toUpperCase(),
+                icon: new Icon(choice.icon),
+              )).toList(),
+            )
+            : null,
+        ),
+        body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+          ? new TabBarView(
+            children: <Widget>[
+              new UpvotedItemsTab(
+                userId: accountStore.primaryAccountId,
+                showComments: true,
+              ),
+            ],
+          )
+          : new UpvotedItemsTab(
+            userId: accountStore.primaryAccountId,
+            showComments: true,
           ),
-        ),
-        body: new TabBarView(
-          children: <Widget>[
-            new StarredSubmissionsTab(accountStore.primaryAccountId),
-            new StarredCommentsTab(accountStore.primaryAccountId),
-          ],
-        ),
       ),
     );
   }
@@ -92,6 +110,6 @@ class _Choice {
 }
 
 const List<_Choice> _choices = const <_Choice>[
-  const _Choice(title: 'Submissions', icon: Icons.forum),
-  const _Choice(title: 'Comments', icon: Icons.chat),
+  const _Choice(title: 'Upvoted', icon: Icons.arrow_upward),
+  const _Choice(title: 'Downvoted', icon: Icons.arrow_downward),
 ];

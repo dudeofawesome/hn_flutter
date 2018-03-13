@@ -10,8 +10,8 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/upvoted_items_tab.dart';
 
-class VotedPage extends StoreWatcher {
-  VotedPage ({
+class VotedStoriesPage extends StoreWatcher {
+  VotedStoriesPage ({
     Key key,
   }) : super(key: key);
 
@@ -36,15 +36,23 @@ class VotedPage extends StoreWatcher {
 
     final HNAccountStore accountStore = stores[accountStoreToken];
 
-    bool userCanDownvote = false;
-
     return new DefaultTabController(
       length: _choices.length,
       child: new Scaffold(
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          title: new Text(userCanDownvote ? 'Voted' : 'Upvoted'),
+          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
+            ? new IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            )
+            : null,
+          title: new Text(
+            (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+              ? 'Upvoted'
+              : 'Voted'
+          ),
           actions: <Widget>[
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
@@ -63,7 +71,7 @@ class VotedPage extends StoreWatcher {
             ),
 
           ],
-          bottom: userCanDownvote
+          bottom: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
             ? new TabBar(
               // isScrollable: true,
               tabs: _choices.map((choice) => new Tab(
@@ -73,13 +81,19 @@ class VotedPage extends StoreWatcher {
             )
             : null,
         ),
-        body: userCanDownvote ?
-          new TabBarView(
+        body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+          ? new TabBarView(
             children: <Widget>[
-              new UpvotedItemsTab(accountStore.primaryAccountId),
+              new UpvotedItemsTab(
+                userId: accountStore.primaryAccountId,
+                showStories: true,
+              ),
             ],
           )
-          : new UpvotedItemsTab(accountStore.primaryAccountId),
+          : new UpvotedItemsTab(
+            userId: accountStore.primaryAccountId,
+            showStories: true,
+          ),
       ),
     );
   }

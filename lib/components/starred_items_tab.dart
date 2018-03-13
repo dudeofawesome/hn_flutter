@@ -14,12 +14,12 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/components/story_card.dart';
 import 'package:hn_flutter/components/comment.dart';
 
-class UpvotedItemsTab extends StatefulWidget {
+class StarredItemsTab extends StatefulWidget {
   final String userId;
   final bool showStories;
   final bool showComments;
 
-  const UpvotedItemsTab ({
+  const StarredItemsTab ({
     this.userId,
     this.showStories = false,
     this.showComments = false,
@@ -27,10 +27,10 @@ class UpvotedItemsTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  createState () => new _UpvotedItemsTabState();
+  createState () => new _StarredItemsTabState();
 }
 
-class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixin<UpvotedItemsTab> {
+class _StarredItemsTabState extends State<StarredItemsTab> with StoreWatcherMixin<StarredItemsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
@@ -47,11 +47,11 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
   Future<Null> _refresh (BuildContext context) async {
     try {
       if (widget.showStories) {
-        await this._hnUserService.getVotedByUserID(
+        await this._hnUserService.getSavedByUserID(
           widget.userId, true, this._hnAccountStore.primaryAccount.accessCookie);
       }
       if (widget.showComments) {
-        await this._hnUserService.getVotedByUserID(
+        await this._hnUserService.getSavedByUserID(
           widget.userId, false, this._hnAccountStore.primaryAccount.accessCookie);
       }
     } on HandshakeException catch (err) {
@@ -64,7 +64,7 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
   @override
   Widget build (BuildContext context) {
     final upvotedItems = this._hnItemStore.itemStatuses.values
-      .where((itemStatus) => itemStatus.upvoted)
+      .where((itemStatus) => itemStatus.saved)
       .where((itemStatus) {
         if (widget.showStories && widget.showComments) {
           return true;
