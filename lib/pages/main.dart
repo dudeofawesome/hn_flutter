@@ -8,9 +8,10 @@ import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
 import 'package:hn_flutter/components/main_drawer.dart';
+import 'package:hn_flutter/pages/starred_comments.dart';
+import 'package:hn_flutter/pages/starred_stories.dart';
 import 'package:hn_flutter/pages/stories.dart';
 import 'package:hn_flutter/pages/user.dart';
-import 'package:hn_flutter/pages/starred.dart';
 import 'package:hn_flutter/pages/voted_stories.dart';
 import 'package:hn_flutter/pages/voted_comments.dart';
 
@@ -41,10 +42,10 @@ class MainPage extends StoreWatcher {
         pageWidget = new UserPage(userId: accountStore.primaryAccountId);
         break;
       case MainPageSubPages.STARRED_STORIES:
-        pageWidget = new StarredPage();
+        pageWidget = new StarredStoriesPage();
         break;
       case MainPageSubPages.STARRED_COMMENTS:
-        pageWidget = new StarredPage();
+        pageWidget = new StarredCommentsPage();
         break;
       case MainPageSubPages.VOTED_STORIES:
         pageWidget = new VotedStoriesPage();
