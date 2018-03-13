@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show utf8;
-import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
+import 'dart:io' show HttpClient, HttpStatus, ContentType;
 import 'dart:ui' show Color;
 
 // import 'package:html/dom.dart' show ;

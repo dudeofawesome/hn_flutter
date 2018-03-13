@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert' show JSON;
 
 import 'package:flutter_flux/flutter_flux.dart';
 

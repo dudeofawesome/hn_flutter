@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:io' show Cookie;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
