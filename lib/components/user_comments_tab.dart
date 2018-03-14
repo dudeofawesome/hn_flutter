@@ -23,6 +23,7 @@ class UserCommentsTab extends StatelessWidget {
           children: this.user.submitted.map((itemId) => new Comment(
             itemId: itemId,
             loadChildren: false,
+            indicateSelf: false,
             buttons: <BarButtons>[
               BarButtons.VIEW_CONTEXT,
               BarButtons.SAVE,

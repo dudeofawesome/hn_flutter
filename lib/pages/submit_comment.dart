@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
 import 'package:hn_flutter/injection/di.dart';
-import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 

@@ -6,7 +6,7 @@ homepage: https://github.com/dudeofawesome/hn_flutter
 
 environment:
   sdk: '>=2.0.0-dev.16.0 <3.0.0'
-  flutter: ^0.1.2-pre.21
+  flutter: ^0.2.2-pre.36
 dependencies:
   flutter:
     sdk: flutter
@@ -23,10 +23,10 @@ dependencies:
       url: git@github.com:flutter/flutter_markdown.git
       ref: bed98a71161cfdb3141b971360ad8198c1ea3729
   flutter_web_browser:
-    # git: git@github.com:victorbonnet/flutter_web_browser.git
-    git:
-      url: git@github.com:dudeofawesome/flutter_web_browser.git
-      ref: feat/upgrade-gradle
+    git: git@github.com:victorbonnet/flutter_web_browser.git
+    # git:
+    #   url: git@github.com:dudeofawesome/flutter_web_browser.git
+    #   ref: feat/upgrade-gradle
   html: ^0.13.2+2
   html_unescape: ^0.1.5
   http: ^0.11.3+16

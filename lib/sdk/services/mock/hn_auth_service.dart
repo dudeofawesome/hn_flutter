@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io' show HttpClient, HttpStatus, ContentType, Cookie;
-import 'dart:convert' show UTF8;
+import 'dart:convert' show utf8;
 
 import 'package:hn_flutter/sdk/services/abstract/hn_auth_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -41,18 +41,23 @@ class HNAuthServiceMock implements HNAuthService {
 
         final userReq = await (await _httpClient.getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
           ..cookies.add(accessCookie)).close();
-        final body = await userReq.transform(UTF8.decoder).toList().then((body) => body.join());
+        final body = await userReq.transform(utf8.decoder).toList().then((body) => body.join());
 
-        final emailMatch = new RegExp(r'<input.*?name="uemail".*?value="(.*?)".*?>').firstMatch(body);
+        final emailMatch = _emailRegExp.firstMatch(body);
         if (emailMatch != null) {
           email = emailMatch[1];
         }
+
+        final canDownvote = _canDownvoteRegExp.hasMatch(body);
 
         return new HNAccount(
           id: userId,
           email: email,
           password: userPassword,
           accessCookie: accessCookie,
+          permissions: new HNAccountPermissions(
+            canDownvote: canDownvote,
+          ),
         );
       })
       .then((account) {
@@ -90,3 +95,6 @@ class HNAuthServiceMock implements HNAuthService {
     return true;
   }
 }
+
+final _emailRegExp = new RegExp(r'''<input.*?name="uemail".*?value="(.*?)".*?>''');
+final _canDownvoteRegExp = new RegExp(r'''<u>downvoted submissions</u>''');

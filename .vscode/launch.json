@@ -6,7 +6,7 @@
   "configurations": [
     {
       "name": "Flutter mobile app",
-      "type": "flutter",
+      "type": "dart",
       "request": "launch"
     }
   ]

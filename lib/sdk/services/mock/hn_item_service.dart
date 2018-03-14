@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show json, utf8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:html/parser.dart' show parse;
@@ -32,7 +32,7 @@ class HNItemServiceMock implements HNItemService {
     }
 
     return http.get('${this._config.url}/item/$id.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => json.decode(res.body))
       .then((item) => new HNItem.fromMap(item))
       .then((item) {
         addHNItem(item);
@@ -76,9 +76,9 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -93,9 +93,9 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -104,27 +104,27 @@ class HNItemServiceMock implements HNItemService {
 
   HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
     return new HNItemAuthTokens(
-      // logout: new RegExp(r'''<a.*?id=(?:"|')logout(?:"|').*?href=(?:"|')logout\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      // logout: new RegExp(r'''<a.*?id=["']logout["'].*?href=["']logout\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
       //   .firstMatch(itemPage)[1],
-      upvote: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      upvote: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      downvote: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      downvote: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      hide: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
-      save: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>''').firstMatch(itemPage)?.group(1),
+      hide: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
+      save: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>''').firstMatch(itemPage)?.group(1),
     );
   }
 
   HNItemStatus _parseItemStatus (int itemId, String itemPage) {
     return new HNItemStatus.patch(
       id: itemId,
-      upvoted: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      upvoted: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      downvoted: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      downvoted: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-hide''').firstMatch(itemPage) != null,
-      saved: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage) != null,
-      // seen: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage)[1],
+      hidden: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-hide''').firstMatch(itemPage) != null,
+      saved: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage) != null,
+      // seen: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage)[1],
     );
   }
 
@@ -199,8 +199,8 @@ class HNItemServiceMock implements HNItemService {
         ..cookies.add(account.accessCookie))
         .close();
 
-      final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-      var faved = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body) != null;
+      final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
+      var faved = new RegExp(r'''href=["']fave\?.*?id=''' '${status.id}' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(body) != null;
       if (save == faved) {
         return;
       } else {
@@ -283,7 +283,7 @@ class HNItemServiceMock implements HNItemService {
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
     if (body.contains('Bad login')) {
       throw 'Bad login.';
@@ -320,7 +320,7 @@ class HNItemServiceMock implements HNItemService {
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
 
     if (body.contains('Bad login')) {
@@ -345,7 +345,7 @@ class HNItemServiceMock implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
     final fnid = new RegExp(r'''<input .*?value="([a-zA-Z0-9])*?".*?>''').allMatches(body);
 

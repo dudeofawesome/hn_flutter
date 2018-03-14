@@ -42,7 +42,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
   }
 
   Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
@@ -111,7 +111,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$by');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$by');
   }
 
   @override
@@ -124,12 +124,17 @@ class StoryCard extends StoreWatcher {
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
-    final storyTextOpacity = !storyStatus.seen ? 1.0 : 0.5;
+    final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
-        _hnItemService.getItemByID(storyId, account?.accessCookie);
+        _hnItemService.getItemByID(storyId, account?.accessCookie)
+          .catchError((err) {
+            Scaffold.of(context).showSnackBar(new SnackBar(
+              content: new Text(err?.toString() ?? 'Unknown Error'),
+            ));
+          });
       }
 
       return new Padding(
@@ -274,7 +279,7 @@ class StoryCard extends StoreWatcher {
                 decoration: new BoxDecoration(
                   color: const Color.fromRGBO(0, 0, 0, 0.5),
                 ),
-                width: double.INFINITY,
+                width: double.infinity,
                 child: new Padding(
                   padding: new EdgeInsets.all(8.0),
                   child: new Column(

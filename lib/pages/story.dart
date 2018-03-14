@@ -242,7 +242,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
                 decoration: new BoxDecoration(
                   color: const Color.fromRGBO(0, 0, 0, 0.5),
                 ),
-                width: double.INFINITY,
+                width: double.infinity,
                 child: new Padding(
                   padding: new EdgeInsets.all(8.0),
                   child: new Column(
@@ -285,7 +285,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
 
     final storyCard = new Container(
-      width: double.INFINITY,
+      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8.0),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -487,7 +487,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 }
 
