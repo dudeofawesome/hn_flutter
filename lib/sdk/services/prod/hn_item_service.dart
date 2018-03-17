@@ -78,7 +78,7 @@ class HNItemServiceProd implements HNItemService {
 
     final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
+    if (body.contains(_loginLink)) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -95,7 +95,7 @@ class HNItemServiceProd implements HNItemService {
 
     final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=["']login.*?["'].*?>'''))) {
+    if (body.contains(_loginLink)) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -165,12 +165,12 @@ class HNItemServiceProd implements HNItemService {
       if (hide != null) {
         patch.hidden = hide.innerHtml.contains('un-hide');
         patch.authTokens.hide =
-          new RegExp(r'auth=(.+)').firstMatch(hide.attributes['href'])?.group(1);
+          _authTokenQueryParam.firstMatch(hide.attributes['href'])?.group(1);
       }
       if (fave != null) {
         patch.saved = fave.innerHtml.contains('un-fave');
         patch.authTokens.save =
-          new RegExp(r'auth=(.+)').firstMatch(fave.attributes['href'])?.group(1);
+          _authTokenQueryParam.firstMatch(fave.attributes['href'])?.group(1);
       }
       if (reply != null) {
         patch.authTokens.reply = reply.attributes['value'];
@@ -336,10 +336,7 @@ class HNItemServiceProd implements HNItemService {
     if (!newestBody.contains('<font color="#ff6600">*</font>'))
       throw 'Submission not created';
 
-    final itemId = int.parse(
-      new RegExp(r'''<tr class="athing" id="([0-9]*?)">.*?<font color="#ff6600">*</font>''')
-        .firstMatch(newestBody)?.group(1),
-    );
+    final itemId = int.parse(_postedItemId.firstMatch(newestBody)?.group(1));
 
     // TODO: add new itemId to top of new stories list
 
@@ -353,12 +350,20 @@ class HNItemServiceProd implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList()
+      .then((body) => body.join());
 
-    final fnid = new RegExp(r'''<input .*?name="fnid" .*?value="([a-zA-Z0-9]*?)".*?>''').allMatches(body);
+    final fnid = _submissionAuthToken.allMatches(body);
 
     if (fnid.first == null) throw 'New submission FNID not found';
 
     return fnid.first[1];
   }
 }
+
+final _loginLink = new RegExp(r'''<a.*?href=["']login.*?["'].*?>''');
+final _authTokenQueryParam = new RegExp(r'auth=(.+)');
+final _postedItemId =
+  new RegExp(r'''<tr class="athing" id="([0-9]*?)">.*?<font color="#ff6600">*</font>''');
+final _submissionAuthToken =
+  new RegExp(r'''<input .*?name="fnid" .*?value="([a-zA-Z0-9]*?)".*?>''');
