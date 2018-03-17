@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'package:hn_flutter/utils/simple_html_to_markdown.dart';
 import 'package:hn_flutter/utils/dedent.dart';
 
-class HNItem {
+part 'hn_item.g.dart';
+
+@JsonSerializable()
+class HNItem extends Object with _$HNItemSerializerMixin {
   /// The item's unique id.
   int id;
   /// `true` if the item is deleted.
@@ -27,6 +31,7 @@ class HNItem {
   /// In the case of stories or polls, the total comment count.
   int descendants;
   /// The ids of the item's comments, in ranked display order.
+  @JsonKey(nullable: false)
   List<int> kids;
   /// The comment's parent: either another comment or the relevant story.
   int parent;
@@ -60,24 +65,10 @@ class HNItem {
     }
   }
 
-  HNItem.fromMap (Map map) {
-    this.id = map['id'];
-    this.deleted = map['deleted'];
-    this.dead = map['dead'];
-    this.type = map['type'];
-    this.title = map['title'];
-    this.url = map['url'];
-    this.text = map['text'];
-    this.time = map['time'];
-    this.by = map['by'];
-    this.score = map['score'];
-    this.descendants = map['descendants'];
-    this.kids = map['kids'];
-    this.parent = map['parent'];
-    this.poll = map['poll'];
-    this.parts = map['parts'];
-
-    this.computed = new HNItemComputed.fromItem(this);
+  factory HNItem.fromJson(Map<String, dynamic> json) {
+    final item = _$HNItemFromJson(json);
+    return item
+      ..computed = new HNItemComputed.fromItem(item);
   }
 
   @override
@@ -186,6 +177,7 @@ class HNItemAuthTokens {
   }
 }
 
+@JsonSerializable(includeIfNull: false)
 class HNItemComputed {
   String markdown;
   String simpleText;
@@ -210,4 +202,7 @@ class HNItemComputed {
       this.simpleText = this.markdown;
     }
   }
+
+  factory HNItemComputed.fromJson(Map<String, dynamic> json) =>
+    _$HNItemComputedFromJson(json);
 }

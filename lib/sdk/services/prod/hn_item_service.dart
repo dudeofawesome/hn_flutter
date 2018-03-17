@@ -33,7 +33,7 @@ class HNItemServiceProd implements HNItemService {
 
     return http.get('${this._config.url}/item/$id.json')
       .then((res) => json.decode(res.body))
-      .then((item) => new HNItem.fromMap(item))
+      .then((map) => new HNItem.fromJson(map))
       .then((item) {
         addHNItem(item);
         patchItemStatus(new HNItemStatus.patch(id: id, loading: false));
