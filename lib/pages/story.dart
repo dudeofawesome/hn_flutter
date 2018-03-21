@@ -131,10 +131,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               children: <Widget>[
                 new Text(item?.by ?? '…'),
                 new Text(' • '),
-                new Text(item?.time != null ?
-                  timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000)) :
-                  '…'
-                ),
+                new Text((item?.time != null) ? timeAgo(item.time) : '…'),
               ],
             ),
           ),

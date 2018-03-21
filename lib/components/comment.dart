@@ -250,7 +250,7 @@ class _CommentState extends State<Comment>
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
               child: new Text(
-                '${timeAgo(new DateTime.fromMillisecondsSinceEpoch(comment.time * 1000))}',
+                '${timeAgo(comment.time)}',
                 style: new TextStyle(
                   color: (commentStatus?.upvoted ?? false) ? Colors.orange :
                     (commentStatus?.downvoted ?? false) ? Colors.blue :

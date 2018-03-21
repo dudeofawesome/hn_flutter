@@ -18,8 +18,8 @@ class HNItem {
   String url;
   /// The comment, story or poll text. HTML.
   String text;
-  /// Creation date of the item, in [Unix Time](http://en.wikipedia.org/wiki/Unix_time).
-  int time;
+  /// Creation date of the item
+  DateTime time;
   /// The username of the item's author.
   String by;
   /// The story's score, or the votes for a pollopt.
@@ -68,7 +68,9 @@ class HNItem {
     this.title = map['title'];
     this.url = map['url'];
     this.text = map['text'];
-    this.time = map['time'];
+    this.time = (map['time'] != null)
+      ? new DateTime.fromMillisecondsSinceEpoch(map['time'] * 1000)
+      : null;
     this.by = map['by'];
     this.score = map['score'];
     this.descendants = map['descendants'];
@@ -89,7 +91,7 @@ class HNItem {
       text: $text
       by: $by
       score: $score
-      time: $time
+      time: ${time.toIso8601String()}
       descendants: $descendants
       computed:
         markdown: ${computed.markdown}

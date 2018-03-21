@@ -65,12 +65,12 @@ class UserPage extends StoreWatcher {
             : null,
           title: new Text(user?.id ?? this.userId),
           actions: <Widget>[
-            new IconButton(
-              icon: const Icon(Icons.star_border),
-              tooltip: 'Save',
-              onPressed: () => _saveUser(),
-              // color: user.computed.saved ? Colors.amber : Colors.black,
-            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.star_border),
+            //   tooltip: 'Save',
+            //   onPressed: () => _saveUser(),
+            //   // color: user.computed.saved ? Colors.amber : Colors.black,
+            // ),
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[

@@ -52,7 +52,7 @@ void main() {
       kids: [17, 454424],
       parent: 1,
       text: '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
-      time: 1160423461,
+      time: new DateTime.fromMillisecondsSinceEpoch(1160423461),
       type: 'comment',
     ));
     patchItemStatus(new HNItemStatus(
@@ -74,7 +74,7 @@ void main() {
       descendants: 15,
       kids: [487171, 15, 234509, 454410, 82729],
       score: 61,
-      time: 1160418111,
+      time: new DateTime.fromMillisecondsSinceEpoch(1160418111),
       title: 'Y Combinator',
       type: 'story',
       url: 'http://ycombinator.com',

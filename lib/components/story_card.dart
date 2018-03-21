@@ -178,7 +178,7 @@ class StoryCard extends StoreWatcher {
               children: <Widget>[
                 new Text(story?.by ?? ((story?.deleted ?? false) ? '[deleted]' : '…')),
                 new Text(' • '),
-                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
+                new Text(timeAgo(story.time)),
               ],
             ),
           ),
