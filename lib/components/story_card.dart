@@ -23,6 +23,7 @@ class StoryCard extends StoreWatcher {
   final _hnItemService = new Injector().hnItemService;
 
   final int storyId;
+  final _popupMenuButtonKey = new GlobalKey();
 
   StoryCard ({
     Key key,
@@ -110,8 +111,12 @@ class StoryCard extends StoreWatcher {
     showHideItem(storyId);
   }
 
-  void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}/$by');
+  void _viewProfile (BuildContext context, String by) {
+    Navigator.pushNamed(context, '/${Routes.USERS}/$by');
+  }
+
+  void _showOverflowMenu (BuildContext context) {
+    (this._popupMenuButtonKey.currentState as dynamic).showButtonMenu();
   }
 
   @override
@@ -228,6 +233,7 @@ class StoryCard extends StoreWatcher {
             //   icon: const Icon(Icons.more_vert),
             // ),
             new PopupMenuButton<OverflowMenuItems>(
+              key: this._popupMenuButtonKey,
               icon: const Icon(
                 Icons.more_horiz,
                 size: 20.0
@@ -326,6 +332,7 @@ class StoryCard extends StoreWatcher {
       child: new Card(
         child: new InkWell(
           onTap: () => this._openStory(context),
+          onLongPress: () => this._showOverflowMenu(context),
           child: new DefaultTextStyle(
             style: Theme.of(context).textTheme.body1.copyWith(
               color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),

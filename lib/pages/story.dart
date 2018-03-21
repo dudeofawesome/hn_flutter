@@ -45,7 +45,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   HNItemStore _itemStore;
 
   ScrollController _scrollController;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+    new GlobalKey<RefreshIndicatorState>();
+  final _popupMenuButtonKey = new GlobalKey();
 
   @override
   void initState () {
@@ -77,6 +79,10 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         curve: Curves.easeInOut
       );
     }
+  }
+
+  void _showOverflowMenu (BuildContext context) {
+    (this._popupMenuButtonKey.currentState as dynamic).showButtonMenu();
   }
 
   Future<bool> _onPopScope () async {
@@ -182,6 +188,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               color: (itemStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             new PopupMenuButton<OverflowMenuItems>(
+              key: this._popupMenuButtonKey,
               icon: const Icon(
                 Icons.more_horiz,
                 size: 20.0
@@ -226,62 +233,95 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       ],
     );
 
-    List<Widget> cardContent;
+    Widget cardContent;
     if (item?.url != null) {
-      cardContent = <Widget>[
-        new InkWell(
-          onTap: () => this._openStoryUrl(context, item.url),
-          child: new Stack(
-            alignment: AlignmentDirectional.bottomStart,
-            children: <Widget>[
-              // new Image.network(
-              //   this.story.computed.imageUrl,
-              //   fit: BoxFit.cover,
-              // ),
-              new Container(
-                decoration: new BoxDecoration(
-                  color: const Color.fromRGBO(0, 0, 0, 0.5),
-                ),
-                width: double.infinity,
-                child: new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Text(
-                        item.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
+      cardContent = new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          new Material(
+            child: new InkWell(
+              onTap: () => this._openStoryUrl(context, item.url),
+              child: new Stack(
+                alignment: AlignmentDirectional.bottomStart,
+                children: <Widget>[
+                  // new Image.network(
+                  //   this.story.computed.imageUrl,
+                  //   fit: BoxFit.cover,
+                  // ),
+                  new Container(
+                    decoration: new BoxDecoration(
+                      color: const Color.fromRGBO(0, 0, 0, 0.5),
+                    ),
+                    width: double.infinity,
+                    child: new Padding(
+                      padding: new EdgeInsets.all(8.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          new Text(
+                            item.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                            style: linkOverlayText,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          new Text(
+                            item.url ?? 'NO story.url FOUND!',
+                            style: linkOverlayText,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      new Text(
-                        item.url ?? 'NO story.url FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
+            ),
+          ),
+          new Material(
+            child: new InkWell(
+              onLongPress: () => this._showOverflowMenu(context),
+              child: new Column(
+                children: <Widget>[
+                  titleColumn,
+                  bottomRow,
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (item?.text != null) {
+      cardContent = new Material(
+        child: new InkWell(
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              titleColumn,
+              new Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                child: new SimpleMarkdown(item.computed.markdown),
+              ),
+              bottomRow,
             ],
           ),
         ),
-        titleColumn,
-        bottomRow,
-      ];
-    } else if (item?.text != null) {
-      cardContent = <Widget>[
-        titleColumn,
-        new Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-          child: new SimpleMarkdown(item.computed.markdown),
-        ),
-        bottomRow,
-      ];
+      );
     } else {
-      cardContent = <Widget>[
-        titleColumn,
-        bottomRow,
-      ];
+      cardContent = new Material(
+        child: new InkWell(
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              titleColumn,
+              bottomRow,
+            ],
+          ),
+        ),
+      );
     }
 
     final storyCard = new Container(
@@ -296,11 +336,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ],
       ),
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: cardContent,
-      ),
+      child: cardContent,
     );
 
     // final comments = item.kids != null ?
