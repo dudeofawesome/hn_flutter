@@ -13,6 +13,7 @@ addons:
       # if we don't specify this, the libstdc++6 we get is the wrong version
       - ubuntu-toolchain-r-test
     packages:
+      - lib32stdc++6
       - libstdc++6
       - fonts-droid
 cache:
