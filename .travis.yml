@@ -1,0 +1,59 @@
+os:
+  - linux
+sudo: false
+
+language: dart
+dart:
+  - dev
+
+addons:
+  apt:
+    # sky_shell binary depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
+    sources:
+      # if we don't specify this, the libstdc++6 we get is the wrong version
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++6
+      - fonts-droid
+cache:
+  bundler: true
+  directories:
+    - $HOME/.pub-cache
+
+# https://docs.travis-ci.com/user/customizing-the-build#Building-Specific-Branches
+branches:
+  only:
+    - master
+    - develop
+    - /^release\/.*$/
+    - hotfixes
+    - /^hotfix\/.*$/
+    - feat/travis
+    - feat/tests
+
+before_install:
+  - git clone https://github.com/flutter/flutter.git -b beta
+  - export PATH=`pwd`/flutter/bin:$PATH
+  - flutter doctor
+install:
+  - flutter packages get
+
+script:
+  - flutter test
+
+after_success: |
+  DEPLOY_PROD=false
+  DEPLOY_DEV=false
+
+  if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+    DEPLOY_PROD=true
+  elif [[ $TRAVIS_BRANCH =~ ^release/.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^hotifx/.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^release-.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^hotifx-.*$ ]]; then
+    DEPLOY_DEV=true
+  fi
+
