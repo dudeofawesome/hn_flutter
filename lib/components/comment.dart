@@ -207,7 +207,7 @@ class _CommentState extends State<Comment>
         );
       } else if (
         comment.by != null && widget.indicateSelf &&
-        comment.by == account.id
+        comment.by == account?.id
       ) {
         byline = new Container(
           padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
