@@ -74,7 +74,7 @@ class HNItem {
     this.by = map['by'];
     this.score = map['score'];
     this.descendants = map['descendants'];
-    this.kids = map['kids'];
+    this.kids = (map['kids'] as List)?.cast<int>();
     this.parent = map['parent'];
     this.poll = map['poll'];
     this.parts = map['parts'];

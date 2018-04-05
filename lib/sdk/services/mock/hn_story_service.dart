@@ -18,7 +18,7 @@ class HNStoryServiceMock implements HNStoryService {
     }
   ) {
     return http.get('${this._config.url}/$sort.json')
-      .then((res) => json.decode(res.body) as List<int>)
+      .then((res) => (json.decode(res.body) as List).cast<int>())
       .then((List<int> itemIds) {
         setStorySort(itemIds);
         return itemIds;

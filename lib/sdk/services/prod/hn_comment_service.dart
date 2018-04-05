@@ -15,7 +15,7 @@ class HNCommentServiceProd implements HNCommentService {
 
   getChildComments (HNItem item) async {
     item.kids.forEach((child) => http.get('${this._config.url}/item/$child')
-      .then((res) => json.decode(res.body) as List<int>)
+      .then((res) => (json.decode(res.body) as List).cast<int>())
       .then((List<int> body) => body.sublist(0, 5))
       .then((List<int> body) => Future.wait(body.map((itemId) => this._itemService.getItemByID(itemId)).toList()))
       .then((List<HNItem> children) {
