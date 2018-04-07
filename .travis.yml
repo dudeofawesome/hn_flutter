@@ -40,7 +40,7 @@ install:
   - flutter packages get
 
 script:
-  - flutter test
+  - flutter test --name='unit test'
 
 after_success: |
   DEPLOY_PROD=false
