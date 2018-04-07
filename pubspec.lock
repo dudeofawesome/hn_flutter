@@ -115,7 +115,7 @@ packages:
       path: "."
       ref: HEAD
       resolved-ref: a1a113a65f98c7f316fbb3890b37a46b1e32f260
-      url: "git@github.com:victorbonnet/flutter_web_browser.git"
+      url: "git://github.com/victorbonnet/flutter_web_browser.git"
     source: git
     version: "0.0.1"
   front_end:

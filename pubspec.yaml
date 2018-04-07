@@ -23,7 +23,7 @@ dependencies:
   #     url: git@github.com:flutter/flutter_markdown.git
   #     ref: bed98a71161cfdb3141b971360ad8198c1ea3729
   flutter_web_browser:
-    git: git@github.com:victorbonnet/flutter_web_browser.git
+    git: git://github.com/victorbonnet/flutter_web_browser.git
     # git:
     #   url: git@github.com:dudeofawesome/flutter_web_browser.git
     #   ref: feat/upgrade-gradle
