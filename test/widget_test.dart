@@ -7,9 +7,13 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:hn_flutter/main.dart';
+import 'package:hn_flutter/injection/di.dart';
 
 void main() {
   testWidgets('Main smoke test', (WidgetTester tester) async {
+    Injector.configure(Flavor.PROD);
+    await new Injector().localStorageService.init();
+
     // Build our app and trigger a frame.
     await tester.pumpWidget(new HNApp());
 
