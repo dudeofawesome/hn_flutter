@@ -12,6 +12,7 @@ packages
 **/*.jks
 **/*.p12
 **/*.pem
+Butterfly Reader-*.google.json
 
 # error logs
 flutter_*.log
