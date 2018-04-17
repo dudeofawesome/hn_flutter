@@ -1,12 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
-import 'package:hn_flutter/components/fab_bottom_padding.dart';
-
-import 'package:hn_flutter/sdk/services/hn_story_service.dart';
-import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
 
 class SettingsPage extends StoreWatcher {
@@ -19,10 +13,6 @@ class SettingsPage extends StoreWatcher {
     listenToStore(uiStoreToken);
   }
 
-  Future<Null> _changeSortMode (SortModes sortMode) async {
-    setStorySortMode(sortMode);
-  }
-
   @override
   Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
@@ -31,9 +21,6 @@ class SettingsPage extends StoreWatcher {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    final UIStore uiStore = stores[uiStoreToken];
-
-    final sortMode = uiStore.sortMode;
 
     return new Scaffold(
       appBar: new AppBar(

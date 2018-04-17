@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'dart:io' show Cookie;
 import 'package:http/http.dart' as http;
-import 'dart:convert' show JSON;
+import 'dart:convert' show json;
 
-import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/services/abstract/hn_story_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
-import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
-import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 class HNStoryServiceProd implements HNStoryService {
   HNConfig _config = new HNConfig();
-  HNItemService _hnItemService = new Injector().hnItemService;
 
   Future<List<int>> _getStories (
     String sort,
@@ -22,17 +18,11 @@ class HNStoryServiceProd implements HNStoryService {
     }
   ) {
     return http.get('${this._config.url}/$sort.json')
-      .then((res) => JSON.decode(res.body))
-      .then((List<int> itemIds) {
+      .then((res) => (json.decode(res.body) as List).cast<int>())
+      .then((itemIds) {
         setStorySort(itemIds);
         return itemIds;
       });
-      // .then((List<int> itemIds) => [itemIds, itemIds.sublist(skip, skip + 10)])
-      // .then((List<List<int>> body) =>
-      //   [body[0], Future.wait(body[1].map((itemId) => _hnItemService.getItemByID(itemId, accessCookie)).toList())])
-      // .then((stories) {
-      //   setStorySort(stories[0]);
-      // });
   }
 
   Future<List<int>> getTopStories ({

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
-import 'dart:convert' show JSON, UTF8;
+import 'dart:convert' show json, utf8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:flutter/foundation.dart';
@@ -50,7 +50,7 @@ class HNItemServiceProd implements HNItemService {
           }
 
           final item = await http.get('${_config.url}/item/$id.json')
-            .then((res) => JSON.decode(res.body))
+            .then((res) => json.decode(res.body))
             .then((item) => new HNItem.fromMap(item));
 
           replyTo.send([item, statusUpdates]);
@@ -119,9 +119,9 @@ class HNItemServiceProd implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(_loginLink)) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -136,9 +136,9 @@ class HNItemServiceProd implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
 
-    if (body.contains(new RegExp(r'''<a.*?href=(?:"|')login.*?(?:"|').*?>'''))) {
+    if (body.contains(_loginLink)) {
       throw 'Invalid or expired auth cookie';
     }
 
@@ -147,27 +147,27 @@ class HNItemServiceProd implements HNItemService {
 
   static HNItemAuthTokens _parseItemAuthTokens (int itemId, String itemPage) {
     return new HNItemAuthTokens(
-      // logout: new RegExp(r'''<a.*?id=(?:"|')logout(?:"|').*?href=(?:"|')logout\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      // logout: new RegExp(r'''<a.*?id=["']logout["'].*?href=["']logout\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
       //   .firstMatch(itemPage)[1],
-      upvote: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      upvote: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      downvote: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?href=(?:"|')vote\?.*?auth=(.*?)(?:&.*?)?(?:"|').*?>''')
+      downvote: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?href=["']vote\?.*?auth=(.*?)(?:&.*?)?["'].*?>''')
         .firstMatch(itemPage)?.group(1),
-      hide: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
-      save: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)(?:"|').*?>''').firstMatch(itemPage)?.group(1),
+      hide: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>(?:un-)?hide''').firstMatch(itemPage)?.group(1),
+      save: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''&.*?auth=(.*?)["'].*?>''').firstMatch(itemPage)?.group(1),
     );
   }
 
   static HNItemStatus _parseItemStatus (int itemId, String itemPage) {
     return new HNItemStatus.patch(
       id: itemId,
-      upvoted: new RegExp(r'''<a.*?id=(?:"|')up_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      upvoted: new RegExp(r'''<a.*?id=["']up_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      downvoted: new RegExp(r'''<a.*?id=(?:"|')down_''' '$itemId' r'''(?:"|').*?class=(?:"|').*?nosee.*?(?:"|').*?>''')
+      downvoted: new RegExp(r'''<a.*?id=["']down_''' '$itemId' r'''["'].*?class=["'].*?nosee.*?["'].*?>''')
         .firstMatch(itemPage) != null,
-      hidden: new RegExp(r'''href=(?:"|')hide\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-hide''').firstMatch(itemPage) != null,
-      saved: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage) != null,
-      // seen: new RegExp(r'''href=(?:"|')fave\?.*?id=''' '$itemId' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(itemPage)[1],
+      hidden: new RegExp(r'''href=["']hide\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-hide''').firstMatch(itemPage) != null,
+      saved: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage) != null,
+      // seen: new RegExp(r'''href=["']fave\?.*?id=''' '$itemId' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(itemPage)[1],
     );
   }
 
@@ -208,12 +208,12 @@ class HNItemServiceProd implements HNItemService {
       if (hide != null) {
         patch.hidden = hide.innerHtml.contains('un-hide');
         patch.authTokens.hide =
-          new RegExp(r'auth=(.+)').firstMatch(hide.attributes['href'])?.group(1);
+          _authTokenQueryParam.firstMatch(hide.attributes['href'])?.group(1);
       }
       if (fave != null) {
         patch.saved = fave.innerHtml.contains('un-fave');
         patch.authTokens.save =
-          new RegExp(r'auth=(.+)').firstMatch(fave.attributes['href'])?.group(1);
+          _authTokenQueryParam.firstMatch(fave.attributes['href'])?.group(1);
       }
       if (reply != null) {
         patch.authTokens.reply = reply.attributes['value'];
@@ -242,8 +242,8 @@ class HNItemServiceProd implements HNItemService {
         ..cookies.add(account.accessCookie))
         .close();
 
-      final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
-      var faved = new RegExp(r'''href=(?:"|')fave\?.*?id=''' '${status.id}' '''(?:&.*?)?(?:"|').*?>un-favorite''').firstMatch(body) != null;
+      final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
+      var faved = new RegExp(r'''href=["']fave\?.*?id=''' '${status.id}' '''(?:&.*?)?["'].*?>un-favorite''').firstMatch(body) != null;
       if (save == faved) {
         return;
       } else {
@@ -305,82 +305,111 @@ class HNItemServiceProd implements HNItemService {
       });
   }
 
-  Future<Null> replyToItemById (int parentId, String comment, HNItemAuthTokens authTokens, Cookie accessCookie) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${_config.apiHost}/comment'))
+  Future<int> replyToItemById (int parentId, String comment, String authToken, Cookie accessCookie) async {
+    final req = await ((await _httpClient.postUrl(Uri.parse('${_config.apiHost}/comment')))
       ..cookies.add(accessCookie)
-      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
       ..write(
         'parent=$parentId'
         '&goto=${Uri.encodeQueryComponent('item?id=$parentId')}'
-        '&hmac=${authTokens.reply}'
+        '&hmac=$authToken'
         '&text=${Uri.encodeQueryComponent(comment)}'
       ))
-      // ..write({
-      //   'parent': '$parentId',
-      //   'goto': Uri.encodeQueryComponent('item?id=$parentId'),
-      //   'hmac': authTokens.reply,
-      //   'text': Uri.encodeQueryComponent(comment),
-      // }))
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
-    if (body.contains('Bad login')) {
-      throw 'Bad login.';
-    // } else if (
-    //   body.contains('<title>Add Comment | Hacker News</title>') &&
-    //   body.contains('Please confirm that this is your comment')
-    // ) {
-    //   // Looks like we need to submit the comment again
-    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
+    if (body.contains('Bad login')) throw 'Bad login.';
+    if (req.headers.value('location') == null) throw 'Unknown error';
+    if (req.headers.value('location') == 'deadlink') throw 'Outdated hmac (I think)';
+    if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
+    if (!req.headers.value('location').startsWith('item?id=')) {
+      if (req.headers.value('location').contains('fnop=commconfirm')) throw 'Submission failed';
+      else throw 'Unknown error';
     }
 
-    return null;
+    this.getItemByID(parentId);
+
+    return int.parse(req.headers.value('location').replaceFirst('item?id=', ''));
   }
 
-  Future<Null> postItem (
+  Future<int> postItem (
     String authToken, Cookie accessCookie,
     String title,
     {
       String text, String url,
     }
   ) async {
-    final req = await (await _httpClient.postUrl(Uri.parse('${_config.apiHost}/r'))
+    final req = await ((await _httpClient.postUrl(Uri.parse('${_config.apiHost}/r')))
       ..cookies.add(accessCookie)
-      // ..headers.add('cookie', '${accessCookie.name}=${accessCookie.value}')
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
-      // ..headers.add('content-type', 'application/x-www-form-urlencoded')
       ..write(
-        'fnop=submit-page'
-        '&fnid=$authToken'
+        'fnid=$authToken'
+        '&fnop=submit-page'
         '&title=$title'
-        '&url=$url'
-        '&text=$text'
+        '&url=${url != null ? Uri.encodeQueryComponent(url) : ''}'
+        '&text=${text != null ? Uri.encodeQueryComponent(text) : ''}'
       ))
       .close();
 
     print(req.headers);
-    final body = await req.transform(UTF8.decoder).toList().then((body) => body.join());
+    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
     print(body);
 
-    if (body.contains('Bad login')) {
+    if (body.contains('Bad login'))
       throw 'Bad login.';
-    // } else if (
-    //   body.contains('<title>Add Comment | Hacker News</title>') &&
-    //   body.contains('Please confirm that this is your comment')
-    // ) {
-    //   // Looks like we need to submit the comment again
-    //   return await replyToItemById(parentId, comment, authTokens, accessCookie);
-    } else if (body.contains('''You're posting too fast. Please slow down. Thanks.''')) {
+    else if (body.contains('''You're posting too fast. Please slow down. Thanks.'''))
       throw '''You're posting too fast. Please slow down. Thanks.''';
-    }
+    else if (req.statusCode != 302) throw 'Unknown error';
+    else if (req.headers.value('location') == null) throw 'Unknown error';
+    else if (req.headers.value('location') == 'deadlink') throw 'Outdated fnid (I think)';
+    else if (req.headers.value('location').contains('fnop=story-toofast')) throw 'Submitting too fast';
 
-    return null;
+    print('''req.headers->location''');
+    print(req.headers.value('location'));
+
+    final newestReq = await ((await _httpClient.getUrl(Uri.parse(
+        '${_config.apiHost}/${req.headers.value('location')}'
+      )))
+      ..cookies.add(accessCookie))
+      .close();
+    final newestBody = await newestReq.transform(utf8.decoder).toList().then((body) => body.join());
+
+    if (!newestBody.contains('<font color="#ff6600">*</font>'))
+      throw 'Submission not created';
+
+    final itemId = int.parse(_postedItemId.firstMatch(newestBody)?.group(1));
+
+    // TODO: add new itemId to top of new stories list
+
+    return itemId;
+  }
+
+  Future<String> getSubmissionAuthToken (Cookie accessCookie) async {
+    final req = await (await _httpClient.getUrl(Uri.parse(
+        '${_config.apiHost}/submit'
+      ))
+      ..cookies.add(accessCookie))
+      .close();
+
+    final body = await req.transform(utf8.decoder).toList()
+      .then((body) => body.join());
+
+    final fnid = _submissionAuthToken.allMatches(body);
+
+    if (fnid.first == null) throw 'New submission FNID not found';
+
+    return fnid.first[1];
   }
 }
+
+final _loginLink = new RegExp(r'''<a.*?href=["']login.*?["'].*?>''');
+final _authTokenQueryParam = new RegExp(r'auth=(.+)');
+final _postedItemId =
+  new RegExp(r'''<tr class="athing" id="([0-9]*?)">.*?<font color="#ff6600">*</font>''');
+final _submissionAuthToken =
+  new RegExp(r'''<input .*?name="fnid" .*?value="([a-zA-Z0-9]*?)".*?>''');
 
 class _IsolateMessage {
   _IsolateMessageType type;
@@ -404,4 +433,3 @@ enum _IsolateMessageType {
   POST_ITEM,
   DESTRUCT,
 }
-

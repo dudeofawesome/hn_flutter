@@ -12,7 +12,12 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_account_actions.dart';
 
 class MainDrawer extends StatefulWidget {
-  MainDrawer ({Key key}) : super(key: key);
+  final MainPageSubPages page;
+
+  MainDrawer (
+    this.page, {
+    Key key,
+  }) : super(key: key);
 
   @override
   _MainDrawerState createState () => new _MainDrawerState();
@@ -56,144 +61,219 @@ class _MainDrawerState extends State<MainDrawer>
 
   @override
   Widget build (BuildContext context) {
-    return new MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      child: new ListView(
-        children: <Widget>[
-          new UserAccountsDrawerHeader(
-            accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
-              new Text(this._accountStore.primaryAccount.email) : null,
-            accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
-            onDetailsPressed: this._toggleAccounts,
-          ),
-          new ClipRect(
-            child: new Align(
-              heightFactor: _animation.value,
-              child: new Container(
-                // color: Colors.grey[700],
-                child: new Column(
-                  children: this._accountStore.accounts.values
-                    // .where((account) => account.id != this._accountStore.primaryAccountId)
-                    .map<Widget>((account) =>
-                      new ListTile(
-                        title: new Text(account.id),
-                        trailing: new IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => _showRemoveAccountDialog(context, account.id),
-                        ),
-                        onTap: () async {
-                          this._switchAccount(context, account.id);
-                          this._toggleAccounts();
-                        },
-                      )).toList()
-                      ..addAll([
-                        new ListTile(
-                          title: new Text('Add account'),
-                          trailing: new IconButton(
-                            disabledColor: Colors.black45,
-                            icon: const Icon(Icons.add),
-                          ),
-                          onTap: () async {
-                            if (await this._showAddAccountDialog(context) ?? false) {
-                              this._closeDrawer(context);
-                            }
-                          },
-                        ),
-                        const Divider(),
-                      ]),
-                ),
+    return new Drawer(
+      child: new MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        child: new ListView(
+          children: <Widget>[
+            this._buildAccountHeader(context),
+            this._buildAccountManager(context),
+            new MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: new Column(
+                children: this._buildMenuItems(context),
               ),
             ),
-          ),
-          new MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: new Column(
-              children: <Widget>[
-                this._accountStore.primaryAccountId != null
-                  ? new Column(
-                    children: <Widget>[
-                      new ListTile(
-                        leading: const Icon(Icons.account_circle),
-                        title: const Text('Profile'),
-                        onTap: () async {
-                          this._closeDrawer(context);
-                          await Navigator.pushNamed(context, '/${Routes.USERS}:${_accountStore.primaryAccountId}');
-                        },
-                      ),
-                      new ListTile(
-                        leading: const Icon(Icons.star),
-                        title: const Text('Stared'),
-                        onTap: () async {
-                          this._closeDrawer(context);
-                          await Navigator.pushNamed(context, '/${Routes.STARRED}');
-                        },
-                      ),
-                      new ListTile(
-                        leading: new Transform.rotate(
-                          angle: math.PI,
-                          child: const Icon(Icons.arrow_drop_down_circle),
-                        ),
-                        title: const Text('Voted'),
-                        onTap: () async {
-                          this._closeDrawer(context);
-                          await Navigator.pushNamed(context, '/${Routes.VOTED}');
-                        },
-                      ),
-                      const Divider(),
-                    ],
-                  )
-                  : new Container(),
-                new Column(
-                  children: <Widget>[
-                    new ListTile(
-                      leading: const Icon(Icons.book),
-                      title: const Text('View Story'),
-                      onTap: () async {
-                        final storyId = await this._showStoryDialog(context);
-                        if (storyId != null) {
-                          print(storyId);
-                          await Navigator.pushNamed(context, '/${Routes.STORIES}:$storyId');
-                        }
-                        this._closeDrawer(context);
-                      },
-                    ),
-                    new ListTile(
-                      leading: const Icon(Icons.account_circle),
-                      title: const Text('View User'),
-                      onTap: () async {
-                        final userId = await this._showUserDialog(context);
-                        if (userId != null) {
-                          print(userId);
-                          await Navigator.pushNamed(context, '/${Routes.USERS}:$userId');
-                        }
-                        this._closeDrawer(context);
-                      },
-                    ),
-                    const Divider(),
-                    new ListTile(
-                      leading: const Icon(Icons.settings),
-                      title: const Text('Settings'),
-                      onTap: () async {
-                        this._closeDrawer(context);
-                        this._openSettings(context);
-                      }
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildAccountHeader (BuildContext context) {
+    return new UserAccountsDrawerHeader(
+      accountEmail: (this._accountStore.primaryAccount != null && this._accountStore.primaryAccount.email != null) ?
+        new Text(this._accountStore.primaryAccount.email) : null,
+      accountName: new Text(this._accountStore.primaryAccountId ?? 'Not logged in'),
+      onDetailsPressed: this._toggleAccounts,
+    );
+  }
+
+  Widget _buildAccountManager (BuildContext context) {
+    return new ClipRect(
+      child: new Align(
+        heightFactor: _animation.value,
+        child: new Container(
+          // color: Colors.grey[700],
+          child: new Column(
+            children: this._accountStore.accounts.values
+              // .where((account) => account.id != this._accountStore.primaryAccountId)
+              .map<Widget>((account) =>
+                new ListTile(
+                  title: new Text(account.id),
+                  trailing: new IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => _showRemoveAccountDialog(context, account.id),
+                  ),
+                  onTap: () async {
+                    this._switchAccount(context, account.id);
+                    this._toggleAccounts();
+                  },
+                )).toList()
+                ..addAll([
+                  new ListTile(
+                    title: new Text('Add account'),
+                    trailing: new Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 12.0
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.black45
+                      ),
+                    ),
+                    onTap: () async {
+                      if (await this._showAddAccountDialog(context) ?? false) {
+                        this._closeDrawer(context);
+                      }
+                    },
+                  ),
+                  const Divider(),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildMenuItems (BuildContext context) {
+    final menuItems = <Widget>[];
+
+    menuItems.add(new ListTile(
+      leading: const Icon(Icons.dashboard),
+      title: const Text('Stories'),
+      selected: widget.page == MainPageSubPages.STORIES,
+      onTap: () async {
+        this._closeDrawer(context);
+        await Navigator.pushReplacementNamed(
+          context, '/${Routes.MAIN}/${Routes.STORIES}');
+      },
+    ));
+
+    if (this._accountStore.primaryAccountId != null) {
+      menuItems.add(new ListTile(
+        leading: const Icon(Icons.account_circle),
+        title: const Text('Profile'),
+        selected: widget.page == MainPageSubPages.PROFILE,
+        onTap: () async {
+          this._closeDrawer(context);
+          await Navigator.pushReplacementNamed(
+            context, '/${Routes.MAIN}/${Routes.USERS}'
+          );
+        },
+      ));
+      menuItems.add(new ExpansionTile(
+        leading: const Icon(Icons.star),
+        title: const Text('Favorites'),
+        initiallyExpanded:
+          widget.page == MainPageSubPages.STARRED_STORIES ||
+          widget.page == MainPageSubPages.STARRED_COMMENTS,
+        children: <Widget>[
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Stories'),
+            selected: widget.page == MainPageSubPages.STARRED_STORIES,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.STARRED}/${Routes.SUBPAGE_STORIES}');
+            },
+          ),
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Comments'),
+            selected: widget.page == MainPageSubPages.STARRED_COMMENTS,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.STARRED}/${Routes.SUBPAGE_COMMENTS}');
+            },
+          ),
+        ],
+      ));
+      menuItems.add(new ExpansionTile(
+        leading: new Transform.rotate(
+          angle: math.pi,
+          child: const Icon(Icons.arrow_drop_down_circle),
+        ),
+        title: const Text('Voted'),
+        initiallyExpanded:
+          widget.page == MainPageSubPages.VOTED_STORIES ||
+          widget.page == MainPageSubPages.VOTED_COMMENTS,
+        children: <Widget>[
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Stories'),
+            selected: widget.page == MainPageSubPages.VOTED_STORIES,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.VOTED}/${Routes.SUBPAGE_STORIES}');
+            },
+          ),
+          new ListTile(
+            leading: new Container(),
+            title: const Text('Comments'),
+            selected: widget.page == MainPageSubPages.VOTED_COMMENTS,
+            onTap: () async {
+              this._closeDrawer(context);
+              await Navigator.pushReplacementNamed(
+                context, '/${Routes.MAIN}/${Routes.VOTED}/${Routes.SUBPAGE_COMMENTS}');
+            },
+          ),
+        ],
+      ));
+    }
+
+    menuItems.add(const Divider());
+
+    menuItems.add(new ListTile(
+      leading: const Icon(Icons.book),
+      title: const Text('View Story'),
+      onTap: () async {
+        final storyId = await this._showStoryDialog(context);
+        if (storyId != null) {
+          print(storyId);
+          await Navigator.pushNamed(context, '/${Routes.STORIES}/$storyId');
+        }
+        this._closeDrawer(context);
+      },
+    ));
+    menuItems.add(new ListTile(
+      leading: const Icon(Icons.account_circle),
+      title: const Text('View User'),
+      onTap: () async {
+        final userId = await this._showUserDialog(context);
+        if (userId != null) {
+          print(userId);
+          await Navigator.pushNamed(context, '/${Routes.USERS}/$userId');
+        }
+        this._closeDrawer(context);
+      },
+    ));
+
+    menuItems.add(const Divider());
+
+    menuItems.add(new ListTile(
+      leading: const Icon(Icons.settings),
+      title: const Text('Settings'),
+      onTap: () async {
+        this._closeDrawer(context);
+        this._openSettings(context);
+      }
+    ));
+
+    return menuItems;
   }
 
   void _closeDrawer (BuildContext ctx) {
     final scaffold = Scaffold.of(ctx);
     if (scaffold.hasDrawer) {
-      Navigator.pop(ctx);
+      final DrawerControllerState drawer = ctx.ancestorStateOfType(new TypeMatcher<DrawerControllerState>());
+      drawer?.close();
     }
   }
 
@@ -235,14 +315,12 @@ class _MainDrawerState extends State<MainDrawer>
                   child: new Text('Cancel'.toUpperCase()),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    this._closeDrawer(ctx);
                   },
                 ),
                 new FlatButton(
                   child: new Text('View'.toUpperCase()),
                   onPressed: () {
-                    Navigator.pop(ctx, storyId);
-                    this._closeDrawer(ctx);
+                    Navigator.pop(ctx, int.parse(storyId, onError: (err) => null));
                   },
                 ),
               ],

@@ -23,6 +23,7 @@ class StoryCard extends StoreWatcher {
   final _hnItemService = new Injector().hnItemService;
 
   final int storyId;
+  final _popupMenuButtonKey = new GlobalKey();
 
   StoryCard ({
     Key key,
@@ -42,7 +43,7 @@ class StoryCard extends StoreWatcher {
   }
 
   void _openStory (BuildContext ctx) {
-    Navigator.pushNamed(ctx, '/${Routes.STORIES}:${this.storyId}');
+    Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
   }
 
   Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
@@ -110,8 +111,12 @@ class StoryCard extends StoreWatcher {
     showHideItem(storyId);
   }
 
-  void _viewProfile (BuildContext ctx, String by) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$by');
+  void _viewProfile (BuildContext context, String by) {
+    Navigator.pushNamed(context, '/${Routes.USERS}/$by');
+  }
+
+  void _showOverflowMenu (BuildContext context) {
+    (this._popupMenuButtonKey.currentState as dynamic).showButtonMenu();
   }
 
   @override
@@ -124,10 +129,17 @@ class StoryCard extends StoreWatcher {
 
     final cardOuterPadding = const EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0);
 
+    final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
+
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
-        _hnItemService.getItemByID(storyId, account?.accessCookie);
+        _hnItemService.getItemByID(storyId, account?.accessCookie)
+          .catchError((err) {
+            Scaffold.of(context).showSnackBar(new SnackBar(
+              content: new Text(err?.toString() ?? 'Unknown Error'),
+            ));
+          });
       }
 
       return new Padding(
@@ -155,6 +167,7 @@ class StoryCard extends StoreWatcher {
           new Text(
             story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
+              color: Theme.of(context).textTheme.title.color.withOpacity(storyTextOpacity),
               fontSize: 18.0,
             ),
           ),
@@ -165,7 +178,7 @@ class StoryCard extends StoreWatcher {
               children: <Widget>[
                 new Text(story?.by ?? ((story?.deleted ?? false) ? '[deleted]' : '…')),
                 new Text(' • '),
-                new Text(timeAgo(new DateTime.fromMillisecondsSinceEpoch(story.time * 1000))),
+                new Text(timeAgo(story.time)),
               ],
             ),
           ),
@@ -220,6 +233,7 @@ class StoryCard extends StoreWatcher {
             //   icon: const Icon(Icons.more_vert),
             // ),
             new PopupMenuButton<OverflowMenuItems>(
+              key: this._popupMenuButtonKey,
               icon: const Icon(
                 Icons.more_horiz,
                 size: 20.0
@@ -271,7 +285,7 @@ class StoryCard extends StoreWatcher {
                 decoration: new BoxDecoration(
                   color: const Color.fromRGBO(0, 0, 0, 0.5),
                 ),
-                width: double.INFINITY,
+                width: double.infinity,
                 child: new Padding(
                   padding: new EdgeInsets.all(8.0),
                   child: new Column(
@@ -318,10 +332,16 @@ class StoryCard extends StoreWatcher {
       child: new Card(
         child: new InkWell(
           onTap: () => this._openStory(context),
-          child: new Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: cardContent
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new DefaultTextStyle(
+            style: Theme.of(context).textTheme.body1.copyWith(
+              color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),
+            ),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: cardContent
+            ),
           ),
         ),
       ),

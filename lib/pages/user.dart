@@ -57,14 +57,20 @@ class UserPage extends StoreWatcher {
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
+          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
+            ? new IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            )
+            : null,
           title: new Text(user?.id ?? this.userId),
           actions: <Widget>[
-            new IconButton(
-              icon: const Icon(Icons.star_border),
-              tooltip: 'Save',
-              onPressed: () => _saveUser(),
-              // color: user.computed.saved ? Colors.amber : Colors.black,
-            ),
+            // new IconButton(
+            //   icon: const Icon(Icons.star_border),
+            //   tooltip: 'Save',
+            //   onPressed: () => _saveUser(),
+            //   // color: user.computed.saved ? Colors.amber : Colors.black,
+            // ),
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
               itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[

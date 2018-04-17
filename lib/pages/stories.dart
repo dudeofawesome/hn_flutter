@@ -4,14 +4,12 @@ import 'dart:io' show Cookie;
 import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 
-import 'package:hn_flutter/pages/submit_story.dart';
+import 'package:hn_flutter/router.dart';
 
-import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/story_card.dart';
 
 import 'package:hn_flutter/injection/di.dart';
-import 'package:hn_flutter/sdk/services/hn_story_service.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/ui_store.dart';
@@ -27,7 +25,7 @@ class StoriesPage extends StatefulWidget {
 }
 
 class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<StoriesPage> {
-  final HNStoryService _hnStoryService = new Injector().hnStoryService;
+  final _hnStoryService = new Injector().hnStoryService;
 
   HNAccountStore _accountStore;
   HNItemStore _itemStore;
@@ -85,13 +83,6 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         curve: Curves.easeInOut
       );
     }
-  }
-
-  Future<Null> _submitStoryModal (BuildContext ctx) async {
-    return await showDialog(
-      context: ctx,
-      child: new SubmitStoryPage(),
-    );
   }
 
   @override
@@ -169,6 +160,10 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         flexibleSpace: new GestureDetector(
           onTap: () => this._scrollToTop(),
         ),
+        leading: new IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
         actions: <Widget>[
           new IconButton(
             icon: const Icon(Icons.refresh),
@@ -211,9 +206,6 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
           ),
         ],
       ),
-      drawer: new Drawer(
-        child: new MainDrawer(),
-      ),
       body: stories.length > 0 ?
         new RefreshIndicator(
           key: this._refreshIndicatorKey,
@@ -225,7 +217,7 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         new FloatingActionButton(
           tooltip: 'Submit Story',
           child: new Icon(Icons.add),
-          onPressed: () => this._submitStoryModal(context),
+          onPressed: () => Navigator.pushNamed(context, '/${Routes.SUBMIT_STORY}'),
         ) :
         null,
     );

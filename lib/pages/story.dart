@@ -21,7 +21,6 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
-import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
@@ -46,7 +45,9 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   HNItemStore _itemStore;
 
   ScrollController _scrollController;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+    new GlobalKey<RefreshIndicatorState>();
+  final _popupMenuButtonKey = new GlobalKey();
 
   @override
   void initState () {
@@ -67,7 +68,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       debouncer.debounce();
     });
 
-    this._refreshStory(_accountStore.primaryAccount?.accessCookie);
+    this._refreshStory(cookie: _accountStore.primaryAccount?.accessCookie);
   }
 
   Future<Null> _scrollToTop () async {
@@ -78,6 +79,10 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         curve: Curves.easeInOut
       );
     }
+  }
+
+  void _showOverflowMenu (BuildContext context) {
+    (this._popupMenuButtonKey.currentState as dynamic).showButtonMenu();
   }
 
   Future<bool> _onPopScope () async {
@@ -105,6 +110,8 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       markAsSeen(widget.itemId);
     }
 
+    final comments = this._buildCommentTree(widget.itemId);
+
     final titleColumn = new Padding(
       padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 6.0),
       child: new Column(
@@ -124,10 +131,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               children: <Widget>[
                 new Text(item?.by ?? '…'),
                 new Text(' • '),
-                new Text(item?.time != null ?
-                  timeAgo(new DateTime.fromMillisecondsSinceEpoch(item.time * 1000)) :
-                  '…'
-                ),
+                new Text((item?.time != null) ? timeAgo(item.time) : '…'),
               ],
             ),
           ),
@@ -181,6 +185,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               color: (itemStatus?.saved ?? false) ? Colors.amber : Colors.black,
             ),
             new PopupMenuButton<OverflowMenuItems>(
+              key: this._popupMenuButtonKey,
               icon: const Icon(
                 Icons.more_horiz,
                 size: 20.0
@@ -225,66 +230,99 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       ],
     );
 
-    List<Widget> cardContent;
+    Widget cardContent;
     if (item?.url != null) {
-      cardContent = <Widget>[
-        new InkWell(
-          onTap: () => this._openStoryUrl(context, item.url),
-          child: new Stack(
-            alignment: AlignmentDirectional.bottomStart,
-            children: <Widget>[
-              // new Image.network(
-              //   this.story.computed.imageUrl,
-              //   fit: BoxFit.cover,
-              // ),
-              new Container(
-                decoration: new BoxDecoration(
-                  color: const Color.fromRGBO(0, 0, 0, 0.5),
-                ),
-                width: double.INFINITY,
-                child: new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Text(
-                        item.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
+      cardContent = new Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          new Material(
+            child: new InkWell(
+              onTap: () => this._openStoryUrl(context, item.url),
+              child: new Stack(
+                alignment: AlignmentDirectional.bottomStart,
+                children: <Widget>[
+                  // new Image.network(
+                  //   this.story.computed.imageUrl,
+                  //   fit: BoxFit.cover,
+                  // ),
+                  new Container(
+                    decoration: new BoxDecoration(
+                      color: const Color.fromRGBO(0, 0, 0, 0.5),
+                    ),
+                    width: double.infinity,
+                    child: new Padding(
+                      padding: new EdgeInsets.all(8.0),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          new Text(
+                            item.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                            style: linkOverlayText,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          new Text(
+                            item.url ?? 'NO story.url FOUND!',
+                            style: linkOverlayText,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
-                      new Text(
-                        item.url ?? 'NO story.url FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
+            ),
+          ),
+          new Material(
+            child: new InkWell(
+              onLongPress: () => this._showOverflowMenu(context),
+              child: new Column(
+                children: <Widget>[
+                  titleColumn,
+                  bottomRow,
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else if (item?.text != null) {
+      cardContent = new Material(
+        child: new InkWell(
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              titleColumn,
+              new Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+                child: new SimpleMarkdown(item.computed.markdown),
+              ),
+              bottomRow,
             ],
           ),
         ),
-        titleColumn,
-        bottomRow,
-      ];
-    } else if (item?.text != null) {
-      cardContent = <Widget>[
-        titleColumn,
-        new Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-          child: new SimpleMarkdown(item.computed.markdown),
-        ),
-        bottomRow,
-      ];
+      );
     } else {
-      cardContent = <Widget>[
-        titleColumn,
-        bottomRow,
-      ];
+      cardContent = new Material(
+        child: new InkWell(
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              titleColumn,
+              bottomRow,
+            ],
+          ),
+        ),
+      );
     }
 
     final storyCard = new Container(
-      width: double.INFINITY,
+      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8.0),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -295,11 +333,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ],
       ),
-      child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: cardContent,
-      ),
+      child: cardContent,
     );
 
     // final comments = item.kids != null ?
@@ -331,44 +365,50 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           onTap: () => this._scrollToTop(),
         ),
         actions: <Widget>[
-          new IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () {
-              this._refreshIndicatorKey.currentState.show();
-              this._refreshStory();
-            }
+          new Builder(
+            builder: (context) => new IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh',
+              onPressed: () {
+                this._refreshIndicatorKey.currentState.show();
+                this._refreshStory(context: context);
+              }
+            ),
           ),
         ],
       ),
-      body: new RefreshIndicator(
-        key: this._refreshIndicatorKey,
-        onRefresh: () => this._refreshStory(account?.accessCookie),
-        child: new Scrollbar(
-          child: new ListView.builder(
-            controller: this._scrollController,
-            itemCount: (item?.kids?.length ?? 1) + 2,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return storyCard;
-              } else if (index == (item?.kids?.length ?? 1) + 1) {
-                return const FABBottomPadding();
-              } else {
-                if (item?.kids != null && item.kids.length > 0) {
-                  return new Comment(
-                    itemId: item.kids[index - 1],
-                    op: item.by,
-                  );
+      body: new Builder(
+        builder: (context) => new RefreshIndicator(
+          key: this._refreshIndicatorKey,
+          onRefresh: () => this._refreshStory(context: context, cookie: account?.accessCookie),
+          child: new Scrollbar(
+            child: new ListView.builder(
+              controller: this._scrollController,
+              itemCount: (comments.length ?? 1) + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return storyCard;
+                } else if (index == comments.length + 1) {
+                  return const FABBottomPadding();
                 } else {
-                  return const Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: const Center(
-                      child: const Text('No comments'),
-                    ),
-                  );
+                  if (comments.length > 0) {
+                    return new Comment(
+                      itemId: comments[index - 1].commentId,
+                      op: item.by,
+                      depth: comments[index - 1].depth,
+                      loadChildren: false,
+                    );
+                  } else {
+                    return const Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: const Center(
+                        child: const Text('No comments'),
+                      ),
+                    );
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
         ),
       ),
@@ -382,6 +422,41 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
         ) :
         null,
     );
+  }
+
+  List<_CommentInfo> _buildCommentTree (int storyId, [bool hideCollapsed = true]) {
+    final story = this._itemStore.items[storyId];
+    if (story == null || story.kids == null) return new List();
+
+    final commentTree = story.kids
+      .map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
+      .where((comment) => comment != null);
+    return this._flattenCommentTree(commentTree).toList();
+  }
+
+  _CommentTreeNode _itemToCommentTreeNode (int itemId, bool hideCollapsed) {
+    final item = this._itemStore.items[itemId];
+    final itemStatus = this._itemStore.itemStatuses[itemId];
+
+    return new _CommentTreeNode(
+      commentId: itemId,
+      children: !hideCollapsed || !(itemStatus?.hidden ?? false)
+        ? item?.kids?.map((kid) => this._itemToCommentTreeNode(kid, hideCollapsed))
+        : null,
+    );
+  }
+
+  Iterable<_CommentInfo> _flattenCommentTree (
+    Iterable<_CommentTreeNode> commentTree, [int depth = 0, List<_CommentInfo> list]
+  ) {
+    return commentTree.fold<List<_CommentInfo>>(list ?? new List(), (val, el) {
+      if (el == null) return val;
+
+      val.add(new _CommentInfo(commentId: el.commentId, depth: depth));
+      if (el.children != null && el.children.length > 0)
+        this._flattenCommentTree(el.children, depth + 1, val);
+      return val;
+    });
   }
 
   void _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
@@ -402,13 +477,14 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       });
   }
 
-  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) {
-    this._hnItemService.faveItem(storyStatus, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  void _saveStory (BuildContext ctx, HNItemStatus storyStatus, HNAccount account) async {
+    try {
+      await this._hnItemService.faveItem(storyStatus, account);
+    } catch (err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    }
     // toggleSaveItem(this.storyId);
   }
 
@@ -417,67 +493,24 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
-    String comment;
-    comment = await showDialog(
-      context: ctx,
-      child: new SimpleDialog(
-        title: const Text('Reply'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        children: <Widget>[
-          new TextField(
-            maxLines: null,
-            autofocus: true,
-            autocorrect: true,
-            keyboardType: TextInputType.text,
-            decoration: new InputDecoration(
-              labelText: 'Comment',
-            ),
-            onChanged: (val) => comment = val,
-          ),
-          const Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-          ),
-          new ButtonTheme.bar(
-            child: new ButtonBar(
-              children: <Widget>[
-                new FlatButton(
-                  child: new Text('Cancel'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-                new FlatButton(
-                  child: new Text('Reply'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx, comment),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
+    Navigator.pushNamed(
+      ctx,
+      '/${Routes.SUBMIT_COMMENT}?parentId=${widget.itemId}&authToken=${status.authTokens.reply}'
     );
-
-    print(comment);
-
-    if (comment != null) {
-      await this._hnItemService.replyToItemById(
-        widget.itemId,
-        comment,
-        status.authTokens,
-        account.accessCookie,
-      ).catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err),
-        ));
-        throw err;
-      });
-
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text('Comment added.'),
-      ));
-    }
   }
 
-  Future<Null> _refreshStory ([Cookie accessCookie]) async {
-    await this._hnItemService.getItemByID(widget.itemId, accessCookie);
+  Future<Null> _refreshStory ({BuildContext context, Cookie cookie}) async {
+    try {
+      await this._hnItemService.getItemByID(widget.itemId, cookie);
+    } catch (err) {
+      if (context != null) {
+        Scaffold.of(context).showSnackBar(new SnackBar(
+          content: new Text(err.toString()),
+        ));
+      } else {
+        print(err);
+      }
+    }
   }
 
   _openStoryUrl (BuildContext ctx, String url) async {
@@ -487,7 +520,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 }
 
@@ -495,4 +528,24 @@ enum OverflowMenuItems {
   SHARE,
   COPY_TEXT,
   VIEW_PROFILE,
+}
+
+class _CommentTreeNode {
+  Iterable<_CommentTreeNode> children;
+  int commentId;
+
+  _CommentTreeNode ({
+    @required this.commentId,
+    this.children,
+  });
+}
+
+class _CommentInfo {
+  int commentId;
+  int depth;
+
+  _CommentInfo ({
+    @required this.commentId,
+    @required this.depth,
+  });
 }

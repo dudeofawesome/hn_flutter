@@ -17,7 +17,7 @@ class Injector {
   static final Injector _singleton = new Injector._internal();
 
   static Flavor _flavor;
-  Map<Flavor, Map<String, dynamic>> _instances = new Map();
+  Map<Flavor, Map<_Injectables, dynamic>> _instances = new Map();
 
   static void configure (Flavor flavor) {
     _flavor = flavor;
@@ -54,7 +54,7 @@ class Injector {
   }
 
   HNUserService get hnUserService {
-    if (!_instances[_flavor].containsKey('HNUserService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.HN_USER_SERVICE)) {
       HNUserService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -64,13 +64,13 @@ class Injector {
           instance = new HNUserServiceMock();
           break;
       }
-      _instances[_flavor]['HNUserService'] = instance;
+      _instances[_flavor][_Injectables.HN_USER_SERVICE] = instance;
     }
-    return _instances[_flavor]['HNUserService'];
+    return _instances[_flavor][_Injectables.HN_USER_SERVICE];
   }
 
   HNItemService get hnItemService {
-    if (!_instances[_flavor].containsKey('HNItemService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.HN_ITEM_SERVICE)) {
       HNItemService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -80,13 +80,13 @@ class Injector {
           instance = new HNItemServiceMock();
           break;
       }
-      _instances[_flavor]['HNItemService'] = instance;
+      _instances[_flavor][_Injectables.HN_ITEM_SERVICE] = instance;
     }
-    return _instances[_flavor]['HNItemService'];
+    return _instances[_flavor][_Injectables.HN_ITEM_SERVICE];
   }
 
   HNStoryService get hnStoryService {
-    if (!_instances[_flavor].containsKey('HNStoryService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.HN_STORY_SERVICE)) {
       HNStoryService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -96,13 +96,13 @@ class Injector {
           instance = new HNStoryServiceMock();
           break;
       }
-      _instances[_flavor]['HNStoryService'] = instance;
+      _instances[_flavor][_Injectables.HN_STORY_SERVICE] = instance;
     }
-    return _instances[_flavor]['HNStoryService'];
+    return _instances[_flavor][_Injectables.HN_STORY_SERVICE];
   }
 
   HNCommentService get hnCommentService {
-    if (!_instances[_flavor].containsKey('HNCommentService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.HN_COMMENT_SERVICE)) {
       HNCommentService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -112,13 +112,13 @@ class Injector {
           instance = new HNCommentServiceMock();
           break;
       }
-      _instances[_flavor]['HNCommentService'] = instance;
+      _instances[_flavor][_Injectables.HN_COMMENT_SERVICE] = instance;
     }
-    return _instances[_flavor]['HNCommentService'];
+    return _instances[_flavor][_Injectables.HN_COMMENT_SERVICE];
   }
 
   HNAuthService get hnAuthService {
-    if (!_instances[_flavor].containsKey('HNAuthService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.HN_AUTH_SERVICE)) {
       HNAuthService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -128,13 +128,13 @@ class Injector {
           instance = new HNAuthServiceMock();
           break;
       }
-      _instances[_flavor]['HNAuthService'] = instance;
+      _instances[_flavor][_Injectables.HN_AUTH_SERVICE] = instance;
     }
-    return _instances[_flavor]['HNAuthService'];
+    return _instances[_flavor][_Injectables.HN_AUTH_SERVICE];
   }
 
   LocalStorageService get localStorageService {
-    if (!_instances[_flavor].containsKey('LocalStorageService')) {
+    if (!_instances[_flavor].containsKey(_Injectables.LOCAL_STORAGE_SERVICE)) {
       LocalStorageService instance;
       switch (_flavor) {
         case Flavor.PROD:
@@ -144,8 +144,17 @@ class Injector {
           instance = new LocalStorageServiceMock();
           break;
       }
-      _instances[_flavor]['LocalStorageService'] = instance;
+      _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = instance;
     }
-    return _instances[_flavor]['LocalStorageService'];
+    return _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE];
   }
+}
+
+enum _Injectables {
+  HN_USER_SERVICE,
+  HN_ITEM_SERVICE,
+  HN_STORY_SERVICE,
+  HN_COMMENT_SERVICE,
+  HN_AUTH_SERVICE,
+  LOCAL_STORAGE_SERVICE,
 }

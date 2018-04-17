@@ -2,17 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/rendering.dart' show
-  debugPaintSizeEnabled,
-  debugPaintBaselinesEnabled,
-  debugPaintLayerBordersEnabled,
-  debugPaintPointersEnabled,
-  debugRepaintRainbowEnabled;
-
-import 'package:hn_flutter/pages/settings.dart';
-import 'package:hn_flutter/pages/stories.dart';
-import 'package:hn_flutter/pages/story.dart';
-import 'package:hn_flutter/pages/user.dart';
 
 import 'package:hn_flutter/router.dart';
 

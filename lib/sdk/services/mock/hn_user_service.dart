@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert' show json;
+import 'dart:io' show Cookie;
+
 import 'package:http/http.dart' as http;
-import 'dart:convert' show JSON;
 
 import 'package:hn_flutter/sdk/services/abstract/hn_user_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -14,10 +16,18 @@ class HNUserServiceMock implements HNUserService {
     addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
 
     return http.get('${this._config.url}/user/$id.json')
-      .then((res) => JSON.decode(res.body))
+      .then((res) => json.decode(res.body))
       .then((user) => new HNUser.fromMap(user))
       .then((user) {
         addHNUser(user);
       });
+  }
+
+  Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
+    return new List();
+  }
+
+  Future<List<int>> getVotedByUserID (String id, bool stories, Cookie accessCookie) async {
+    return new List();
   }
 }

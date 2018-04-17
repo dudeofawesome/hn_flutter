@@ -17,7 +17,6 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
-import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 
 import 'package:hn_flutter/components/simple_markdown.dart';
 
@@ -26,6 +25,7 @@ class Comment extends StatefulWidget {
   final int depth;
   final bool loadChildren;
   final String op;
+  final bool indicateSelf;
   final List<BarButtons> buttons;
   final List<BarButtons> overflowButtons;
 
@@ -45,6 +45,7 @@ class Comment extends StatefulWidget {
       BarButtons.COPY_TEXT,
     ],
     this.op,
+    this.indicateSelf = true,
   }) : super(key: key);
 
   @override
@@ -52,7 +53,7 @@ class Comment extends StatefulWidget {
 }
 
 class _CommentState extends State<Comment>
-  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin {
+  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin<Comment> {
 
   final _hnItemService = new Injector().hnItemService;
   HNItemStore _itemStore;
@@ -135,71 +136,18 @@ class _CommentState extends State<Comment>
   }
 
   Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
-    String comment;
-    comment = await showDialog(
-      context: ctx,
-      child: new SimpleDialog(
-        title: const Text('Reply'),
-        contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-        children: <Widget>[
-          new TextField(
-            maxLines: null,
-            autofocus: true,
-            autocorrect: true,
-            keyboardType: TextInputType.text,
-            decoration: new InputDecoration(
-              labelText: 'Comment',
-            ),
-            onChanged: (val) => comment = val,
-          ),
-          const Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-          ),
-          new ButtonTheme.bar(
-            child: new ButtonBar(
-              children: <Widget>[
-                new FlatButton(
-                  child: new Text('Cancel'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-                new FlatButton(
-                  child: new Text('Reply'.toUpperCase()),
-                  onPressed: () => Navigator.pop(ctx, comment),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
+    Navigator.pushNamed(
+      ctx,
+      '/${Routes.SUBMIT_COMMENT}?parentId=${widget.itemId}&authToken=${status.authTokens.reply}'
     );
-
-    print(comment);
-
-    if (comment != null) {
-      await this._hnItemService.replyToItemById(
-        status.id,
-        comment,
-        status.authTokens,
-        account.accessCookie,
-      ).catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-        throw err;
-      });
-
-      Scaffold.of(ctx).showSnackBar(new SnackBar(
-        content: new Text('Comment added.'),
-      ));
-    }
   }
 
   void _viewProfile (BuildContext ctx, String author) {
-    Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
   void _viewContext (BuildContext ctx, int parent) {
-    // Navigator.pushNamed(ctx, '/${Routes.USERS}:$author');
+    // Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
   Future<Null> _copyText (String text) async {
@@ -241,29 +189,52 @@ class _CommentState extends State<Comment>
         fontWeight: FontWeight.w500,
       );
 
+      Widget byline;
+
+      if (comment.by != null && comment.by == widget.op) {
+        byline = new Container(
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+            color: Colors.blue,
+          ),
+          child: new Text(
+            comment.by,
+            style: bylineStyle.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        );
+      } else if (
+        comment.by != null && widget.indicateSelf &&
+        comment.by == account?.id
+      ) {
+        byline = new Container(
+          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+          decoration: new BoxDecoration(
+            borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
+            color: Colors.amber[600],
+          ),
+          child: new Text(
+            comment.by,
+            style: bylineStyle.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        );
+      } else {
+        byline = new Text(
+          comment.by ?? (comment.computed.markdown != null ? '…' : '[deleted]'),
+          style: bylineStyle,
+        );
+      }
+
       if (!commentStatus.loading) {
         topRow = new Row(
           children: <Widget>[
             new Padding(
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
-              child: (comment.by != null && comment.by == widget.op) ?
-                new Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
-                  decoration: new BoxDecoration(
-                    borderRadius: new BorderRadius.all(new Radius.circular(4.0)),
-                    color: Colors.blue,
-                  ),
-                  child: new Text(
-                    comment.by,
-                    style: bylineStyle.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ) :
-                new Text(
-                  comment.by ?? (comment.computed.markdown != null ? '…' : '[deleted]'),
-                  style: bylineStyle,
-                ),
+              child: byline,
             ),
             comment.score != null ? new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
@@ -279,7 +250,7 @@ class _CommentState extends State<Comment>
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
               child: new Text(
-                '${timeAgo(new DateTime.fromMillisecondsSinceEpoch(comment.time * 1000))}',
+                '${timeAgo(comment.time)}',
                 style: new TextStyle(
                   color: (commentStatus?.upvoted ?? false) ? Colors.orange :
                     (commentStatus?.downvoted ?? false) ? Colors.blue :
@@ -393,7 +364,7 @@ class _CommentState extends State<Comment>
         }
       }).toList();
 
-      if (widget.overflowButtons?.length > 0) {
+      if (widget.overflowButtons != null && widget.overflowButtons.length > 0) {
         buttons.add(
           new PopupMenuButton<BarButtons>(
             icon: const Icon(
@@ -533,7 +504,7 @@ class _CommentState extends State<Comment>
               child: new Padding(
                 padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
                 child: new Container(
-                  width: double.INFINITY,
+                  width: double.infinity,
                   decoration: new BoxDecoration(
                     border: new Border(
                       left: widget.depth > 0 ? new BorderSide(
