@@ -43,6 +43,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  ansicolor: ^0.1.0
+  apk_parser: ^0.0.2+2
+  args: ^1.4.1
+  googleapis: ^0.50.0
+  googleapis_auth: ^0.2.5
+  meta: ^1.1.2
 
 
 # For information on the generic Dart part of this file, see the
