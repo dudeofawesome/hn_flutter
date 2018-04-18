@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show MethodChannel;
 
 import 'package:hn_flutter/pages/main.dart';
 import 'package:hn_flutter/pages/settings.dart';
+import 'package:hn_flutter/pages/licenses.dart';
 import 'package:hn_flutter/pages/story.dart';
 import 'package:hn_flutter/pages/submit_comment.dart';
 import 'package:hn_flutter/pages/submit_story.dart';
@@ -22,11 +23,13 @@ class Routes {
   static const SUBMIT_STORY = 'submit_story';
   static const SUBMIT_COMMENT = 'submit_comment';
   static const SETTINGS = 'settings';
+  static const LICENSES = 'licenses';
 }
 
 final staticRoutes = <String, WidgetBuilder>{
   '/': (BuildContext context) => new MainPage(MainPageSubPages.STORIES),
-  '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage()
+  '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage(),
+  '/${Routes.LICENSES}': (BuildContext context) => new LicensesPage(),
 };
 
 Route<Null> getRoute (RouteSettings settings) {
