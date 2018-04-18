@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flux/flutter_flux.dart';
+import 'package:package_info/package_info.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
-import 'package:hn_flutter/sdk/stores/ui_store.dart';
+import 'package:hn_flutter/router.dart';
 
-class SettingsPage extends StoreWatcher {
-  SettingsPage ({
-    Key key
-  }) : super(key: key);
+class SettingsPage extends StatefulWidget {
+  SettingsPage ({Key key}) : super(key: key);
 
   @override
-  void initStores(ListenToStore listenToStore) {
-    listenToStore(uiStoreToken);
+  SettingsPageState createState () => new SettingsPageState();
+}
+
+class SettingsPageState extends State<SettingsPage> {
+  String _packageVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    PackageInfo.fromPlatform().then((info) {
+      setState(() {
+        this._packageVersion = info.version;
+      });
+    }).catchError((err) {
+      setState(() {
+        this._packageVersion = 'Unknown version';
+      });
+    });
   }
 
   @override
-  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
+  Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -29,11 +38,17 @@ class SettingsPage extends StoreWatcher {
         title: const Text('Settings'),
         actions: <Widget>[],
       ),
-      body: const Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: const Center(
-          child: const Text('Settings…'),
-        ),
+      body: new ListView(
+        children: <Widget>[
+          new ListTile(
+            title: const Text('Version'),
+            subtitle: new Text(this._packageVersion),
+          ),
+          new ListTile(
+            title: const Text('Licenses'),
+            onTap: () => Navigator.pushNamed(context, '/${Routes.LICENSES}'),
+          ),
+        ],
       )
     );
   }
