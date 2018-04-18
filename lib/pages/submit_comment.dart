@@ -49,7 +49,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
 
     return await showDialog(
       context: context,
-      child: this._buildPopConfirmDialog(context),
+      builder: (BuildContext ctx) => this._buildPopConfirmDialog(context),
     );
   }
 

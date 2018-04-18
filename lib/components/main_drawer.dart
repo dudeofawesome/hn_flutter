@@ -296,7 +296,7 @@ class _MainDrawerState extends State<MainDrawer>
 
     return await showDialog(
       context: ctx,
-      child: new SimpleDialog(
+      builder: (BuildContext ctx) => new SimpleDialog(
         title: const Text('Enter story ID'),
         contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         children: <Widget>[
@@ -336,7 +336,7 @@ class _MainDrawerState extends State<MainDrawer>
 
     return await showDialog(
       context: ctx,
-      child: new SimpleDialog(
+      builder: (BuildContext ctx) => new SimpleDialog(
         title: const Text('Enter user ID'),
         contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         children: <Widget>[
@@ -377,7 +377,7 @@ class _MainDrawerState extends State<MainDrawer>
 
     return await showDialog(
       context: ctx,
-      child: new SimpleDialog(
+      builder: (BuildContext ctx) => new SimpleDialog(
         title: const Text('Login'),
         contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         children: <Widget>[
@@ -430,7 +430,7 @@ class _MainDrawerState extends State<MainDrawer>
   _showRemoveAccountDialog (BuildContext ctx, String userId) async {
     return await showDialog(
       context: ctx,
-      child: new SimpleDialog(
+      builder: (BuildContext ctx) => new SimpleDialog(
         title: new Text('Remove $userId?'),
         contentPadding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
         children: <Widget>[

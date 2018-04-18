@@ -60,7 +60,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
 
     return await showDialog(
       context: context,
-      child: this._buildPopConfirmDialog(context),
+      builder: (BuildContext ctx) => this._buildPopConfirmDialog(context),
     );
   }
 
