@@ -38,13 +38,15 @@ class HNUserServiceProd implements HNUserService {
 
       switch (data.type) {
         case _IsolateMessageType.GET_USER_BY_ID:
-          final user = await http.get('${_config.url}/user/${data.params}.json')
-            .then((res) => json.decode(res.body))
-            .then((body) async {
-              if (body != null) return new HNUser.fromMap(body);
-              else return _getUserByIdFromSite(data.params);
-            });
-          replyTo.send(user);
+          new Future(() async {
+            final user = await http.get('${_config.url}/user/${data.params}.json')
+              .then((res) => json.decode(res.body))
+              .then((body) async {
+                if (body != null) return new HNUser.fromMap(body);
+                else return _getUserByIdFromSite(data.params);
+              });
+            replyTo.send(user);
+          });
           break;
         case _IsolateMessageType.DESTRUCT:
           port.close();

@@ -40,20 +40,22 @@ class HNItemServiceProd implements HNItemService {
 
       switch (data.type) {
         case _IsolateMessageType.GET_ITEM_BY_ID:
-          final int id = data.params['id'];
-          final Cookie accessCookie = data.params['accessCookie'];
+          new Future(() async {
+            final int id = data.params['id'];
+            final Cookie accessCookie = data.params['accessCookie'];
 
-          List<HNItemStatus> statusUpdates;
+            List<HNItemStatus> statusUpdates;
 
-          if (accessCookie != null) {
-            statusUpdates = _parseAllItems(await _getItemPageById(id, accessCookie));
-          }
+            if (accessCookie != null) {
+              statusUpdates = _parseAllItems(await _getItemPageById(id, accessCookie));
+            }
 
-          final item = await http.get('${_config.url}/item/$id.json')
-            .then((res) => json.decode(res.body))
-            .then((item) => new HNItem.fromMap(item));
+            final item = await http.get('${_config.url}/item/$id.json')
+              .then((res) => json.decode(res.body))
+              .then((item) => new HNItem.fromMap(item));
 
-          replyTo.send([item, statusUpdates]);
+            replyTo.send([item, statusUpdates]);
+          });
           break;
         case _IsolateMessageType.DESTRUCT:
           port.close();
