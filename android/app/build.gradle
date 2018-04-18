@@ -52,14 +52,13 @@ android {
 
     buildTypes {
         release {
+            profile {
+                matchingFallbacks = ['debug', 'release']
+            }
             signingConfig signingConfigs.release
         }
         debug {
             signingConfig signingConfigs.debug
-        }
-
-        profile {
-            matchingFallbacks = ['debug', 'release']
         }
     }
 }
