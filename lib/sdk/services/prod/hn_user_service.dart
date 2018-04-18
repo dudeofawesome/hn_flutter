@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:convert' show json, utf8;
 import 'dart:io' show HttpClient, ContentType, Cookie;
 
 import 'package:http/http.dart' as http;
+
+import 'package:flutter/foundation.dart';
 
 import 'package:hn_flutter/sdk/services/abstract/hn_user_service.dart';
 import 'package:hn_flutter/sdk/hn_config.dart';
@@ -12,25 +15,62 @@ import 'package:hn_flutter/sdk/actions/hn_user_actions.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
 class HNUserServiceProd implements HNUserService {
-  HNConfig _config = new HNConfig();
+  static final _config = new HNConfig();
   final _httpClient = new HttpClient();
+  final _receivePort = new ReceivePort();
+  SendPort _sendPort;
 
-  Future<HNUser> getUserByID (String id) {
-    addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
+  Future<Null> init () async {
+    assert(this._sendPort == null, 'HNUserServiceProd::init has already been called');
 
-    return http.get('${this._config.url}/user/$id.json')
-      .then((res) => json.decode(res.body))
-      .then((body) async {
-        if (body != null) return new HNUser.fromMap(body);
-        else return this._getUserByIdFromSite(id);
-      })
-      .then((user) {
-        addHNUser(user);
-      });
+    await Isolate.spawn(_onMessage, this._receivePort.sendPort);
+    this._sendPort = await _receivePort.first;
   }
 
-  Future _getUserByIdFromSite (String id) {
-    return http.get('${this._config.apiHost}/user?id=$id')
+  static Future<Null> _onMessage (SendPort sendPort) async {
+    final port = new ReceivePort();
+    sendPort.send(port.sendPort);
+
+    // handle message passing
+    await for (final msg in port) {
+      final _IsolateMessage data = msg[0];
+      final SendPort replyTo = msg[1];
+
+      switch (data.type) {
+        case _IsolateMessageType.GET_USER_BY_ID:
+          new Future(() async {
+            final user = await http.get('${_config.url}/user/${data.params}.json')
+              .then((res) => json.decode(res.body))
+              .then((body) async {
+                if (body != null) return new HNUser.fromMap(body);
+                else return _getUserByIdFromSite(data.params);
+              });
+            replyTo.send(user);
+          });
+          break;
+        case _IsolateMessageType.DESTRUCT:
+          port.close();
+          break;
+      }
+    }
+  }
+
+  Future<HNUser> getUserByID (String id) async {
+    addHNUser(new HNUser(id: id, computed: new HNUserComputed(loading: true)));
+
+    final response = new ReceivePort();
+    this._sendPort.send([new _IsolateMessage(
+      type: _IsolateMessageType.GET_USER_BY_ID,
+      params: id,
+    ), response.sendPort]);
+
+    final HNUser user = await response.first;
+    addHNUser(user);
+    return user;
+  }
+
+  static Future _getUserByIdFromSite (String id) {
+    return http.get('${_config.apiHost}/user?id=$id')
       .then((res) {
         if (res.statusCode != 200) throw 'User "$id" not found';
         return res.body;
@@ -55,7 +95,7 @@ class HNUserServiceProd implements HNUserService {
 
   Future<List<int>> getSavedByUserID (String id, bool stories, Cookie accessCookie) async {
     final req = await ((await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/favorites?id=$id&comments=${stories ? 'f' : 't'}'
+        '${_config.apiHost}/favorites?id=$id&comments=${stories ? 'f' : 't'}'
       )))
       ..cookies.add(accessCookie)
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
@@ -82,7 +122,7 @@ class HNUserServiceProd implements HNUserService {
 
   Future<List<int>> getVotedByUserID (String id, bool stories, Cookie accessCookie) async {
     final req = await ((await _httpClient.getUrl(Uri.parse(
-        '${this._config.apiHost}/upvoted?id=$id&comments=${stories ? 'f' : 't'}'
+        '${_config.apiHost}/upvoted?id=$id&comments=${stories ? 'f' : 't'}'
       )))
       ..cookies.add(accessCookie)
       ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'))
@@ -112,3 +152,18 @@ final _commentIdRegExp = new RegExp(r'''<tr class=["']athing["'] id=["']([0-9]+)
 final _createdRegExp = new RegExp(r'''created:.*?<td><a href="front\?day=([0-9\-]+)&birth=''');
 final _karmaRegExp = new RegExp(r'''<td valign="top">karma:<\/td><td>\s*([0-9]+)\s*<\/td>''');
 final _aboutRegExp = new RegExp(r'''<td valign="top">about:<\/td><td>\s*(.*)\s*<\/td>''');
+
+class _IsolateMessage {
+  _IsolateMessageType type;
+  dynamic params;
+
+  _IsolateMessage ({
+    @required this.type,
+    @required this.params,
+  });
+}
+
+enum _IsolateMessageType {
+  GET_USER_BY_ID,
+  DESTRUCT,
+}

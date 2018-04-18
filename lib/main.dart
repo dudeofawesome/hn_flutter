@@ -9,8 +9,7 @@ import 'package:hn_flutter/injection/di.dart';
 
 Future<Null> main () async {
   Injector.configure(Flavor.PROD);
-
-  await new Injector().localStorageService.init();
+  await new Injector().init();
 
   runApp(new HNApp());
 }

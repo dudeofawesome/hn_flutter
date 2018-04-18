@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 import 'package:hn_flutter/sdk/services/hn_item_service.dart';
 import 'package:hn_flutter/sdk/services/hn_story_service.dart';
@@ -27,6 +29,28 @@ class Injector {
     for (final flavor in Flavor.values) {
       this._instances[flavor] = new Map();
     }
+  }
+
+  Future<Null> init () async {
+    // construct and initialize all services with an init method
+      switch (_flavor) {
+        case Flavor.PROD:
+          _instances[_flavor][_Injectables.HN_ITEM_SERVICE] = new HNItemServiceProd();
+          _instances[_flavor][_Injectables.HN_USER_SERVICE] = new HNUserServiceProd();
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceProd();
+          await Future.wait<dynamic>([
+            _instances[_flavor][_Injectables.HN_ITEM_SERVICE].init(),
+            _instances[_flavor][_Injectables.HN_USER_SERVICE].init(),
+            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
+          ]);
+          break;
+        case Flavor.MOCK:
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceMock();
+          await Future.wait<dynamic>([
+            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
+          ]);
+          break;
+      }
   }
 
   HNUserService get hnUserService {
