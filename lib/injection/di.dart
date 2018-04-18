@@ -35,19 +35,19 @@ class Injector {
     // construct and initialize all services with an init method
       switch (_flavor) {
         case Flavor.PROD:
-          _instances[_flavor]['HNItemService'] = new HNItemServiceProd();
-          _instances[_flavor]['HNUserService'] = new HNUserServiceProd();
-          _instances[_flavor]['LocalStorageService'] = new LocalStorageServiceProd();
+          _instances[_flavor][_Injectables.HN_ITEM_SERVICE] = new HNItemServiceProd();
+          _instances[_flavor][_Injectables.HN_USER_SERVICE] = new HNUserServiceProd();
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceProd();
           await Future.wait<dynamic>([
-            _instances[_flavor]['HNItemService'].init(),
-            _instances[_flavor]['HNUserService'].init(),
-            _instances[_flavor]['LocalStorageService'].init(),
+            _instances[_flavor][_Injectables.HN_ITEM_SERVICE].init(),
+            _instances[_flavor][_Injectables.HN_USER_SERVICE].init(),
+            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
           ]);
           break;
         case Flavor.MOCK:
-          _instances[_flavor]['LocalStorageService'] = new LocalStorageServiceMock();
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceMock();
           await Future.wait<dynamic>([
-            _instances[_flavor]['LocalStorageService'].init(),
+            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
           ]);
           break;
       }
