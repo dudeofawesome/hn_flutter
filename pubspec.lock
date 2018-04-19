@@ -8,8 +8,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.31.1"
+  ansicolor:
+    dependency: "direct dev"
+    description:
+      name: ansicolor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   args:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: args
       url: "https://pub.dartlang.org"
