@@ -24,25 +24,6 @@ Future<Map<String, String>> generateLicenses() async {
     licenses[name] = await licenseFile.readAsString();
   }
 
-  // if (forLibrary) {
-  //   var name = library.element.name;
-  //   if (name.isEmpty) {
-  //     name = library.element.source.uri.pathSegments.last;
-  //   }
-  //   output.writeln('// Code for "$name"');
-  // }
-  // if (forClasses) {
-  //   for (var classElement
-  //       in library.allElements.where((e) => e is ClassElement)) {
-  //     if (classElement.displayName.contains('GoodError')) {
-  //       throw new InvalidGenerationSourceError(
-  //           "Don't use classes with the word 'Error' in the name",
-  //           todo: 'Rename ${classElement.displayName} to something else.',
-  //           element: classElement);
-  //     }
-  //     output.writeln('// Code for "$classElement"');
-  //   }
-  // }
   return licenses;
 }
 
