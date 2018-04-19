@@ -300,6 +300,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.4"
+  pub_cache:
+    dependency: "direct dev"
+    description:
+      name: pub_cache
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   pub_semver:
     dependency: transitive
     description:
@@ -495,7 +502,7 @@ packages:
     source: hosted
     version: "1.0.7"
   yaml:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: yaml
       url: "https://pub.dartlang.org"

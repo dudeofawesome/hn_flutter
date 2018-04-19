@@ -44,6 +44,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pub_cache: ^0.1.1
+  yaml: ^2.1.13
 
 
 # For information on the generic Dart part of this file, see the
