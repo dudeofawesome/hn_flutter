@@ -16,6 +16,7 @@ addons:
       - lib32stdc++6
       - libstdc++6
       - fonts-droid
+      - oracle-java8-set-default
 cache:
   bundler: true
   directories:
