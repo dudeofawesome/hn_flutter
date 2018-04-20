@@ -36,6 +36,8 @@ before_install:
   - git clone https://github.com/flutter/flutter.git -b beta
   - export PATH=`pwd`/flutter/bin:$PATH
   - flutter doctor
+  - bundle update
+  - fastlane --version
 install:
   - flutter packages get
 
