@@ -19,11 +19,11 @@ platform :android do
   lane :deploy_play_store do
     begin
       upload_to_play_store(
-        track: 'alpha',
+        track: ENV['FASTLANE_TRACK'] || 'alpha',
         apk: '../build/app/outputs/apk/release/app-release.apk',
         json_key_data: ENV['GOOGLE_DEVELOPER_SERVICE_ACCOUNT_ACTOR_FASTLANE'],
         skip_upload_screenshots: true,
-        skip_upload_images: true
+        skip_upload_images: true,
       )
     rescue => exception
       raise exception unless exception.message.include?('apkUpgradeVersionConflict')
