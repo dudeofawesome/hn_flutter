@@ -43,8 +43,10 @@ install:
 
 script:
   - flutter test --name='unit test'
+  - flutter build apk --release
 
 after_success: |
+  DEPLOY=false
   DEPLOY_PROD=false
   DEPLOY_DEV=false
 
@@ -60,3 +62,24 @@ after_success: |
     DEPLOY_DEV=true
   fi
 
+  if [[ "$DEPLOY_PROD" = true ]]; then
+    DEPLOY=true
+    FASTLANE_TRACK=production
+  if [[ "$DEPLOY_DEV" = true ]]; then
+    DEPLOY=true
+    FASTLANE_TRACK=beta
+  fi
+
+before_deploy:
+  - echo "DEPLOY = $DEPLOY"
+  - echo "DEPLOY_PROD = $DEPLOY_PROD"
+  - echo "DEPLOY_DEV = $DEPLOY_DEV"
+  - echo "FASTLANE_TRACK = $FASTLANE_TRACK"
+
+deploy:
+  - provider: script
+    script: bundle exec fastlane deploy_play_store
+    skip_cleanup: true
+    on:
+      all_branches: true
+      condition: $DEPLOY == true
