@@ -1,5 +1,11 @@
 {
   "editor.rulers": [80],
+  "files.associations": {
+    ".env": "dotenv",
+    "*.travis": "yaml",
+    "Fastfile": "ruby",
+    "Appfile": "ruby",
+  },
   "cSpell.words": [
     "Combinator",
     "Cupertino",
