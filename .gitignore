@@ -16,3 +16,4 @@ Butterfly Reader-*.google.json
 
 # error logs
 flutter_*.log
+**/*/fastlane/report.xml
