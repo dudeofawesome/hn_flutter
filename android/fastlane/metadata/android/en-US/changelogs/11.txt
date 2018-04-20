@@ -1,0 +1,4 @@
+• ✨ add ability to see favorited items
+• ✨ add ability to see upvoted items
+• 💄 indicate user's comments
+• ⬆️ upgrade Flutter engine
