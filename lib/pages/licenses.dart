@@ -1,12 +1,41 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
-class LicensesPage extends StatelessWidget {
-  LicensesPage ({Key key}) : super(key: key);
+import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/utils/dedent.dart';
+
+class LicensesPage extends StatefulWidget {
+  LicensesPage({Key key}) : super(key: key);
+
+  @override
+  LicensePageState createState() => new LicensePageState();
+}
+
+class LicensePageState extends State<LicensesPage> {
+  Map<String, String> licenses = new Map<String, String>();
+
+  @override
+  void initState() {
+    super.initState();
+    rootBundle
+        .loadString('assets/strings/licenses.json')
+        .then((input) => json.decode(input).retype<String, String>())
+        .then((licenses) {
+      setState(() {
+        this.licenses = licenses;
+      });
+    }).catchError((err) {
+      print(err);
+      throw err;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final keys = this.licenses.keys.toList()..sort((a, b) => a.compareTo(b));
     return new Scaffold(
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -14,17 +43,20 @@ class LicensesPage extends StatelessWidget {
         title: const Text('Licenses'),
         actions: <Widget>[],
       ),
-      body: new ListView(
-        children: <Widget>[
-          new ListTile(
-            title: const Text('Butterfly Reader'),
-          ),
-          new ListTile(
-            title: const Text('Licenses'),
-            onTap: () => UrlLauncher.launch('https://github.com'),
-          ),
-        ],
-      )
+      body: new ListView.builder(
+        itemCount: this.licenses.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0)
+            return new Text('Butterfly Reader',
+                style: Theme.of(context).textTheme.headline,
+                textAlign: TextAlign.center);
+          final name = keys[index - 1];
+          return new SimpleMarkdown('### $name\n'
+              '```\n' +
+              this.licenses[name] +
+              '\n```');
+        },
+      ),
     );
   }
 }
