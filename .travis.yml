@@ -45,8 +45,8 @@ before_install:
   # suppressing output of sdkmanager to keep log under 4MB (travis limit)
   - echo y | sdkmanager "tools" >/dev/null
   - echo y | sdkmanager "platform-tools" >/dev/null
-  - echo y | sdkmanager "build-tools;26.0.3" >/dev/null
-  - echo y | sdkmanager "platforms;android-26" >/dev/null
+  - echo y | sdkmanager "build-tools;27.0.3" >/dev/null
+  - echo y | sdkmanager "platforms;android-27" >/dev/null
   - echo y | sdkmanager "extras;android;m2repository" >/dev/null
   - echo y | sdkmanager "extras;google;m2repository" >/dev/null
   - echo y | sdkmanager "patcher;v4" >/dev/null
