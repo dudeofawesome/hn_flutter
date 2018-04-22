@@ -34,6 +34,14 @@ branches:
     - feat/tests
 
 before_install:
+  # decrypt private files
+  - openssl aes-256-cbc -K $encrypted_0148444d11bc_key -iv $encrypted_0148444d11bc_iv
+    -in android/keystore.jks.enc -out android/keystore.jks -d
+  - openssl aes-256-cbc -K $encrypted_0148444d11bc_key -iv $encrypted_0148444d11bc_iv
+    -in android/key.properties.enc -out android/key.properties -d
+  - openssl aes-256-cbc -K $encrypted_0148444d11bc_key -iv $encrypted_0148444d11bc_iv
+    -in android/Butterfly\ Reader-e6f19b063eb9.google.json.enc -out android/Butterfly\ Reader-e6f19b063eb9.google.json
+    -d
   # install Android SDK
   - wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
   - mkdir android-sdk
