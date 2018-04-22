@@ -51,6 +51,8 @@ before_install:
   - echo y | sdkmanager "extras;google;m2repository" >/dev/null
   - echo y | sdkmanager "patcher;v4" >/dev/null
   - sdkmanager --list
+  # accept Android SDK licenses
+  - yes | sdkmanager --licenses
   # install gradle
   - wget https://services.gradle.org/distributions/gradle-4.6-bin.zip
   - unzip -qq gradle-4.6-bin.zip
