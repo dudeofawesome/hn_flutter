@@ -13,6 +13,7 @@ packages
 **/*.p12
 **/*.pem
 Butterfly Reader-*.google.json
+secrets.tar
 
 # error logs
 flutter_*.log
