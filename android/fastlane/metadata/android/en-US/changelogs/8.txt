@@ -1,0 +1,2 @@
+• ⚡️ significantly improve rendering performance of long comment chains
+• 🐛 fix open story dialog

@@ -1,0 +1,117 @@
+os:
+  - linux
+sudo: false
+
+language: dart
+dart:
+  - dev
+
+addons:
+  apt:
+    # sky_shell binary depends on /usr/lib/x86_64-linux-gnu/libstdc++.so.6 version GLIBCXX_3.4.18
+    sources:
+      # if we don't specify this, the libstdc++6 we get is the wrong version
+      - ubuntu-toolchain-r-test
+    packages:
+      - lib32stdc++6
+      - libstdc++6
+      - fonts-droid
+      - oracle-java8-set-default
+cache:
+  bundler: true
+  directories:
+    - $HOME/.pub-cache
+
+# https://docs.travis-ci.com/user/customizing-the-build#Building-Specific-Branches
+branches:
+  only:
+    - master
+    - develop
+    - /^release\/.*$/
+    - hotfixes
+    - /^hotfix\/.*$/
+    - feat/travis
+    - feat/tests
+
+before_install:
+  # decrypt private files
+  - openssl aes-256-cbc -K $encrypted_0148444d11bc_key -iv $encrypted_0148444d11bc_iv
+    -in android/secrets.tar.enc -out android/secrets.tar -d
+  - tar xvf android/secrets.tar -C android
+  # install Android SDK
+  - wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip -nv
+  - mkdir android-sdk
+  - unzip -qq sdk-tools-linux-3859397.zip -d android-sdk
+  - export ANDROID_HOME=`pwd`/android-sdk
+  - export PATH=`pwd`/android-sdk/tools/bin:$PATH
+  - mkdir -p /home/travis/.android # silence sdkmanager warning
+  - echo 'count=0' > /home/travis/.android/repositories.cfg # silence sdkmanager warning
+  # suppressing output of sdkmanager to keep log under 4MB (travis limit)
+  - echo y | sdkmanager "tools" >/dev/null
+  - echo y | sdkmanager "platform-tools" >/dev/null
+  - echo y | sdkmanager "build-tools;27.0.3" >/dev/null
+  - echo y | sdkmanager "platforms;android-27" >/dev/null
+  - echo y | sdkmanager "extras;android;m2repository" >/dev/null
+  - echo y | sdkmanager "extras;google;m2repository" >/dev/null
+  - echo y | sdkmanager "patcher;v4" >/dev/null
+  - sdkmanager --list
+  # accept Android SDK licenses
+  - yes | sdkmanager --licenses > /dev/null
+  # install gradle
+  - wget https://services.gradle.org/distributions/gradle-4.6-bin.zip -nv
+  - unzip -qq gradle-4.6-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-4.6
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  - gradle -v
+  # install Flutter
+  - git clone https://github.com/flutter/flutter.git -b beta
+  - export PATH=`pwd`/flutter/bin:$PATH
+  - flutter doctor
+  # install Ruby gems, including Fastlane
+  - bundle update
+  - fastlane --version
+install:
+  - flutter packages get
+
+script:
+  - flutter test --name='unit test'
+  - flutter build apk --release
+
+after_success: |
+  DEPLOY=false
+  DEPLOY_PROD=false
+  DEPLOY_DEV=false
+
+  if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+    DEPLOY_PROD=true
+  elif [[ $TRAVIS_BRANCH =~ ^release/.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^hotifx/.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^release-.*$ ]]; then
+    DEPLOY_DEV=true
+  elif [[ $TRAVIS_BRANCH =~ ^hotifx-.*$ ]]; then
+    DEPLOY_DEV=true
+  fi
+
+  if [[ "$DEPLOY_PROD" = true ]]; then
+    DEPLOY=true
+    FASTLANE_TRACK=production
+  if [[ "$DEPLOY_DEV" = true ]]; then
+    DEPLOY=true
+    FASTLANE_TRACK=beta
+  fi
+
+before_deploy:
+  - echo "DEPLOY = $DEPLOY"
+  - echo "DEPLOY_PROD = $DEPLOY_PROD"
+  - echo "DEPLOY_DEV = $DEPLOY_DEV"
+  - echo "FASTLANE_TRACK = $FASTLANE_TRACK"
+
+deploy:
+  - provider: script
+    script: bundle exec fastlane deploy_play_store
+    skip_cleanup: true
+    on:
+      all_branches: true
+      condition: $DEPLOY == true

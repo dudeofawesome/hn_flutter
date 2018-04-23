@@ -11,9 +11,13 @@ import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
+import 'package:hn_flutter/injection/di.dart';
 
 void main() {
   testWidgets('[Comment] widget test', (WidgetTester tester) async {
+    Injector.configure(Flavor.PROD);
+    await new Injector().localStorageService.init();
+
     // Build our app and trigger a frame.
     // await tester.pumpWidget(new Comment(
     //   itemId: 1,

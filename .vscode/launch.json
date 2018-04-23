@@ -8,6 +8,12 @@
       "name": "Flutter mobile app",
       "type": "dart",
       "request": "launch"
-    }
+    },
+    {
+      "name": "Unit Tests",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/test/unit_tests.dart",
+    },
   ]
 }
