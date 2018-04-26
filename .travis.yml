@@ -39,6 +39,9 @@ before_install:
     -in android/secrets.tar.enc -out android/secrets.tar -d
   - tar xvf android/secrets.tar -C android
   # install build tools
+  - pushd dev/bots/ci
+  - pub get
+  - popd
   - source dev/bots/ci/install-android-sdk.bash
   - source dev/bots/ci/install-flutter.bash
   # install Ruby gems, including Fastlane

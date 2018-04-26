@@ -1,5 +1,6 @@
 #!/usr/bin/env dart
 import 'dart:io';
+import 'package:ansicolor/ansicolor.dart';
 import 'package:path/path.dart' as path;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
@@ -34,7 +35,8 @@ main() async {
   final flutterSemVer = new VersionConstraint.parse(requiredFlutter);
   final version =
       tags.firstWhere((tag) => flutterSemVer.allows(tag), orElse: () {
-    print('Error: no matching Flutter version found for $flutterSemVer');
+    print((new AnsiPen()
+      ..red())('Error: no matching Flutter version found for $flutterSemVer'));
     exit(1);
   });
   print(version);
