@@ -113,3 +113,15 @@ deploy:
     on:
       all_branches: true
       condition: $DEPLOY == true
+  # - provider: releases
+  #   api_key: ""
+  #   # TODO: figure out how to use vars
+  #   name: ""
+  #   body: ""
+  #   # TODO: figure out how to upload a Google-signed APK
+  #   file: "build/app/outputs/apk/release/app-release.apk"
+  #   prerelease: true
+  #   skip_cleanup: true
+  #   on:
+  #     all_branches: true
+  #     condition: $DEPLOY == true
