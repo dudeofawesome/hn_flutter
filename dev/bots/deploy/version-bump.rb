@@ -70,7 +70,7 @@ def bump_version (options, curr_version)
   when 'pre_release', 'pre'
     pre_release = pre_release.gsub(/(.*?)(\d+)$/) { |match| "#{$1}#{$2.to_i + 1}"}
   else
-    puts "Unknown version section #{bump}"
+    puts "Unknown version section #{options.bump}"
     exit(1)
   end
 
