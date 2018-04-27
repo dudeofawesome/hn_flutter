@@ -105,7 +105,7 @@ def write_version_to_android (options, version)
     File.open(options.android_build_gradle_path, 'w') { |f|
       f.write(curr
         .gsub(/^(\s*versionCode\s*)(\d+)$/m) { |match| "#{$1}#{$2.to_i + 1}"}
-        .gsub(/^(\s*versionName\s*)".*?+"$/m) { |match| "#{$1}\"#{version}\""})
+        .gsub(/^(\s*versionName\s*)".*?"$/m) { |match| "#{$1}\"#{version}\""})
       f.close()
     }
   }
