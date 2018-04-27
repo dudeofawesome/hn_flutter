@@ -19,6 +19,7 @@ class VersionBump
     options.tag = true
     options.push = true
     options.version = nil
+    options.auto_accept = false
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = 'Usage: version-bump.rb [major, minor, patch, prerelease] [options]'
@@ -52,6 +53,10 @@ class VersionBump
 
       opts.on('--[no-]push', 'Whether to push changes') do |push|
         options.push = push
+      end
+
+      opts.on('-y', '--yes', 'Automatically answer yes to all prompts') do |auto_accept|
+        options.auto_accept = auto_accept
       end
 
       opts.on('-h', '--help', 'Show this message') do
@@ -167,7 +172,12 @@ if options.version == nil
   options.version = get_current_version(options)
   options.version = bump_version(options)
 end
-puts "Bumping to #{options.version}"
+if !options.auto_accept
+  puts "Bump to #{options.version}? (yes)"
+  exit 1 if (gets.chomp || '').downcase == 'no'
+else
+  puts "Bumping to #{options.version}"
+end
 write_version_to_files(options)
 
 commit_changes(options, git) if options.commit
