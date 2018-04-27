@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'bundler/setup'
+Bundler.setup(:default, :ci)
+require 'git'
 require 'optparse'
 require 'ostruct'
 require 'semverse'
@@ -11,6 +14,7 @@ class VersionBump
     options.pubspec_path = 'pubspec.yaml'
     options.android_build_gradle_path = 'android/app/build.gradle'
     options.pre_release = false
+    options.allow_dirty = false
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = 'Usage: version-bump.rb [major, minor, patch, prerelease] [options]'
@@ -26,6 +30,10 @@ class VersionBump
         options.pre_release = pre
       end
 
+      opts.on('--[no-]allow-dirty', 'Whether to allow running on a dirty repo') do |allow_dirty|
+        options.allow_dirty = allow_dirty
+      end
+
       opts.on('-h', '--help', 'Show this message') do
         puts opts
         exit
@@ -38,7 +46,15 @@ class VersionBump
   end
 end
 
-options = VersionBump.parse(ARGV)
+def check_if_dirty (options, git)
+  if !options.allow_dirty
+    status = git.status
+    if status.added.size + status.changed.size + status.deleted.size + status.untracked.size > 0
+      puts "Repo is dirty"
+      exit(1)
+    end
+  end
+end
 
 def get_current_version (options)
   pubspec = YAML.load_file(options.pubspec_path)
@@ -111,6 +127,10 @@ def write_version_to_android (options, version)
   }
 end
 
+options = VersionBump.parse(ARGV)
+git = Git.open("#{__dir__}/../../../")
+
+check_if_dirty(options, git)
 version = get_current_version(options)
 version = bump_version(options, version)
 puts "Bumping to #{version}"
