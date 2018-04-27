@@ -22,7 +22,7 @@ GEM
     declarative-option (0.1.0)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.3.0)
+    dotenv (2.4.0)
     emoji_regex (0.1.1)
     excon (0.62.0)
     faraday (0.15.0)
@@ -33,7 +33,7 @@ GEM
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
     fastimage (2.1.1)
-    fastlane (2.92.1)
+    fastlane (2.93.1)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.3, < 3.0.0)
       babosa (>= 1.0.2, < 2.0.0)
@@ -154,7 +154,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  fastlane
+  fastlane (~> 2.93, >= 2.93.1)
   git!
   semverse (~> 2.0)
 
