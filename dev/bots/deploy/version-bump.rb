@@ -78,6 +78,10 @@ def tag_commit (options, git)
   git.add_tag("v#{options.version}", :options => 'here')
 end
 
+def push_tags (options, git)
+  git.push('origin', git.current_branch, :tags => true)
+end
+
 def get_current_version (options)
   pubspec = YAML.load_file(options.pubspec_path)
   version_string = pubspec['version']
@@ -163,3 +167,4 @@ write_version_to_files(options)
 
 commit_changes(options, git) if options.commit
 tag_commit(options, git) if options.tag
+push_tags(options, git) if options.tag
