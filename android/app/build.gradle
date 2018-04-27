@@ -36,8 +36,8 @@ android {
         applicationId "io.orleans.hnflutter"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 12002
-        versionName 0.0.12-1
+        versionCode 12003
+        versionName "0.0.12-3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
