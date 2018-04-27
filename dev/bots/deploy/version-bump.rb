@@ -15,6 +15,9 @@ class VersionBump
     options.android_build_gradle_path = 'android/app/build.gradle'
     options.pre_release = false
     options.allow_dirty = false
+    options.commit = true
+    options.tag = true
+    options.version = nil
 
     opt_parser = OptionParser.new do |opts|
       opts.banner = 'Usage: version-bump.rb [major, minor, patch, prerelease] [options]'
@@ -34,6 +37,18 @@ class VersionBump
         options.allow_dirty = allow_dirty
       end
 
+      opts.on('--[no-]commit', 'Whether to commit changes') do |commit|
+        options.commit = commit
+      end
+
+      opts.on('--[no-]tag', 'Whether to tag commit') do |tag|
+        if !options.commit
+          puts "Committing must be enabled to tag"
+          exit
+        end
+        options.tag = tag
+      end
+
       opts.on('-h', '--help', 'Show this message') do
         puts opts
         exit
@@ -47,13 +62,20 @@ class VersionBump
 end
 
 def check_if_dirty (options, git)
-  if !options.allow_dirty
-    status = git.status
-    if status.added.size + status.changed.size + status.deleted.size + status.untracked.size > 0
-      puts "Repo is dirty"
-      exit(1)
-    end
+  status = git.status
+  if status.added.size + status.changed.size + status.deleted.size + status.untracked.size > 0
+    puts "Repo is dirty"
+    exit(1)
   end
+end
+
+def commit_changes (options, git)
+  git.add([options.pubspec_path, options.android_build_gradle_path])
+  git.commit("🚀🔖 v#{options.version}")
+end
+
+def tag_commit (options, git)
+  git.add_tag("v#{options.version}", :options => 'here')
 end
 
 def get_current_version (options)
@@ -63,12 +85,12 @@ def get_current_version (options)
   version
 end
 
-def bump_version (options, curr_version)
-  major = curr_version.major
-  minor = curr_version.minor
-  patch = curr_version.patch
-  pre_release = curr_version.pre_release
-  build = curr_version.build
+def bump_version (options)
+  major = options.version.major
+  minor = options.version.minor
+  patch = options.version.patch
+  pre_release = options.version.pre_release
+  build = options.version.build
 
   case options.bump.downcase
   when 'major'
@@ -83,7 +105,7 @@ def bump_version (options, curr_version)
   when 'patch'
     patch += 1
     pre_release = nil
-  when 'pre_release', 'pre'
+  when 'pre_release' 'prerelease', 'pre'
     pre_release = pre_release.gsub(/(.*?)(\d+)$/) { |match| "#{$1}#{$2.to_i + 1}"}
   else
     puts "Unknown version section #{options.bump}"
@@ -97,31 +119,31 @@ def bump_version (options, curr_version)
   version = Semverse::Version.new([major, minor, patch, pre_release, build])
 end
 
-def write_version_to_files (options, version)
-  write_version_to_pubspec(options, version)
-  write_version_to_android(options, version)
+def write_version_to_files (options)
+  write_version_to_pubspec(options)
+  write_version_to_android(options)
 end
 
-def write_version_to_pubspec (options, version)
+def write_version_to_pubspec (options)
   File.open(options.pubspec_path, 'r') { |f|
     curr = f.read()
     f.close()
     File.open(options.pubspec_path, 'w') { |f|
       f.write(
-        curr.gsub(/^(\s*version:\s*)\d+(?:\.\d+){2,2}(?:\w|-)*$/m) { |match| "#{$1}#{version}"})
+        curr.gsub(/^(\s*version:\s*)\d+(?:\.\d+){2,2}(?:\w|-)*$/m) { |match| "#{$1}#{options.version}"})
       f.close()
     }
   }
 end
 
-def write_version_to_android (options, version)
+def write_version_to_android (options)
   File.open(options.android_build_gradle_path, 'r') { |f|
     curr = f.read()
     f.close()
     File.open(options.android_build_gradle_path, 'w') { |f|
       f.write(curr
         .gsub(/^(\s*versionCode\s*)(\d+)$/m) { |match| "#{$1}#{$2.to_i + 1}"}
-        .gsub(/^(\s*versionName\s*)".*?"$/m) { |match| "#{$1}\"#{version}\""})
+        .gsub(/^(\s*versionName\s*)".*?"$/m) { |match| "#{$1}\"#{options.version}\""})
       f.close()
     }
   }
@@ -130,8 +152,14 @@ end
 options = VersionBump.parse(ARGV)
 git = Git.open("#{__dir__}/../../../")
 
-check_if_dirty(options, git)
-version = get_current_version(options)
-version = bump_version(options, version)
-puts "Bumping to #{version}"
-write_version_to_files(options, version)
+check_if_dirty(options, git) unless options.allow_dirty
+
+if options.version == nil
+  options.version = get_current_version(options)
+  options.version = bump_version(options)
+end
+puts "Bumping to #{options.version}"
+write_version_to_files(options)
+
+commit_changes(options, git) if options.commit
+tag_commit(options, git) if options.tag
