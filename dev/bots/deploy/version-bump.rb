@@ -17,6 +17,7 @@ class VersionBump
     options.allow_dirty = false
     options.commit = true
     options.tag = true
+    options.push = true
     options.version = nil
 
     opt_parser = OptionParser.new do |opts|
@@ -49,6 +50,10 @@ class VersionBump
         options.tag = tag
       end
 
+      opts.on('--[no-]push', 'Whether to push changes') do |push|
+        options.push = push
+      end
+
       opts.on('-h', '--help', 'Show this message') do
         puts opts
         exit
@@ -78,7 +83,7 @@ def tag_commit (options, git)
   git.add_tag("v#{options.version}", :options => 'here')
 end
 
-def push_tags (options, git)
+def push_origin (git)
   git.push('origin', git.current_branch, :tags => true)
 end
 
@@ -167,4 +172,4 @@ write_version_to_files(options)
 
 commit_changes(options, git) if options.commit
 tag_commit(options, git) if options.tag
-push_tags(options, git) if options.tag
+push_origin(git) if options.push
