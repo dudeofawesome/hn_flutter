@@ -84,7 +84,7 @@ after_success: |
 
 deploy:
   - provider: script
-    script: fastlane deploy_play_store
+    script: dev/bots/ci/travis-deploy.bash
     skip_cleanup: true
     on:
       all_branches: true
