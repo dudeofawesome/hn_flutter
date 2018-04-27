@@ -45,7 +45,7 @@ before_install:
   - source dev/bots/ci/install-android-sdk.bash
   - source dev/bots/ci/install-flutter.bash
   # install Ruby gems, including Fastlane
-  - bundle update
+  - bundle install
   - fastlane --version
 install:
   - flutter packages get
