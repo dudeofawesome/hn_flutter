@@ -84,7 +84,7 @@ after_success: |
 
 deploy:
   - provider: script
-    script: bundle exec fastlane deploy_play_store
+    script: fastlane deploy_play_store
     skip_cleanup: true
     on:
       all_branches: true
