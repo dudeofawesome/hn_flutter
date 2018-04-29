@@ -156,6 +156,7 @@ PLATFORMS
 DEPENDENCIES
   fastlane (~> 2.93, >= 2.93.1)
   git!
+  json (~> 2.1)
   semverse (~> 2.0)
 
 BUNDLED WITH
