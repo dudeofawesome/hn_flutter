@@ -20,6 +20,7 @@ GEM
       highline (~> 1.7.2)
     declarative (0.0.10)
     declarative-option (0.1.0)
+    dedent (1.0.1)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.4.0)
@@ -154,6 +155,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dedent (~> 1.0, >= 1.0.1)
   fastlane (~> 2.93, >= 2.93.1)
   git!
   json (~> 2.1)
