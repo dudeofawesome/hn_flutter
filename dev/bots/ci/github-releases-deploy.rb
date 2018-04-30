@@ -7,6 +7,7 @@ require 'dedent'
 require 'git'
 require 'json'
 require 'net/http'
+require 'semverse'
 require 'uri'
 
 repo = 'hn_flutter'
@@ -34,6 +35,7 @@ if (git_tag == nil)
   exit 1
 end
 
+package_version = Semverse::Version.new(git_tag.name.gsub(/^v/, ''))
 
 github_api = Net::HTTP.new('api.github.com', 443)
 github_api.use_ssl = true
@@ -65,8 +67,7 @@ body = {
     TODO: INSERT CHANGELOG HERE
   }.gsub(/^\s*\n/, '').gsub(/\n\s*$/, '').dedent,
   draft: false,
-  # TODO: get this from semver
-  prerelease: true,
+  prerelease: package_version.pre_release?,
 }
 req.body = body.to_json
 
@@ -80,7 +81,7 @@ puts "Release set"
 
 upload_url = JSON.parse(res.body)['upload_url'].partition('{?name,label}')[0]
 
-create_release_url = URI.parse("#{upload_url}?name=android-release.apk")
+create_release_url = URI.parse("#{upload_url}?name=android-release_#{package_version}.apk")
 headers = {
   'Content-Type': 'application/zip',
   Authorization: "token #{ENV['GITHUB_OAUTH_TOKEN']}",
