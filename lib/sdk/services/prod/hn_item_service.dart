@@ -57,6 +57,20 @@ class HNItemServiceProd implements HNItemService {
             replyTo.send([item, statusUpdates]);
           });
           break;
+        case _IsolateMessageType.GET_COMMENT_ITEM_AUTH_BY_ID:
+          new Future(() async {
+            final int id = data.params['id'];
+            final Cookie accessCookie = data.params['accessCookie'];
+
+            List<HNItemStatus> statusUpdates;
+
+            if (accessCookie != null) {
+              statusUpdates = _parseAllItems(await _getItemPageById(id, accessCookie));
+            }
+
+            replyTo.send(statusUpdates);
+          });
+          break;
         case _IsolateMessageType.DESTRUCT:
           port.close();
           break;
@@ -106,11 +120,16 @@ class HNItemServiceProd implements HNItemService {
       patchItemStatus(new HNItemStatus.patch(id: id, loading: true));
     }
 
-    final replyPage = await _getItemReplyPageById(id, accessCookie);
-    return _parseAllItems(replyPage)
-      ..forEach((patch) {
-        patchItemStatus(patch);
-      });
+    final response = new ReceivePort();
+    this._sendPort.send([new _IsolateMessage(
+      type: _IsolateMessageType.GET_COMMENT_ITEM_AUTH_BY_ID,
+      params: {'id': id, 'accessCookie': accessCookie},
+    ), response.sendPort]);
+
+    final List<HNItemStatus> statusUpdates = await response.first;
+
+    return statusUpdates
+      ..forEach((patch) => patchItemStatus(patch));
   }
 
   static Future<String> _getItemPageById (int itemId, Cookie accessCookie) async {
