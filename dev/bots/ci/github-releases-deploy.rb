@@ -25,9 +25,19 @@ git_tag = nil
 
 if ARGV[0] == nil
   last_commit = git.log(1)[0]
-  git_tags.each { |t| git_tag = t if t.sha == last_commit.sha }
+  git_tags.each { |t|
+    if t.sha == last_commit.sha
+      git_tag = t
+      break
+    end
+  }
 else
-  git_tags.each { |t| git_tag = t if t.sha == ARGV[0] }
+  git_tags.each { |t|
+    if t.sha == ARGV[0]
+      git_tag = t
+      break
+    end
+  }
 end
 
 if (git_tag == nil)
