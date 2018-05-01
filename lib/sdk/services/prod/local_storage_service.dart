@@ -145,8 +145,8 @@ class LocalStorageServiceProd implements LocalStorageService {
     print('Removed $userId from SQLite');
   }
 
-  Future<Null> setPrimaryHNAccount (String userId) {
-    return this._databases[KEYS_DB].rawInsert(
+  Future<Null> setPrimaryHNAccount (String userId) async {
+    await this._databases[KEYS_DB].rawInsert(
       '''
       INSERT OR REPLACE INTO $KEYS_TABLE ($KEYS_ID, $KEYS_VALUE)
         VALUES (?, ?);
@@ -155,8 +155,8 @@ class LocalStorageServiceProd implements LocalStorageService {
     );
   }
 
-  Future<Null> unsetPrimaryHNAccount (String userId) {
-    return this._databases[KEYS_DB].delete(
+  Future<Null> unsetPrimaryHNAccount (String userId) async {
+    await this._databases[KEYS_DB].delete(
       KEYS_TABLE,
       where: '$KEYS_ID = ?',
       whereArgs: [KEY_PRIMARY_ACCOUNT_ID],
