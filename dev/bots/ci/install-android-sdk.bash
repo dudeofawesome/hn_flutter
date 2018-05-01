@@ -7,8 +7,9 @@ mkdir android-sdk
 unzip -qq sdk-tools-linux-3859397.zip -d android-sdk
 export ANDROID_HOME=`pwd`/android-sdk
 export PATH=`pwd`/android-sdk/tools/bin:$PATH
-mkdir -p /home/travis/.android # silence sdkmanager warning
-echo 'count=0' > /home/travis/.android/repositories.cfg # silence sdkmanager warning
+# silence sdkmanager warning
+mkdir -p ~/.android
+echo 'count=0' > ~/.android/repositories.cfg
 # suppressing output of sdkmanager to keep log under 4MB (travis limit)
 echo y | sdkmanager "tools" >/dev/null
 echo y | sdkmanager "platform-tools" >/dev/null
