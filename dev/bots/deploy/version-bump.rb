@@ -175,9 +175,8 @@ end
 if !options.auto_accept
   puts "Bump to #{options.version}? (yes)"
   exit 1 if (gets.chomp || '').downcase == 'no'
-else
-  puts "Bumping to #{options.version}"
 end
+puts "Bumping to #{options.version}"
 write_version_to_files(options)
 
 commit_changes(options, git) if options.commit
