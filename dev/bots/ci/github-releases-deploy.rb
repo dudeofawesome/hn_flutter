@@ -67,15 +67,20 @@ else
   req = Net::HTTP::Post.new("/repos/#{owner}/#{repo}/releases", headers)
 end
 
+changelog = nil
+if File.file?("changelogs/#{package_version}.md")
+  changelog_file = open("changelogs/#{package_version}.md")
+  changelog =
+    "<a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='65px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>\n\n" +
+    changelog_file.read
+  changelog_file.close()
+end
+
 body = {
   tag_name: git_tag.name,
   target_commitish: "master",
   name: git_tag.name,
-  body: %{
-    <a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='65px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
-
-    TODO: INSERT CHANGELOG HERE
-  }.gsub(/^\s*\n/, '').gsub(/\n\s*$/, '').dedent,
+  body: changelog,
   draft: false,
   prerelease: package_version.pre_release?,
 }
