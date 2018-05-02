@@ -33,11 +33,15 @@ if ARGV[0] == nil
   }
 else
   git_tags.each { |t|
-    if t.sha == ARGV[0]
+    if t.sha.start_with? ARGV[0]
       git_tag = t
       break
     end
   }
+  if git_tag == nil
+    puts "Error: no tag for #{ARGV[0]} found"
+    exit 1
+  end
 end
 
 if (git_tag == nil)
