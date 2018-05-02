@@ -16,6 +16,7 @@ class VersionBump
     options.pre_release = false
     options.allow_dirty = false
     options.commit = true
+    options.commit_changelog = false
     options.tag = true
     options.push = true
     options.version = nil
@@ -37,6 +38,11 @@ class VersionBump
 
       opts.on('--[no-]allow-dirty', 'Whether to allow running on a dirty repo') do |allow_dirty|
         options.allow_dirty = allow_dirty
+      end
+
+      opts.on('--[no-]commit-cl', 'Whether to commit changelog changes with too') do |commit_changelog|
+        options.commit_changelog = commit_changelog
+        options.allow_dirty = true if commit_changelog
       end
 
       opts.on('--[no-]commit', 'Whether to commit changes') do |commit|
@@ -76,6 +82,14 @@ def check_if_dirty (options, git)
   if status.added.size + status.changed.size + status.deleted.size + status.untracked.size > 0
     puts "Repo is dirty"
     exit(1)
+  end
+end
+
+def add_changelog (options, git)
+  begin
+    git.add('changelogs/.')
+  rescue
+    puts "No changelogs found to commit"
   end
 end
 
@@ -179,6 +193,7 @@ end
 puts "Bumping to #{options.version}"
 write_version_to_files(options)
 
+add_changelog(options, git) if options.commit_changelog
 commit_changes(options, git) if options.commit
 tag_commit(options, git) if options.tag
 push_origin(git) if options.push
