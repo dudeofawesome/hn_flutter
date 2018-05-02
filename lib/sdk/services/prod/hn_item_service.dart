@@ -65,7 +65,7 @@ class HNItemServiceProd implements HNItemService {
             List<HNItemStatus> statusUpdates;
 
             if (accessCookie != null) {
-              statusUpdates = _parseAllItems(await _getItemPageById(id, accessCookie));
+              statusUpdates = _parseAllItems(await _getItemReplyPageById(id, accessCookie));
             }
 
             replyTo.send(statusUpdates);
