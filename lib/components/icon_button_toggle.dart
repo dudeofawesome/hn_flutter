@@ -61,8 +61,11 @@ class _IconButtonToggleState extends State<IconButtonToggle>
         });
       });
     this._colorTween =
-        new ColorTween(begin: widget.inactiveColor, end: widget.activeColor)
-          ..animate(this._animation);
+        new ColorTween(begin: widget.inactiveColor, end: widget.activeColor);
+
+    if (widget.value) {
+      this._controller.value = this._controller.upperBound;
+    }
   }
 
   @override
