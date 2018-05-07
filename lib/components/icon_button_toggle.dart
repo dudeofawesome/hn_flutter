@@ -56,7 +56,9 @@ class _IconButtonToggleState extends State<IconButtonToggle>
       parent: this._controller,
       curve: Curves.easeInOut,
     )..addListener(() {
-        // the state that has changed here is the animation object’s value
+        setState(() {
+          // the state that has changed here is the animation object’s value
+        });
       });
     this._colorTween =
         new ColorTween(begin: widget.inactiveColor, end: widget.activeColor)
