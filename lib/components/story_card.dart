@@ -213,7 +213,6 @@ class StoryCard extends StoreWatcher {
               inactiveColor: Colors.black,
               activeTooltip: 'Upvote',
               iconSize: 20.0,
-              disabled: storyStatus?.authTokens?.upvote == null,
               onChanged: (value) {
                 this._upvoteStory(context, storyStatus, account);
               },
@@ -225,7 +224,6 @@ class StoryCard extends StoreWatcher {
             //   inactiveColor: Colors.black,
             //   activeTooltip: 'Downvote',
             //   iconSize: 20.0,
-            //   disabled: storyStatus?.authTokens?.downvote == null,
             //   onChanged: (value) {
             //     this._downvoteStory(context, storyStatus, account);
             //   },
@@ -237,7 +235,6 @@ class StoryCard extends StoreWatcher {
               inactiveColor: Colors.black,
               activeTooltip: 'Save',
               iconSize: 20.0,
-              disabled: storyStatus?.authTokens?.save == null,
               onChanged: (value) {
                 this._saveStory(context, storyStatus, account);
               },
