@@ -72,6 +72,18 @@ class _IconButtonToggleState extends State<IconButtonToggle>
   }
 
   @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.value != oldWidget.value) {
+      if (widget.value)
+        this._controller.forward(from: this._controller.value);
+      else
+        this._controller.reverse(from: this._controller.value);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget icon = widget.value ? widget.activeIcon : widget.inactiveIcon;
     if (icon == null) icon = widget.activeIcon;
