@@ -36,7 +36,7 @@ class HNUser {
     this.created = map['created'];
     this.karma = map['karma'];
     this.about = map['about'];
-    this.submitted = map['submitted'];
+    this.submitted = (map['submitted'] as List)?.cast<int>();
 
     this.computed = new HNUserComputed.fromUser(this);
   }
