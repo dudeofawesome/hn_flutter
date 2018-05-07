@@ -17,6 +17,7 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 
+import 'package:hn_flutter/components/icon_button_toggle.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
 
 class StoryCard extends StoreWatcher {
@@ -205,33 +206,42 @@ class StoryCard extends StoreWatcher {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            new IconButton(
-              icon: const Icon(Icons.arrow_upward),
-              tooltip: 'Upvote',
+            new IconButtonToggle(
+              value: storyStatus?.upvoted,
+              activeIcon: const Icon(Icons.arrow_upward),
+              activeColor: Colors.orange,
+              inactiveColor: Colors.black,
+              activeTooltip: 'Upvote',
               iconSize: 20.0,
-              onPressed: account != null ?
-                () => _upvoteStory(context, storyStatus, account) :
-                null,
-              color: (storyStatus?.upvoted ?? false) ? Colors.orange : Colors.black,
+              disabled: storyStatus?.authTokens?.upvote == null,
+              onChanged: (value) {
+                this._upvoteStory(context, storyStatus, account);
+              },
             ),
-            // new IconButton(
-            //   icon: const Icon(Icons.arrow_downward),
-            //   tooltip: 'Downvote',
-            //   onPressed: _downvoteStory(context, storyStatus, account),
-            //   color: this.storyStatus.downvoted ? Colors.blue : Colors.black,
+            // new IconButtonToggle(
+            //   value: storyStatus?.downvoted,
+            //   activeIcon: const Icon(Icons.arrow_downward),
+            //   activeColor: Colors.blue,
+            //   inactiveColor: Colors.black,
+            //   activeTooltip: 'Downvote',
+            //   iconSize: 20.0,
+            //   disabled: storyStatus?.authTokens?.downvote == null,
+            //   onChanged: (value) {
+            //     this._downvoteStory(context, storyStatus, account);
+            //   },
             // ),
-            new IconButton(
-              icon: const Icon(Icons.star),
-              tooltip: 'Save',
+            new IconButtonToggle(
+              value: storyStatus?.saved,
+              activeIcon: const Icon(Icons.star),
+              activeColor: Colors.amber,
+              inactiveColor: Colors.black,
+              activeTooltip: 'Save',
               iconSize: 20.0,
-              onPressed: account != null ?
-                () => _saveStory(context, storyStatus, account) :
-                null,
-              color: (storyStatus?.saved ?? false) ? Colors.amber : Colors.black,
+              disabled: storyStatus?.authTokens?.save == null,
+              onChanged: (value) {
+                this._saveStory(context, storyStatus, account);
+              },
             ),
-            // new IconButton(
-            //   icon: const Icon(Icons.more_vert),
-            // ),
             new PopupMenuButton<OverflowMenuItems>(
               key: this._popupMenuButtonKey,
               icon: const Icon(
