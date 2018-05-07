@@ -94,6 +94,9 @@ class _IconButtonToggleState extends State<IconButtonToggle>
     return new IconButton(
       icon: icon,
       color: this._colorTween.evaluate(this._animation),
+      splashColor: widget.value
+          ? widget.activeColor.withOpacity(0.4)
+          : widget.inactiveColor.withOpacity(0.4),
       tooltip: tooltip,
       onPressed: !widget.disabled
           ? () {
