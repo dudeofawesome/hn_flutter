@@ -32,7 +32,7 @@ class IconButtonToggle extends StatefulWidget {
     this.inactiveIcon,
     this.activeTooltip,
     this.inactiveTooltip,
-    this.iconSize,
+    this.iconSize = 24.0,
   }) : super(key: key);
 
   @override
