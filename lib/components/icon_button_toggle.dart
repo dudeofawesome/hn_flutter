@@ -51,6 +51,7 @@ class _IconButtonToggleState extends State<IconButtonToggle>
     this._controller = new AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
+      value: widget.value ? 1.0 : 0.0,
     );
     this._animation = new CurvedAnimation(
       parent: this._controller,
@@ -62,10 +63,6 @@ class _IconButtonToggleState extends State<IconButtonToggle>
       });
     this._colorTween =
         new ColorTween(begin: widget.inactiveColor, end: widget.activeColor);
-
-    if (widget.value) {
-      this._controller.value = this._controller.upperBound;
-    }
   }
 
   @override
