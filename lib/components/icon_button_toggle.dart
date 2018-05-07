@@ -84,7 +84,7 @@ class _IconButtonToggleState extends State<IconButtonToggle>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     Widget icon = widget.value ? widget.activeIcon : widget.inactiveIcon;
     if (icon == null) icon = widget.activeIcon;
     String tooltip =
