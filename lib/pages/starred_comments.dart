@@ -5,14 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
+import 'package:hn_flutter/router.dart';
+
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
+import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/starred_items_tab.dart';
 
 class StarredCommentsPage extends StoreWatcher {
+  final bool showDrawer;
+
   StarredCommentsPage ({
     Key key,
+    this.showDrawer = true,
   }) : super(key: key);
 
   @override
@@ -33,12 +39,6 @@ class StarredCommentsPage extends StoreWatcher {
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
-          ? new IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          )
-          : null,
         title: new Text('Favorite Comments'),
         actions: <Widget>[
           new PopupMenuButton<_OverflowMenuItems>(
@@ -59,6 +59,11 @@ class StarredCommentsPage extends StoreWatcher {
 
         ],
       ),
+      drawer: this.showDrawer
+        ? new Builder(builder: (context) {
+          return new MainDrawer(MainPageSubPages.STARRED_COMMENTS, Scaffold.of(context));
+        })
+        : null,
       body: new StarredItemsTab(
         userId: accountStore.primaryAccountId,
         showComments: true,

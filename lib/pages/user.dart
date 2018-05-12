@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
+import 'package:hn_flutter/router.dart';
 import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
+import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/services/hn_user_service.dart';
 
+import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/user_about_tab.dart';
 import 'package:hn_flutter/components/user_comments_tab.dart';
 import 'package:hn_flutter/components/user_submitted_tab.dart';
@@ -16,15 +19,19 @@ import 'package:hn_flutter/components/user_submitted_tab.dart';
 class UserPage extends StoreWatcher {
   final HNUserService _hnUserService = new Injector().hnUserService;
 
+  /// the HN user id to view. `null` will show the logged in user's page
   final String userId;
+  final bool showDrawer;
 
   UserPage ({
     Key key,
     @required this.userId,
+    this.showDrawer = false,
   }) : super(key: key);
 
   @override
   void initStores(ListenToStore listenToStore) {
+    listenToStore(accountStoreToken);
     listenToStore(userStoreToken);
   }
 
@@ -44,11 +51,15 @@ class UserPage extends StoreWatcher {
     // than having to individually change instances of widgets.
 
     final HNUserStore userStore = stores[userStoreToken];
-    final user = userStore.users[this.userId];
+    final HNAccountStore accountStore = stores[accountStoreToken];
+
+    final userId = this.userId ?? accountStore.primaryAccountId;
+
+    final user = userStore.users[userId];
 
     if (user == null) {
       print('getting user $userId');
-      this._hnUserService.getUserByID(this.userId);
+      this._hnUserService.getUserByID(userId);
     }
 
     return new DefaultTabController(
@@ -57,13 +68,7 @@ class UserPage extends StoreWatcher {
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
-            ? new IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            )
-            : null,
-          title: new Text(user?.id ?? this.userId),
+          title: new Text(userId),
           actions: <Widget>[
             // new IconButton(
             //   icon: const Icon(Icons.star_border),
@@ -82,7 +87,7 @@ class UserPage extends StoreWatcher {
               onSelected: (_OverflowMenuItems selection) async {
                 switch (selection) {
                   case _OverflowMenuItems.SHARE:
-                    return await this._shareUser(user.id);
+                    return await this._shareUser(userId);
                 }
               },
             ),
@@ -96,6 +101,11 @@ class UserPage extends StoreWatcher {
             )).toList(),
           ),
         ),
+        drawer: this.showDrawer
+          ? new Builder(builder: (context) {
+            return new MainDrawer(MainPageSubPages.PROFILE, Scaffold.of(context));
+          })
+          : null,
         body: new TabBarView(
           children: <Widget>[
             new UserAboutTab(user),

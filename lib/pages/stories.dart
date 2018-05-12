@@ -7,6 +7,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:hn_flutter/router.dart';
 
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
+import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/story_card.dart';
 
 import 'package:hn_flutter/injection/di.dart';
@@ -16,8 +17,11 @@ import 'package:hn_flutter/sdk/stores/ui_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 
 class StoriesPage extends StatefulWidget {
+  final bool showDrawer;
+
   StoriesPage ({
     Key key,
+    this.showDrawer = true,
   }) : super(key: key);
 
   @override
@@ -160,10 +164,6 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
         flexibleSpace: new GestureDetector(
           onTap: () => this._scrollToTop(),
         ),
-        leading: new IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
         actions: <Widget>[
           new IconButton(
             icon: const Icon(Icons.refresh),
@@ -206,6 +206,11 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
           ),
         ],
       ),
+      drawer: widget.showDrawer
+        ? new Builder(builder: (context) {
+          return new MainDrawer(MainPageSubPages.STORIES, Scaffold.of(context));
+        })
+        : null,
       body: stories.length > 0 ?
         new RefreshIndicator(
           key: this._refreshIndicatorKey,

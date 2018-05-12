@@ -5,14 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:share/share.dart';
 
+import 'package:hn_flutter/router.dart';
+
 import 'package:hn_flutter/sdk/stores/hn_user_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 
+import 'package:hn_flutter/components/main_drawer.dart';
 import 'package:hn_flutter/components/upvoted_items_tab.dart';
 
 class VotedCommentsPage extends StoreWatcher {
+  final bool showDrawer;
+
   VotedCommentsPage ({
     Key key,
+    this.showDrawer = true,
   }) : super(key: key);
 
   @override
@@ -42,12 +48,6 @@ class VotedCommentsPage extends StoreWatcher {
         appBar: new AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
-          leading: (context.ancestorWidgetOfExactType(Scaffold) != null)
-            ? new IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            )
-            : null,
           title: new Text(
             (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
               ? 'Upvoted'
@@ -81,6 +81,11 @@ class VotedCommentsPage extends StoreWatcher {
             )
             : null,
         ),
+        drawer: this.showDrawer
+          ? new Builder(builder: (context) {
+            return new MainDrawer(MainPageSubPages.VOTED_COMMENTS, Scaffold.of(context));
+          })
+          : null,
         body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
           ? new TabBarView(
             children: <Widget>[

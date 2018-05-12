@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -7,11 +5,9 @@ import 'package:hn_flutter/router.dart';
 
 import 'package:hn_flutter/injection/di.dart';
 
-Future<Null> main () async {
+void main () {
   Injector.configure(Flavor.PROD);
-  await new Injector().init();
-
-  runApp(new HNApp());
+  new Injector().init().then((_) => runApp(new HNApp()));
 }
 
 class HNApp extends StatefulWidget {
