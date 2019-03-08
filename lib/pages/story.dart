@@ -8,7 +8,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
 import 'package:share/share.dart';
-import 'package:throttle_debounce/throttle_debounce.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 import 'package:tuple/tuple.dart';
 
@@ -46,6 +46,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   HNItemStore _itemStore;
 
   ScrollController _scrollController;
+  BehaviorSubject<Tuple2<int, double>> _scrollPosSubject;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
     new GlobalKey<RefreshIndicatorState>();
   final _popupMenuButtonKey = new GlobalKey();
@@ -61,15 +62,20 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
       initialScrollOffset: new UIStore().storyScrollPos[widget.itemId] ?? 0.0,
     );
 
-    final debouncer = new Debouncer(const Duration(milliseconds: 250), (List args) {
-      setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
-    }, []);
+    this._scrollPosSubject = BehaviorSubject<Tuple2<int, double>>()
+      ..debounce(Duration(milliseconds: 250)).listen((pos) => setStoryScrollPos(pos));
 
     this._scrollController.addListener(() {
-      debouncer.debounce();
+      this._scrollPosSubject.add(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
     });
 
     this._refreshStory(cookie: _accountStore.primaryAccount?.accessCookie);
+  }
+
+  @override
+  void dispose () {
+    super.dispose();
+    this._scrollPosSubject.close();
   }
 
   Future<Null> _scrollToTop () async {
@@ -500,7 +506,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
   }
 
   Future<Null> _shareStory (String storyUrl) async {
-    await share(storyUrl);
+    await Share.share(storyUrl);
   }
 
   Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {

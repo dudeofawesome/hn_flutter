@@ -28,7 +28,7 @@ class StarredStoriesPage extends StoreWatcher {
   }
 
   Future<Null> _share (String userId) async {
-    await share('https://news.ycombinator.com/favorites?id=$userId');
+    await Share.share('https://news.ycombinator.com/favorites?id=$userId');
   }
 
   @override

@@ -105,7 +105,7 @@ class StoryCard extends StoreWatcher {
   }
 
   Future<Null> _shareStory (String storyUrl) async {
-    await share(storyUrl);
+    await Share.share(storyUrl);
   }
 
   void _hideStory () {

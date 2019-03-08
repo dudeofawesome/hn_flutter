@@ -88,6 +88,8 @@ class HNItemServiceProd implements HNItemService {
         case _IsolateMessageType.DESTRUCT:
           port.close();
           break;
+        default:
+          throw 'Looks like there was an unexpected _IsolateMessageType value';
       }
     }
   }

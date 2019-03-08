@@ -36,7 +36,7 @@ class UserPage extends StoreWatcher {
   }
 
   Future<Null> _shareUser (String userId) async {
-    await share('https://news.ycombinator.com/user?id=$userId');
+    await Share.share('https://news.ycombinator.com/user?id=$userId');
   }
 
   void _saveUser () {}

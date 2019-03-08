@@ -8,6 +8,7 @@ ios/.generated/
 packages
 .flutter-plugins
 .dart_tool
+*.back
 
 # keystores
 **/*.jks

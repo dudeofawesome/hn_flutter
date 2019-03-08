@@ -132,7 +132,7 @@ class _CommentState extends State<Comment>
       print(parentStory.id);
       parentStory = items[parentStory.parent];
     }
-    await share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
+    await Share.share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
   Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {

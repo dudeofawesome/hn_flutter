@@ -34,7 +34,7 @@ class _ImagePreviewState extends State<ImagePreview> {
   }
 
   Future<Null> _shareImage () async {
-    await share(widget.imageUrl);
+    await Share.share(widget.imageUrl);
   }
 
   Future<Null> _download () async {}
