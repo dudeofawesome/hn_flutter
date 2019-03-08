@@ -40,6 +40,10 @@ class SettingsPageState extends State<SettingsPage> {
       ),
       body: new ListView(
         children: <Widget>[
+          new AboutListTile(
+            applicationName: 'Butterfly Reader',
+            applicationVersion: this._packageVersion,
+          ),
           new ListTile(
             title: const Text('Version'),
             subtitle: new Text(this._packageVersion),
