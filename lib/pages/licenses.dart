@@ -22,7 +22,7 @@ class LicensePageState extends State<LicensesPage> {
     super.initState();
     rootBundle
         .loadString('assets/strings/licenses.json')
-        .then((input) => json.decode(input).retype<String, String>())
+        .then((input) => Map<String, String>.from(json.decode(input)))
         .then((licenses) {
       setState(() {
         this.licenses = licenses;
