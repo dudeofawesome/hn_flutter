@@ -48,6 +48,29 @@ class HNUserServiceProd implements HNUserService {
             replyTo.send(user);
           });
           break;
+        case _IsolateMessageType.GET_USER_BY_ID_FROM_SITE:
+          // return http.get('${_config.apiHost}/user?id=$id')
+          //   .then((res) {
+          //     if (res.statusCode != 200) throw 'User "$id" not found';
+          //     return res.body;
+          //   })
+          //   .then((body) {
+          //     if (body == 'No such user.') throw 'User "$id" not found';
+          //     else {
+          //       final created = (DateTime.parse(_createdRegExp.firstMatch(body)?.group(1)).millisecondsSinceEpoch / 1000).round();
+          //       final karma = int.parse(_karmaRegExp.firstMatch(body)?.group(1) ?? '1');
+          //       final about = _aboutRegExp.firstMatch(body)?.group(1);
+
+          //       return new HNUser(
+          //         id: id,
+          //         created: created,
+          //         karma: karma,
+          //         about: about,
+          //         submitted: [],
+          //       );
+          //     }
+          //   });
+          break;
         case _IsolateMessageType.DESTRUCT:
           port.close();
           break;
@@ -165,5 +188,6 @@ class _IsolateMessage {
 
 enum _IsolateMessageType {
   GET_USER_BY_ID,
+  GET_USER_BY_ID_FROM_SITE,
   DESTRUCT,
 }
