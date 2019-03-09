@@ -269,11 +269,12 @@ class _MainDrawerState extends State<MainDrawer>
     return menuItems;
   }
 
-  void _closeDrawer (BuildContext ctx) {
-    final scaffold = Scaffold.of(ctx);
-    if (scaffold.hasDrawer) {
-      final DrawerControllerState drawer = ctx.ancestorStateOfType(new TypeMatcher<DrawerControllerState>());
-      drawer?.close();
+  void _closeDrawer(BuildContext ctx) {
+    if (widget.scaffold.hasDrawer) {
+      // DrawerControllerState drawerController = widget.scaffold.context
+      //       .ancestorStateOfType(new TypeMatcher<DrawerControllerState>());
+      // drawerController.close();
+      Navigator.of(ctx).pop();
     }
   }
 
