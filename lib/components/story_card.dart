@@ -160,8 +160,135 @@ class StoryCard extends StoreWatcher {
 
     final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
-    final titleColumn = new Padding(
-      padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
+    List<Widget> cardContent;
+    if (story.url != null) {
+      cardContent = <Widget>[
+        new InkWell(
+          onTap: () => this._openStoryUrl(context, story.url),
+          child: new Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: <Widget>[
+              // new Image.network(
+              //   this.story.computed.imageUrl,
+              //   fit: BoxFit.cover,
+              // ),
+              new Container(
+                decoration: new BoxDecoration(
+                  color: const Color.fromRGBO(0, 0, 0, 0.5),
+                ),
+                width: double.infinity,
+                child: new Padding(
+                  padding: new EdgeInsets.all(8.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Text(
+                        story.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      new Text(
+                        story.url ?? 'NO story.url FOUND!',
+                        style: linkOverlayText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        story.type != 'job' ?
+          _buildTitleColumn(context, story, storyStatus) :
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Expanded(child:_buildTitleColumn(context, story, storyStatus)), this._buildOverflowButton(context, story, storyStatus)
+            ],
+          ),
+        story.type != 'job' ?
+          _buildBottomRow(context, story, storyStatus, account) :
+          Container(),
+      ];
+    } else if (story.text != null) {
+      cardContent = <Widget>[
+        _buildTitleColumn(context, story, storyStatus),
+        new Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+          child: new SimpleMarkdown(story.computed.markdown),
+        ),
+        _buildBottomRow(context, story, storyStatus, account),
+      ];
+    } else {
+      cardContent = <Widget>[
+        _buildTitleColumn(context, story, storyStatus),
+        _buildBottomRow(context, story, storyStatus, account),
+      ];
+    }
+
+    return new Padding(
+      padding: cardOuterPadding,
+      child: new Card(
+        child: new InkWell(
+          onTap: () => this._openStory(context),
+          onLongPress: () => this._showOverflowMenu(context),
+          child: new DefaultTextStyle(
+            style: Theme.of(context).textTheme.body1.copyWith(
+              color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),
+            ),
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: cardContent
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverflowButton (BuildContext context, HNItem story, HNItemStatus storyStatus) {
+    return new PopupMenuButton<OverflowMenuItems>(
+      key: this._popupMenuButtonKey,
+      icon: const Icon(
+        Icons.more_horiz,
+        size: 20.0
+      ),
+      itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
+        const PopupMenuItem<OverflowMenuItems>(
+          value: OverflowMenuItems.SHARE,
+          child: const Text('Share'),
+        ),
+        new PopupMenuItem<OverflowMenuItems>(
+          value: OverflowMenuItems.HIDE,
+          child: const Text('Hide'),
+          enabled: storyStatus?.authTokens?.hide != null,
+        ),
+        const PopupMenuItem<OverflowMenuItems>(
+          value: OverflowMenuItems.VIEW_PROFILE,
+          child: const Text('View Profile'),
+        ),
+      ],
+      onSelected: (OverflowMenuItems selection) async {
+        switch (selection) {
+          case OverflowMenuItems.HIDE:
+            return this._hideStory();
+          case OverflowMenuItems.SHARE:
+            return await this._shareStory('https://news.ycombinator.com/item?id=${story.id}');
+          case OverflowMenuItems.VIEW_PROFILE:
+            return this._viewProfile(context, story.by);
+        }
+      },
+    );
+  }
+
+  Widget _buildTitleColumn (BuildContext context, HNItem story, HNItemStatus storyStatus) {
+    final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
+
+    return Padding(
+      padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, story.type != 'job' ? 0.0 : 8.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -186,8 +313,10 @@ class StoryCard extends StoreWatcher {
         ],
       ),
     );
+  }
 
-    final bottomRow = new Row(
+  Widget _buildBottomRow (BuildContext context, HNItem story, HNItemStatus storyStatus, HNAccount account) {
+    return Row(
       children: <Widget>[
         new Expanded(
           child: new Padding(
@@ -239,119 +368,10 @@ class StoryCard extends StoreWatcher {
                 this._saveStory(context, storyStatus, account);
               },
             ),
-            new PopupMenuButton<OverflowMenuItems>(
-              key: this._popupMenuButtonKey,
-              icon: const Icon(
-                Icons.more_horiz,
-                size: 20.0
-              ),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-                const PopupMenuItem<OverflowMenuItems>(
-                  value: OverflowMenuItems.SHARE,
-                  child: const Text('Share'),
-                ),
-                new PopupMenuItem<OverflowMenuItems>(
-                  value: OverflowMenuItems.HIDE,
-                  child: const Text('Hide'),
-                  enabled: storyStatus?.authTokens?.hide != null,
-                ),
-                const PopupMenuItem<OverflowMenuItems>(
-                  value: OverflowMenuItems.VIEW_PROFILE,
-                  child: const Text('View Profile'),
-                ),
-              ],
-              onSelected: (OverflowMenuItems selection) async {
-                switch (selection) {
-                  case OverflowMenuItems.HIDE:
-                    return this._hideStory();
-                  case OverflowMenuItems.SHARE:
-                    return await this._shareStory('https://news.ycombinator.com/item?id=${story.id}');
-                  case OverflowMenuItems.VIEW_PROFILE:
-                    return this._viewProfile(context, story.by);
-                }
-              },
-            ),
+            _buildOverflowButton(context, story, storyStatus),
           ],
         ),
       ],
-    );
-
-    List<Widget> cardContent;
-    if (story.url != null) {
-      cardContent = <Widget>[
-        new InkWell(
-          onTap: () => this._openStoryUrl(context, story.url),
-          child: new Stack(
-            alignment: AlignmentDirectional.bottomStart,
-            children: <Widget>[
-              // new Image.network(
-              //   this.story.computed.imageUrl,
-              //   fit: BoxFit.cover,
-              // ),
-              new Container(
-                decoration: new BoxDecoration(
-                  color: const Color.fromRGBO(0, 0, 0, 0.5),
-                ),
-                width: double.infinity,
-                child: new Padding(
-                  padding: new EdgeInsets.all(8.0),
-                  child: new Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      new Text(
-                        story.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      new Text(
-                        story.url ?? 'NO story.url FOUND!',
-                        style: linkOverlayText,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        titleColumn,
-        bottomRow,
-      ];
-    } else if (story.text != null) {
-      cardContent = <Widget>[
-        titleColumn,
-        new Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-          child: new SimpleMarkdown(story.computed.markdown),
-        ),
-        bottomRow,
-      ];
-    } else {
-      cardContent = <Widget>[
-        titleColumn,
-        bottomRow,
-      ];
-    }
-
-    return new Padding(
-      padding: cardOuterPadding,
-      child: new Card(
-        child: new InkWell(
-          onTap: () => this._openStory(context),
-          onLongPress: () => this._showOverflowMenu(context),
-          child: new DefaultTextStyle(
-            style: Theme.of(context).textTheme.body1.copyWith(
-              color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),
-            ),
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: cardContent
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
