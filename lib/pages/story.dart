@@ -24,7 +24,7 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
-import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/components/html_text.dart';
 import 'package:hn_flutter/components/icon_button_toggle.dart';
 
 class StoryPage extends StatefulWidget {
@@ -315,7 +315,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
               titleColumn,
               new Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-                child: new SimpleMarkdown(item.computed.markdown),
+                child: new HTMLText(item.text),
               ),
               bottomRow,
             ],

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:hn_flutter/sdk/models/hn_user.dart';
 
 import 'package:hn_flutter/components/icon_text.dart';
-import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/components/html_text.dart';
 
 class UserAboutTab extends StatelessWidget {
   final HNUser user;
@@ -34,7 +34,7 @@ class UserAboutTab extends StatelessWidget {
             ),
             user != null ?
               user.computed.aboutMarkdown != null ?
-                new SimpleMarkdown(user.computed.aboutMarkdown) :
+                new HTMLText(user.about) :
                 new Container() :
               const Padding(
                 padding: const EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 16.0),

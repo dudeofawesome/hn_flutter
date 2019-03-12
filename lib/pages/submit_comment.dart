@@ -10,7 +10,7 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 import 'package:hn_flutter/components/hn_editor.dart';
-import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/components/html_text.dart';
 
 class SubmitCommentPage extends StatefulWidget {
   final _formKey = new GlobalKey<FormState>();
@@ -127,7 +127,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              new SimpleMarkdown(parent.computed.markdown),
+                              new HTMLText(parent.text),
                             ],
                           ),
                         ),

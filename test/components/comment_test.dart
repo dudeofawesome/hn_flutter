@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:hn_flutter/components/comment.dart';
-import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/components/html_text.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 import 'package:hn_flutter/injection/di.dart';
@@ -55,7 +55,7 @@ void main() {
     await tester.pump();
 
     // Verify that our counter has incremented.
-    expect(find.byType(SimpleMarkdown), findsNothing);
+    expect(find.byType(HTMLText), findsNothing);
     expect(find.text('Loading…'), findsOneWidget);
     expect(find.text('Load more'), findsNothing);
 
@@ -80,7 +80,7 @@ void main() {
     await tester.pump();
 
     // Verify that our counter has incremented.
-    expect(find.byType(SimpleMarkdown), findsNothing);
+    expect(find.byType(HTMLText), findsNothing);
     expect(find.byType(Container), findsOneWidget);
 
     // update HN item with ID 1
@@ -102,7 +102,7 @@ void main() {
     await tester.pump();
 
     // Verify that our counter has incremented.
-    expect(find.byType(SimpleMarkdown), findsOneWidget);
+    expect(find.byType(HTMLText), findsOneWidget);
     expect(find.text('Loading…'), findsNothing);
     expect(find.text('Load more'), findsNothing);
   });

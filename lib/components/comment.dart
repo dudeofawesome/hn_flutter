@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
-// import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
@@ -18,7 +17,7 @@ import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/sdk/models/hn_account.dart';
 
-import 'package:hn_flutter/components/simple_markdown.dart';
+import 'package:hn_flutter/components/html_text.dart';
 
 class Comment extends StatefulWidget {
   final int itemId;
@@ -266,8 +265,8 @@ class _CommentState extends State<Comment>
 
       final content = new Padding(
         padding: new EdgeInsets.only(top: comment.computed.markdown == null ? 0.0 : 4.0),
-        child: comment.computed.markdown != null ?
-          new SimpleMarkdown(comment.computed.markdown) :
+        child: comment.text != null ?
+          new HTMLText(comment.text) :
           commentStatus.loading ? const Text('Loading…') : const Text('[deleted]'),
       );
 
