@@ -26,6 +26,7 @@ import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/html_text.dart';
 import 'package:hn_flutter/components/icon_button_toggle.dart';
+import 'package:hn_flutter/components/story_header.dart';
 
 class StoryPage extends StatefulWidget {
   final int itemId;
@@ -350,7 +351,7 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ],
       ),
-      child: cardContent,
+      child: StoryHeader(storyId: widget.itemId),
     );
 
     // final comments = item.kids != null ?
