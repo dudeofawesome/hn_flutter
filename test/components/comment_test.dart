@@ -68,7 +68,7 @@ void main() {
       score: 61,
       time: new DateTime.fromMillisecondsSinceEpoch(1160418111),
       title: 'Y Combinator',
-      type: 'story',
+      type: HNItemType.STORY,
       url: 'http://ycombinator.com',
     ));
     patchItemStatus(new HNItemStatus.patch(
@@ -91,7 +91,7 @@ void main() {
       parent: 1,
       text: '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
       time: new DateTime.fromMillisecondsSinceEpoch(1160423461),
-      type: 'comment',
+      type: HNItemType.COMMENT,
     ));
     patchItemStatus(new HNItemStatus(
       id: 1,

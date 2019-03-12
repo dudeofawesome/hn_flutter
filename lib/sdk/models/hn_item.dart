@@ -10,8 +10,8 @@ class HNItem {
   bool deleted;
   /// `true` if the item is dead.
   bool dead;
-  /// The type of item. One of `"job"`, `"story"`, `"comment"`, `"poll"`, or `"pollopt"`.
-  String type;
+  /// The type of item.
+  HNItemType type;
   /// The title of the story, poll or job.
   String title;
   /// The URL of the story.
@@ -64,7 +64,25 @@ class HNItem {
     this.id = map['id'];
     this.deleted = map['deleted'];
     this.dead = map['dead'];
-    this.type = map['type'];
+    switch(map['type']) {
+      case 'job':
+        this.type = HNItemType.JOB;
+        break;
+      case 'story':
+        this.type = HNItemType.STORY;
+        break;
+      case 'comment':
+        this.type = HNItemType.COMMENT;
+        break;
+      case 'poll':
+        this.type = HNItemType.POLL;
+        break;
+      case 'pollopt':
+        this.type = HNItemType.POLLOPT;
+        break;
+      default:
+        throw 'Unknown HNItem type from map';
+    }
     this.title = map['title'];
     this.url = map['url'];
     this.text = map['text'];
@@ -212,4 +230,8 @@ class HNItemComputed {
       this.simpleText = this.markdown;
     }
   }
+}
+
+enum HNItemType {
+  JOB, STORY, COMMENT, POLL, POLLOPT
 }

@@ -7,6 +7,7 @@ import 'package:flutter_flux/flutter_flux.dart';
 import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
+import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 import 'package:hn_flutter/components/hn_editor.dart';
 import 'package:hn_flutter/components/simple_markdown.dart';
@@ -97,7 +98,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
           bottom: true,
           child: new Column(
             children: <Widget>[
-              parent.type == 'comment'
+              parent.type == HNItemType.COMMENT
                 ? new Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                   child: new Column(

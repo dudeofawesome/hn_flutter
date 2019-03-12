@@ -128,7 +128,7 @@ class _CommentState extends State<Comment>
 
   Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
     HNItem parentStory = items[comment.parent];
-    while (parentStory.type == 'comment') {
+    while (parentStory.type == HNItemType.COMMENT) {
       print(parentStory.id);
       parentStory = items[parentStory.parent];
     }
@@ -179,7 +179,7 @@ class _CommentState extends State<Comment>
     }
 
     if (comment != null) {
-      if (comment.type != null && comment.type != 'comment') {
+      if (comment.type != null && comment.type != HNItemType.COMMENT) {
         return new Container();
       }
 

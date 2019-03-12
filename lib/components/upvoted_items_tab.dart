@@ -10,6 +10,7 @@ import 'package:hn_flutter/injection/di.dart';
 import 'package:hn_flutter/sdk/services/abstract/hn_user_service.dart';
 import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
+import 'package:hn_flutter/sdk/models/hn_item.dart';
 
 import 'package:hn_flutter/components/story_card.dart';
 import 'package:hn_flutter/components/comment.dart';
@@ -70,9 +71,9 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
           return true;
         } else if (this._hnItemStore.items[itemStatus.id] != null) {
           if (widget.showStories) {
-            return this._hnItemStore.items[itemStatus.id]?.type == 'story';
+            return this._hnItemStore.items[itemStatus.id]?.type == HNItemType.STORY;
           } else if (widget.showComments) {
-            return this._hnItemStore.items[itemStatus.id]?.type == 'comment';
+            return this._hnItemStore.items[itemStatus.id]?.type == HNItemType.COMMENT;
           }
         }
         return true;
@@ -86,7 +87,7 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
           ? new ListView.builder(
             itemCount: upvotedItems.length,
             itemBuilder: (context, index) =>
-              (this._hnItemStore.items[upvotedItems[index].id]?.type == 'story')
+              (this._hnItemStore.items[upvotedItems[index].id]?.type == HNItemType.STORY)
                 ? new StoryCard(
                   storyId: upvotedItems[index].id,
                 )
