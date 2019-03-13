@@ -2,7 +2,7 @@
 
 # Install Flutter version specified in pubspec
 
-git clone https://github.com/flutter/flutter.git -b beta
+git clone https://github.com/flutter/flutter.git -b dev
 export FLUTTER_HOME=`pwd`/flutter
 export PATH=`pwd`/flutter/bin:$PATH
 FLUTTER_VERSION=$(dart dev/bots/ci/get-flutter-version.dart)
