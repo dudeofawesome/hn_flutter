@@ -31,7 +31,7 @@ class HNAuthServiceProd implements HNAuthService {
     return req.close()
       .then((res) {
         if (
-          (res.statusCode == HttpStatus.OK || res.statusCode == HttpStatus.MOVED_TEMPORARILY) &&
+          (res.statusCode == HttpStatus.ok || res.statusCode == HttpStatus.movedTemporarily) &&
           res.cookies.firstWhere((cookie) => cookie.name == 'user') != null
         ) {
           return res;
