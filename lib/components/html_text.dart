@@ -54,7 +54,6 @@ class HTMLText extends StatelessWidget {
 
   @override
   Widget build (BuildContext context) {
-    // final theme = Theme.of(context);
     // final styleSheet = new MarkdownStyleSheet.fromTheme(theme).copyWith(
     //   blockquoteDecoration: new BoxDecoration(
     //     color: Colors.grey.withOpacity(0.5),
@@ -62,13 +61,6 @@ class HTMLText extends StatelessWidget {
     //   ),
     // );
 
-    // return new MarkdownBody(
-    //   data: this.data,
-    //   styleSheet: styleSheet,
-    //   onTapLink: (url) {
-    //     this._openLink(context, url);
-    //   },
-    // );
     return Html(
       data: this.data,
       useRichText: true,

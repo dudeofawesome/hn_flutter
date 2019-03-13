@@ -222,7 +222,7 @@ class HNItemComputed {
   HNItemComputed.fromItem (HNItem item) {
     if (item.url != null) {
       this.urlHostname = Uri.parse(item.url).host;
-      this.imageUrl;
+      // this.imageUrl;
     }
 
     if (item.text != null) {

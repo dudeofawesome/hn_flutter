@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 import 'package:hn_flutter/components/simple_markdown.dart';
-import 'package:hn_flutter/utils/dedent.dart';
 
 class LicensesPage extends StatefulWidget {
   LicensesPage({Key key}) : super(key: key);
