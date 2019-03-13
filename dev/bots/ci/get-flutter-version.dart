@@ -13,7 +13,7 @@ main() async {
   final String requiredFlutter = pubspec['environment']['flutter'];
 
   final tags = await Process
-      .run('git', ['tag', '--merged', 'beta'],
+      .run('git', ['tag', '--merged', 'dev'],
           workingDirectory: Platform.environment['FLUTTER_HOME'])
       .then<String>((res) => res.stdout)
       .then<List<String>>((stdout) => stdout.split('\n'))
