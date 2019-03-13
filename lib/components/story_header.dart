@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
@@ -252,6 +253,10 @@ class StoryHeader extends StoreWatcher {
           enabled: storyStatus?.authTokens?.hide != null,
         ),
         const PopupMenuItem<OverflowMenuItems>(
+          value: OverflowMenuItems.COPY_TEXT,
+          child: const Text('Copy Text'),
+        ),
+        const PopupMenuItem<OverflowMenuItems>(
           value: OverflowMenuItems.VIEW_PROFILE,
           child: const Text('View Profile'),
         ),
@@ -262,6 +267,8 @@ class StoryHeader extends StoreWatcher {
             return this._hideStory();
           case OverflowMenuItems.SHARE:
             return await this._shareStory('https://news.ycombinator.com/item?id=${story.id}');
+          case OverflowMenuItems.COPY_TEXT:
+            return await Clipboard.setData(new ClipboardData(text: story.computed.simpleText));
           case OverflowMenuItems.VIEW_PROFILE:
             return this._viewProfile(context, story.by);
         }
@@ -362,7 +369,8 @@ class StoryHeader extends StoreWatcher {
 }
 
 enum OverflowMenuItems {
-  HIDE,
   SHARE,
+  HIDE,
+  COPY_TEXT,
   VIEW_PROFILE,
 }
