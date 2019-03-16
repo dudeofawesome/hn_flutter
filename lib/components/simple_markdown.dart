@@ -5,33 +5,34 @@ import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
-import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
-import 'package:flutter_markdown/flutter_markdown.dart' show MarkdownBody, MarkdownStyleSheet;
+import 'package:flutter_web_browser/flutter_web_browser.dart'
+    show FlutterWebBrowser;
+import 'package:flutter_markdown/flutter_markdown.dart'
+    show MarkdownBody, MarkdownStyleSheet;
 
 import 'package:hn_flutter/components/image_preview.dart';
 
 class SimpleMarkdown extends StatelessWidget {
   final String data;
 
-  SimpleMarkdown (
-    this.data,
-    {
-      Key key,
-    }
-  ) : super(key: key);
+  SimpleMarkdown(
+    this.data, {
+    Key key,
+  }) : super(key: key);
 
-  _openLink (BuildContext ctx, String url) async {
+  _openLink(BuildContext ctx, String url) async {
     if (await UrlLauncher.canLaunch(url)) {
       if (await this._isImage(url)) {
         print('''That's an image!!!''');
         this._showImage(ctx, url);
       } else {
-        await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
+        await FlutterWebBrowser.openWebPage(
+            url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
       }
     }
   }
 
-  Future<bool> _isImage (String url) async {
+  Future<bool> _isImage(String url) async {
     final head = await http.head(url);
 
     String contentType;
@@ -45,7 +46,7 @@ class SimpleMarkdown extends StatelessWidget {
     return contentType != null && contentType.startsWith('image/');
   }
 
-  void _showImage (BuildContext ctx, String url) {
+  void _showImage(BuildContext ctx, String url) {
     showOverlay(
       context: ctx,
       imageUrl: url,
@@ -53,7 +54,7 @@ class SimpleMarkdown extends StatelessWidget {
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final styleSheet = new MarkdownStyleSheet.fromTheme(theme).copyWith(
       blockquoteDecoration: new BoxDecoration(

@@ -15,16 +15,17 @@ import 'package:hn_flutter/components/comment.dart';
 class StarredCommentsTab extends StatefulWidget {
   final String userId;
 
-  const StarredCommentsTab (
+  const StarredCommentsTab(
     this.userId, {
     Key key,
   }) : super(key: key);
 
   @override
-  createState () => new _StarredCommentsTabState();
+  createState() => new _StarredCommentsTabState();
 }
 
-class _StarredCommentsTabState extends State<StarredCommentsTab> with StoreWatcherMixin<StarredCommentsTab> {
+class _StarredCommentsTabState extends State<StarredCommentsTab>
+    with StoreWatcherMixin<StarredCommentsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
@@ -32,7 +33,7 @@ class _StarredCommentsTabState extends State<StarredCommentsTab> with StoreWatch
   bool _loading = false;
 
   @override
-  initState () {
+  initState() {
     super.initState();
     this._hnItemStore = listenToStore(itemStoreToken);
     this._hnAccountStore = listenToStore(accountStoreToken);
@@ -41,38 +42,44 @@ class _StarredCommentsTabState extends State<StarredCommentsTab> with StoreWatch
     this._refresh();
   }
 
-  Future<Null> _refresh () async {
-    await this._hnUserService.getSavedByUserID(widget.userId, false, this._hnAccountStore.primaryAccount.accessCookie);
+  Future<Null> _refresh() async {
+    await this._hnUserService.getSavedByUserID(
+        widget.userId, false, this._hnAccountStore.primaryAccount.accessCookie);
     setState(() => this._loading = false);
   }
 
   @override
-  Widget build (BuildContext context) {
-    final starredStories = this._hnItemStore.itemStatuses.values
-      .where((itemStatus) => itemStatus.saved);
+  Widget build(BuildContext context) {
+    final starredStories = this
+        ._hnItemStore
+        .itemStatuses
+        .values
+        .where((itemStatus) => itemStatus.saved);
 
     return (!this._loading)
-      ? new Scrollbar(
-        child: starredStories.length > 0
-          ? new ListView(
-            children: starredStories.map((itemStatus) => new Comment(
-              itemId: itemStatus.id,
-              loadChildren: false,
-              buttons: <BarButtons>[
-                BarButtons.VIEW_CONTEXT,
-                BarButtons.SAVE,
-                BarButtons.SHARE,
-                BarButtons.COPY_TEXT,
-              ],
-              overflowButtons: <BarButtons>[],
-            ))?.toList(),
+        ? new Scrollbar(
+            child: starredStories.length > 0
+                ? new ListView(
+                    children: starredStories
+                        .map((itemStatus) => new Comment(
+                              itemId: itemStatus.id,
+                              loadChildren: false,
+                              buttons: <BarButtons>[
+                                BarButtons.VIEW_CONTEXT,
+                                BarButtons.SAVE,
+                                BarButtons.SHARE,
+                                BarButtons.COPY_TEXT,
+                              ],
+                              overflowButtons: <BarButtons>[],
+                            ))
+                        ?.toList(),
+                  )
+                : new Center(
+                    child: new Text('No submissions'),
+                  ),
           )
-          : new Center(
-            child: new Text('No submissions'),
-          ),
-      )
-      : new Center(
-        child: new CircularProgressIndicator(),
-      );
+        : new Center(
+            child: new CircularProgressIndicator(),
+          );
   }
 }

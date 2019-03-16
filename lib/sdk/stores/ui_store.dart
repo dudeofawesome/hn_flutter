@@ -13,18 +13,20 @@ class UIStore extends Store {
 
   final LocalStorageService _localStorage = new Injector().localStorageService;
 
-  UIStore._internal () {
+  UIStore._internal() {
     new Future(() async {
-      final storySortModeKeys = await this._localStorage.databases[KEYS_DB].query(
-        KEYS_TABLE,
-        columns: [KEYS_ID, KEYS_VALUE],
-        where: '$KEYS_ID = ?',
-        whereArgs: [KEY_STORY_SORT_MODE],
-        limit: 1,
-      );
+      final storySortModeKeys =
+          await this._localStorage.databases[KEYS_DB].query(
+                KEYS_TABLE,
+                columns: [KEYS_ID, KEYS_VALUE],
+                where: '$KEYS_ID = ?',
+                whereArgs: [KEY_STORY_SORT_MODE],
+                limit: 1,
+              );
 
       if (storySortModeKeys.length > 0) {
-        setStorySortMode(SortModes.values[int.parse(storySortModeKeys.first[KEYS_VALUE])]);
+        setStorySortMode(
+            SortModes.values[int.parse(storySortModeKeys.first[KEYS_VALUE])]);
       }
     }).then((a) {});
 
@@ -44,17 +46,14 @@ class UIStore extends Store {
     triggerOnAction(setStorySortMode, (SortModes sortMode) async {
       _sortMode = sortMode;
 
-      await this._localStorage.databases[KEYS_DB].rawInsert(
-        '''
+      await this._localStorage.databases[KEYS_DB].rawInsert('''
         INSERT OR REPLACE INTO $KEYS_TABLE ($KEYS_ID, $KEYS_VALUE)
           VALUES (?, ?);
-        ''',
-        [KEY_STORY_SORT_MODE, _sortMode.index]
-      );
+        ''', [KEY_STORY_SORT_MODE, _sortMode.index]);
     });
   }
 
-  factory UIStore () => _singleton;
+  factory UIStore() => _singleton;
 
   int _selectedItem;
   SortModes _sortMode = SortModes.TOP;
@@ -62,7 +61,8 @@ class UIStore extends Store {
 
   int get item => this._selectedItem;
   SortModes get sortMode => this._sortMode;
-  Map<int, double> get storyScrollPos => new Map.unmodifiable(this._storyScrollPos);
+  Map<int, double> get storyScrollPos =>
+      new Map.unmodifiable(this._storyScrollPos);
 }
 
 final StoreToken uiStoreToken = new StoreToken(new UIStore());

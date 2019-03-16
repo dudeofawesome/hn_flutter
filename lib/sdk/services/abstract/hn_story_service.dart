@@ -2,32 +2,32 @@ import 'dart:async';
 import 'dart:io' show Cookie;
 
 abstract class HNStoryService {
-  Future<List<int>> getTopStories ({
+  Future<List<int>> getTopStories({
     int skip = 0,
     Cookie accessCookie,
   });
 
-  Future<List<int>> getNewStories ({
+  Future<List<int>> getNewStories({
     int skip = 0,
     Cookie accessCookie,
   });
 
-  Future<List<int>> getBestStories ({
+  Future<List<int>> getBestStories({
     int skip = 0,
     Cookie accessCookie,
   });
 
-  Future<List<int>> getAskStories ({
+  Future<List<int>> getAskStories({
     int skip = 0,
     Cookie accessCookie,
   });
 
-  Future<List<int>> getShowStories ({
+  Future<List<int>> getShowStories({
     int skip = 0,
     Cookie accessCookie,
   });
 
-  Future<List<int>> getJobStories ({
+  Future<List<int>> getJobStories({
     int skip = 0,
     Cookie accessCookie,
   });

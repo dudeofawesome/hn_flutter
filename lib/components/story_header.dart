@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
-import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
+import 'package:flutter_web_browser/flutter_web_browser.dart'
+    show FlutterWebBrowser;
 import 'package:share/share.dart';
 import 'package:timeago/timeago.dart' show timeAgo;
 
@@ -29,7 +30,7 @@ class StoryHeader extends StoreWatcher {
   final List<OverflowMenuItems> overflowMenuItems;
   final _popupMenuButtonKey = new GlobalKey();
 
-  StoryHeader ({
+  StoryHeader({
     Key key,
     @required this.storyId,
     this.fadeIfSeen = true,
@@ -47,21 +48,24 @@ class StoryHeader extends StoreWatcher {
     listenToStore(accountStoreToken);
   }
 
-  _openStoryUrl (BuildContext ctx, String url) async {
+  _openStoryUrl(BuildContext ctx, String url) async {
     if (await UrlLauncher.canLaunch(url)) {
-      await FlutterWebBrowser.openWebPage(url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
+      await FlutterWebBrowser.openWebPage(
+          url: url, androidToolbarColor: Theme.of(ctx).primaryColor);
     }
   }
 
-  void openStory (BuildContext ctx) {
+  void openStory(BuildContext ctx) {
     Navigator.pushNamed(ctx, '/${Routes.STORIES}/${this.storyId}');
   }
 
-  Future<Null> _upvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) async {
+  Future<Null> _upvoteStory(
+      BuildContext ctx, HNItemStatus status, HNAccount account) async {
     return new Future<Null>(() async {
       if (status.authTokens?.upvote == null) {
-        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
-          .firstWhere((patch) => patch.id == status.id);
+        status = (await _hnItemService.getStoryItemAuthById(
+                status.id, account.accessCookie))
+            .firstWhere((patch) => patch.id == status.id);
 
         if (status?.authTokens?.upvote == null) {
           throw '''Couldn't send upvote''';
@@ -76,11 +80,13 @@ class StoryHeader extends StoreWatcher {
     });
   }
 
-  Future<Null> _downvoteStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+  Future<Null> _downvoteStory(
+      BuildContext ctx, HNItemStatus status, HNAccount account) {
     return new Future<Null>(() async {
       if (status.authTokens?.downvote == null) {
-        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
-          .firstWhere((patch) => patch.id == status.id);
+        status = (await _hnItemService.getStoryItemAuthById(
+                status.id, account.accessCookie))
+            .firstWhere((patch) => patch.id == status.id);
 
         if (status?.authTokens?.downvote == null) {
           throw '''Couldn't send downvote''';
@@ -95,11 +101,13 @@ class StoryHeader extends StoreWatcher {
     });
   }
 
-  Future<Null> _saveStory (BuildContext ctx, HNItemStatus status, HNAccount account) {
+  Future<Null> _saveStory(
+      BuildContext ctx, HNItemStatus status, HNAccount account) {
     return new Future<Null>(() async {
       if (status.authTokens?.save == null) {
-        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
-          .firstWhere((patch) => patch.id == status.id);
+        status = (await _hnItemService.getStoryItemAuthById(
+                status.id, account.accessCookie))
+            .firstWhere((patch) => patch.id == status.id);
 
         if (status?.authTokens?.save == null) {
           throw '''Couldn't favorite item''';
@@ -114,41 +122,43 @@ class StoryHeader extends StoreWatcher {
     });
   }
 
-  Future<Null> _shareStory (String storyUrl) async {
+  Future<Null> _shareStory(String storyUrl) async {
     await Share.share(storyUrl);
   }
 
-  void _hideStory () {
+  void _hideStory() {
     showHideItem(storyId);
   }
 
-  void _viewProfile (BuildContext context, String by) {
+  void _viewProfile(BuildContext context, String by) {
     Navigator.pushNamed(context, '/${Routes.USERS}/$by');
   }
 
-  void showOverflowMenu (BuildContext context) {
+  void showOverflowMenu(BuildContext context) {
     (this._popupMenuButtonKey.currentState as dynamic).showButtonMenu();
   }
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     final HNItemStore itemStore = stores[itemStoreToken];
     final HNAccountStore accountStore = stores[accountStoreToken];
     final story = itemStore.items[this.storyId];
     final storyStatus = itemStore.itemStatuses[this.storyId];
     final account = accountStore.primaryAccount;
 
-    final storyTextOpacity = (fadeIfSeen) ? (!(storyStatus?.seen ?? false) ? 1.0 : 0.5) : 1.0;
+    final storyTextOpacity =
+        (fadeIfSeen) ? (!(storyStatus?.seen ?? false) ? 1.0 : 0.5) : 1.0;
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
         final HNItemService _hnItemService = new Injector().hnItemService;
-        _hnItemService.getItemByID(storyId, account?.accessCookie)
-          .catchError((err) {
-            Scaffold.of(context).showSnackBar(new SnackBar(
-              content: new Text(err?.toString() ?? 'Unknown Error'),
-            ));
-          });
+        _hnItemService
+            .getItemByID(storyId, account?.accessCookie)
+            .catchError((err) {
+          Scaffold.of(context).showSnackBar(new SnackBar(
+            content: new Text(err?.toString() ?? 'Unknown Error'),
+          ));
+        });
       }
 
       return new Padding(
@@ -157,12 +167,15 @@ class StoryHeader extends StoreWatcher {
       );
     }
 
-    if (story.type != HNItemType.STORY && story.type != HNItemType.JOB && story.type != HNItemType.POLL) {
+    if (story.type != HNItemType.STORY &&
+        story.type != HNItemType.JOB &&
+        story.type != HNItemType.POLL) {
       print("Unknown story type found! Might be a comment?");
       return new Container();
     }
 
-    final linkOverlayText = Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
+    final linkOverlayText =
+        Theme.of(context).textTheme.body1.copyWith(color: Colors.white);
 
     List<Widget> cardContent;
     if (story.url != null) {
@@ -187,7 +200,8 @@ class StoryHeader extends StoreWatcher {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       new Text(
-                        story.computed.urlHostname ?? 'NO story.computed.urlHostname FOUND!',
+                        story.computed.urlHostname ??
+                            'NO story.computed.urlHostname FOUND!',
                         style: linkOverlayText,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -203,18 +217,20 @@ class StoryHeader extends StoreWatcher {
             ],
           ),
         ),
-        story.type != HNItemType.JOB ?
-          _buildTitleColumn(context, story, storyStatus) :
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Expanded(child:_buildTitleColumn(context, story, storyStatus)), this._buildOverflowButton(context, story, storyStatus)
-            ],
-          ),
-        story.type != HNItemType.JOB ?
-          _buildBottomRow(context, story, storyStatus, account) :
-          Container(),
+        story.type != HNItemType.JOB
+            ? _buildTitleColumn(context, story, storyStatus)
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Expanded(
+                      child: _buildTitleColumn(context, story, storyStatus)),
+                  this._buildOverflowButton(context, story, storyStatus)
+                ],
+              ),
+        story.type != HNItemType.JOB
+            ? _buildBottomRow(context, story, storyStatus, account)
+            : Container(),
       ];
     } else if (story.text != null) {
       cardContent = <Widget>[
@@ -234,23 +250,24 @@ class StoryHeader extends StoreWatcher {
 
     return new DefaultTextStyle(
       style: Theme.of(context).textTheme.body1.copyWith(
-        color: Theme.of(context).textTheme.body1.color.withOpacity(storyTextOpacity),
-      ),
+            color: Theme.of(context)
+                .textTheme
+                .body1
+                .color
+                .withOpacity(storyTextOpacity),
+          ),
       child: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: cardContent
-      ),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: cardContent),
     );
   }
 
-  Widget _buildOverflowButton (BuildContext context, HNItem story, HNItemStatus storyStatus) {
+  Widget _buildOverflowButton(
+      BuildContext context, HNItem story, HNItemStatus storyStatus) {
     return new PopupMenuButton<OverflowMenuItems>(
       key: this._popupMenuButtonKey,
-      icon: const Icon(
-        Icons.more_horiz,
-        size: 20.0
-      ),
+      icon: const Icon(Icons.more_horiz, size: 20.0),
       itemBuilder: (BuildContext ctx) {
         List<PopupMenuEntry<OverflowMenuItems>> popupMenuEntries = [];
 
@@ -291,9 +308,11 @@ class StoryHeader extends StoreWatcher {
           case OverflowMenuItems.HIDE:
             return this._hideStory();
           case OverflowMenuItems.SHARE:
-            return await this._shareStory('https://news.ycombinator.com/item?id=${story.id}');
+            return await this._shareStory(
+                'https://news.ycombinator.com/item?id=${story.id}');
           case OverflowMenuItems.COPY_TEXT:
-            return await Clipboard.setData(new ClipboardData(text: story.computed.simpleText));
+            return await Clipboard.setData(
+                new ClipboardData(text: story.computed.simpleText));
           case OverflowMenuItems.VIEW_PROFILE:
             return this._viewProfile(context, story.by);
         }
@@ -301,27 +320,34 @@ class StoryHeader extends StoreWatcher {
     );
   }
 
-  Widget _buildTitleColumn (BuildContext context, HNItem story, HNItemStatus storyStatus) {
+  Widget _buildTitleColumn(
+      BuildContext context, HNItem story, HNItemStatus storyStatus) {
     final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
 
     return Padding(
-      padding: new EdgeInsets.fromLTRB(8.0, 6.0, 8.0, story.type != HNItemType.JOB ? 0.0 : 8.0),
+      padding: new EdgeInsets.fromLTRB(
+          8.0, 6.0, 8.0, story.type != HNItemType.JOB ? 0.0 : 8.0),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Text(
             story.title ?? '[deleted]',
             style: Theme.of(context).textTheme.title.copyWith(
-              color: Theme.of(context).textTheme.title.color.withOpacity(storyTextOpacity),
-              fontSize: 18.0,
-            ),
+                  color: Theme.of(context)
+                      .textTheme
+                      .title
+                      .color
+                      .withOpacity(storyTextOpacity),
+                  fontSize: 18.0,
+                ),
           ),
           new Padding(
             padding: const EdgeInsets.only(top: 4.0),
             child: new Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                new Text(story?.by ?? ((story?.deleted ?? false) ? '[deleted]' : '…')),
+                new Text(story?.by ??
+                    ((story?.deleted ?? false) ? '[deleted]' : '…')),
                 new Text(' • '),
                 new Text(timeAgo(story.time)),
               ],
@@ -332,7 +358,8 @@ class StoryHeader extends StoreWatcher {
     );
   }
 
-  Widget _buildBottomRow (BuildContext context, HNItem story, HNItemStatus storyStatus, HNAccount account) {
+  Widget _buildBottomRow(BuildContext context, HNItem story,
+      HNItemStatus storyStatus, HNAccount account) {
     return Row(
       children: <Widget>[
         new Expanded(

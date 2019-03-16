@@ -6,7 +6,7 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 class HNItemStore extends Store {
   static final HNItemStore _singleton = new HNItemStore._internal();
 
-  HNItemStore._internal () {
+  HNItemStore._internal() {
     triggerOnAction(addHNItem, (HNItem item) {
       this._items[item.id] = item;
     });
@@ -65,19 +65,25 @@ class HNItemStore extends Store {
       itemStatus.seen = status.seen ?? itemStatus.seen;
 
       if (itemStatus.authTokens != null && status.authTokens != null) {
-        itemStatus.authTokens.upvote = status.authTokens.upvote ?? itemStatus.authTokens.upvote;
-        itemStatus.authTokens.downvote = status.authTokens.downvote ?? itemStatus.authTokens.downvote;
-        itemStatus.authTokens.hide = status.authTokens.hide ?? itemStatus.authTokens.hide;
-        itemStatus.authTokens.save = status.authTokens.save ?? itemStatus.authTokens.save;
-        itemStatus.authTokens.see = status.authTokens.see ?? itemStatus.authTokens.see;
-        itemStatus.authTokens.reply = status.authTokens.reply ?? itemStatus.authTokens.reply;
+        itemStatus.authTokens.upvote =
+            status.authTokens.upvote ?? itemStatus.authTokens.upvote;
+        itemStatus.authTokens.downvote =
+            status.authTokens.downvote ?? itemStatus.authTokens.downvote;
+        itemStatus.authTokens.hide =
+            status.authTokens.hide ?? itemStatus.authTokens.hide;
+        itemStatus.authTokens.save =
+            status.authTokens.save ?? itemStatus.authTokens.save;
+        itemStatus.authTokens.see =
+            status.authTokens.see ?? itemStatus.authTokens.see;
+        itemStatus.authTokens.reply =
+            status.authTokens.reply ?? itemStatus.authTokens.reply;
       } else if (status.authTokens != null) {
         itemStatus.authTokens = status.authTokens;
       }
     });
   }
 
-  factory HNItemStore () {
+  factory HNItemStore() {
     return _singleton;
   }
 
@@ -86,10 +92,11 @@ class HNItemStore extends Store {
   List<int> _sortedStoryIds = <int>[];
 
   Map<int, HNItem> get items => new Map.unmodifiable(_items);
-  Map<int, HNItemStatus> get itemStatuses => new Map.unmodifiable(_itemStatuses);
+  Map<int, HNItemStatus> get itemStatuses =>
+      new Map.unmodifiable(_itemStatuses);
   List<int> get sortedStoryIds => new List.unmodifiable(_sortedStoryIds);
 
-  _setStatusDefaults (HNItemStatus status) {
+  _setStatusDefaults(HNItemStatus status) {
     if (status.downvoted == null) {
       status.downvoted = false;
     }

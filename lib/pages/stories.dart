@@ -19,16 +19,17 @@ import 'package:hn_flutter/sdk/stores/hn_item_store.dart';
 class StoriesPage extends StatefulWidget {
   final bool showDrawer;
 
-  StoriesPage ({
+  StoriesPage({
     Key key,
     this.showDrawer = true,
   }) : super(key: key);
 
   @override
-  _StoriesPageState createState () => new _StoriesPageState();
+  _StoriesPageState createState() => new _StoriesPageState();
 }
 
-class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<StoriesPage> {
+class _StoriesPageState extends State<StoriesPage>
+    with StoreWatcherMixin<StoriesPage> {
   final _hnStoryService = new Injector().hnStoryService;
 
   HNAccountStore _accountStore;
@@ -36,10 +37,11 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
   UIStore _uiStore;
 
   ScrollController _scrollController;
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = new GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
 
   @override
-  void initState () {
+  void initState() {
     super.initState();
 
     this._accountStore = listenToStore(accountStoreToken);
@@ -49,7 +51,7 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
     this._scrollController = new ScrollController();
   }
 
-  Future<Null> _refresh (SortModes sortMode, Cookie accessCookie) async {
+  Future<Null> _refresh(SortModes sortMode, Cookie accessCookie) async {
     switch (sortMode) {
       case SortModes.TOP:
         await this._hnStoryService.getTopStories(accessCookie: accessCookie);
@@ -74,18 +76,15 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
     this._scrollToTop();
   }
 
-  Future<Null> _changeSortMode (SortModes sortMode, Cookie accessCookie) async {
+  Future<Null> _changeSortMode(SortModes sortMode, Cookie accessCookie) async {
     setStorySortMode(sortMode);
     await this._refresh(sortMode, accessCookie);
   }
 
-  Future<Null> _scrollToTop () async {
+  Future<Null> _scrollToTop() async {
     if (this._scrollController.hasClients) {
-      await this._scrollController.animateTo(
-        0.0,
-        duration: new Duration(milliseconds: 500),
-        curve: Curves.easeInOut
-      );
+      await this._scrollController.animateTo(0.0,
+          duration: new Duration(milliseconds: 500), curve: Curves.easeInOut);
     }
   }
 
@@ -177,54 +176,57 @@ class _StoriesPageState extends State<StoriesPage> with StoreWatcherMixin<Storie
             icon: const Icon(Icons.sort),
             initialValue: sortMode,
             itemBuilder: (BuildContext ctx) => <PopupMenuEntry<SortModes>>[
-              const PopupMenuItem<SortModes>(
-                value: SortModes.TOP,
-                child: const Text('Top'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.NEW,
-                child: const Text('New'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.BEST,
-                child: const Text('Best'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.ASK_HN,
-                child: const Text('Ask HN'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.SHOW_HN,
-                child: const Text('Show HN'),
-              ),
-              const PopupMenuItem<SortModes>(
-                value: SortModes.JOB,
-                child: const Text('Jobs'),
-              ),
-            ],
-            onSelected: (sort) => this._changeSortMode(sort, account?.accessCookie),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.TOP,
+                    child: const Text('Top'),
+                  ),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.NEW,
+                    child: const Text('New'),
+                  ),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.BEST,
+                    child: const Text('Best'),
+                  ),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.ASK_HN,
+                    child: const Text('Ask HN'),
+                  ),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.SHOW_HN,
+                    child: const Text('Show HN'),
+                  ),
+                  const PopupMenuItem<SortModes>(
+                    value: SortModes.JOB,
+                    child: const Text('Jobs'),
+                  ),
+                ],
+            onSelected: (sort) =>
+                this._changeSortMode(sort, account?.accessCookie),
           ),
         ],
       ),
       drawer: widget.showDrawer
-        ? new Builder(builder: (context) {
-          return new MainDrawer(MainPageSubPages.STORIES, Scaffold.of(context));
-        })
-        : null,
-      body: stories.length > 0 ?
-        new RefreshIndicator(
-          key: this._refreshIndicatorKey,
-          onRefresh: () => this._refresh(sortMode, account?.accessCookie),
-          child: storyCards,
-        ) :
-        loadingStories,
-      floatingActionButton: account != null ?
-        new FloatingActionButton(
-          tooltip: 'Submit Story',
-          child: new Icon(Icons.add),
-          onPressed: () => Navigator.pushNamed(context, '/${Routes.SUBMIT_STORY}'),
-        ) :
-        null,
+          ? new Builder(builder: (context) {
+              return new MainDrawer(
+                  MainPageSubPages.STORIES, Scaffold.of(context));
+            })
+          : null,
+      body: stories.length > 0
+          ? new RefreshIndicator(
+              key: this._refreshIndicatorKey,
+              onRefresh: () => this._refresh(sortMode, account?.accessCookie),
+              child: storyCards,
+            )
+          : loadingStories,
+      floatingActionButton: account != null
+          ? new FloatingActionButton(
+              tooltip: 'Submit Story',
+              child: new Icon(Icons.add),
+              onPressed: () =>
+                  Navigator.pushNamed(context, '/${Routes.SUBMIT_STORY}'),
+            )
+          : null,
     );
   }
 }

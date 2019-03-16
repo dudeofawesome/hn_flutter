@@ -1,7 +1,7 @@
 class HNConfig {
   static final HNConfig _singleton = new HNConfig._internal();
 
-  factory HNConfig () {
+  factory HNConfig() {
     return _singleton;
   }
 

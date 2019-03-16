@@ -10,48 +10,53 @@ import 'package:hn_flutter/sdk/actions/hn_item_actions.dart';
 class HNStoryServiceProd implements HNStoryService {
   HNConfig _config = new HNConfig();
 
-  Future<List<int>> _getStories (
-    String sort,
-    {
-      int skip = 0,
-      Cookie accessCookie,
-    }
-  ) {
-    return http.get('${this._config.url}/$sort.json')
-      .then((res) => (json.decode(res.body) as List).cast<int>())
-      .then((itemIds) {
-        setStorySort(itemIds);
-        return itemIds;
-      });
+  Future<List<int>> _getStories(
+    String sort, {
+    int skip = 0,
+    Cookie accessCookie,
+  }) {
+    return http
+        .get('${this._config.url}/$sort.json')
+        .then((res) => (json.decode(res.body) as List).cast<int>())
+        .then((itemIds) {
+      setStorySort(itemIds);
+      return itemIds;
+    });
   }
 
-  Future<List<int>> getTopStories ({
+  Future<List<int>> getTopStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('topstories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('topstories', skip: skip, accessCookie: accessCookie);
 
-  Future<List<int>> getNewStories ({
+  Future<List<int>> getNewStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('newstories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('newstories', skip: skip, accessCookie: accessCookie);
 
-  Future<List<int>> getBestStories ({
+  Future<List<int>> getBestStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('beststories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('beststories', skip: skip, accessCookie: accessCookie);
 
-  Future<List<int>> getAskStories ({
+  Future<List<int>> getAskStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('askstories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('askstories', skip: skip, accessCookie: accessCookie);
 
-  Future<List<int>> getShowStories ({
+  Future<List<int>> getShowStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('showstories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('showstories', skip: skip, accessCookie: accessCookie);
 
-  Future<List<int>> getJobStories ({
+  Future<List<int>> getJobStories({
     int skip = 0,
     Cookie accessCookie,
-  }) => this._getStories('jobstories', skip: skip, accessCookie: accessCookie);
+  }) =>
+      this._getStories('jobstories', skip: skip, accessCookie: accessCookie);
 }

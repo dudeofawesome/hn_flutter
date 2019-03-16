@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 
 import 'package:hn_flutter/utils/dedent.dart';
 
-void main () {
+void main() {
   group('dedent', () {
     test('unit test', () {
       final answers = <List<String>>[
@@ -18,7 +18,7 @@ void main () {
               please ignore
           '''),
           'test string,\n'
-          '  please ignore',
+              '  please ignore',
         ],
       ];
       print(answers.map((ans) => "'${ans[0]}' == '${ans[1]}'"));

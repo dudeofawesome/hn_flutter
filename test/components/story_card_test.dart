@@ -55,7 +55,8 @@ void main() {
       by: 'sama',
       kids: [17, 454424],
       parent: 1,
-      text: '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
+      text:
+          '&#34;the rising star of venture capital&#34; -unknown VC eating lunch on SHR',
       time: new DateTime.fromMillisecondsSinceEpoch(1160423461),
       type: HNItemType.COMMENT,
     ));

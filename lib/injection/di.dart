@@ -19,38 +19,42 @@ class Injector {
   static Flavor _flavor;
   Map<Flavor, Map<_Injectables, dynamic>> _instances = new Map();
 
-  static void configure (Flavor flavor) {
+  static void configure(Flavor flavor) {
     _flavor = flavor;
   }
 
-  factory Injector () => _singleton;
+  factory Injector() => _singleton;
 
-  Injector._internal () {
+  Injector._internal() {
     for (final flavor in Flavor.values) {
       this._instances[flavor] = new Map();
     }
   }
 
-  Future<Null> init () async {
+  Future<Null> init() async {
     // construct and initialize all services with an init method
-      switch (_flavor) {
-        case Flavor.PROD:
-          _instances[_flavor][_Injectables.HN_ITEM_SERVICE] = new HNItemServiceProd();
-          _instances[_flavor][_Injectables.HN_USER_SERVICE] = new HNUserServiceProd();
-          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceProd();
-          await Future.wait<dynamic>([
-            _instances[_flavor][_Injectables.HN_ITEM_SERVICE].init(),
-            _instances[_flavor][_Injectables.HN_USER_SERVICE].init(),
-            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
-          ]);
-          break;
-        case Flavor.MOCK:
-          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] = new LocalStorageServiceMock();
-          await Future.wait<dynamic>([
-            _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
-          ]);
-          break;
-      }
+    switch (_flavor) {
+      case Flavor.PROD:
+        _instances[_flavor][_Injectables.HN_ITEM_SERVICE] =
+            new HNItemServiceProd();
+        _instances[_flavor][_Injectables.HN_USER_SERVICE] =
+            new HNUserServiceProd();
+        _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] =
+            new LocalStorageServiceProd();
+        await Future.wait<dynamic>([
+          _instances[_flavor][_Injectables.HN_ITEM_SERVICE].init(),
+          _instances[_flavor][_Injectables.HN_USER_SERVICE].init(),
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
+        ]);
+        break;
+      case Flavor.MOCK:
+        _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE] =
+            new LocalStorageServiceMock();
+        await Future.wait<dynamic>([
+          _instances[_flavor][_Injectables.LOCAL_STORAGE_SERVICE].init(),
+        ]);
+        break;
+    }
   }
 
   HNUserService get hnUserService {

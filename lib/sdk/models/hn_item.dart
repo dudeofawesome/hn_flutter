@@ -6,38 +6,52 @@ import 'package:hn_flutter/utils/dedent.dart';
 class HNItem {
   /// The item's unique id.
   int id;
+
   /// `true` if the item is deleted.
   bool deleted;
+
   /// `true` if the item is dead.
   bool dead;
+
   /// The type of item.
   HNItemType type;
+
   /// The title of the story, poll or job.
   String title;
+
   /// The URL of the story.
   String url;
+
   /// The comment, story or poll text. HTML.
   String text;
+
   /// Creation date of the item
   DateTime time;
+
   /// The username of the item's author.
   String by;
+
   /// The story's score, or the votes for a pollopt.
   int score;
+
   /// In the case of stories or polls, the total comment count.
   int descendants;
+
   /// The ids of the item's comments, in ranked display order.
   List<int> kids;
+
   /// The comment's parent: either another comment or the relevant story.
   int parent;
+
   /// The pollopt's associated poll.
   dynamic poll;
+
   /// A list of related pollopts, in display order.
   List<dynamic> parts;
 
   HNItemComputed computed;
 
-  HNItem ({
+  HNItem({
     this.id,
     this.deleted,
     this.dead,
@@ -60,11 +74,11 @@ class HNItem {
     }
   }
 
-  HNItem.fromMap (Map map) {
+  HNItem.fromMap(Map map) {
     this.id = map['id'];
     this.deleted = map['deleted'];
     this.dead = map['dead'];
-    switch(map['type']) {
+    switch (map['type']) {
       case 'job':
         this.type = HNItemType.JOB;
         break;
@@ -87,8 +101,8 @@ class HNItem {
     this.url = map['url'];
     this.text = map['text'];
     this.time = (map['time'] != null)
-      ? new DateTime.fromMillisecondsSinceEpoch(map['time'] * 1000)
-      : null;
+        ? new DateTime.fromMillisecondsSinceEpoch(map['time'] * 1000)
+        : null;
     this.by = map['by'];
     this.score = map['score'];
     this.descendants = map['descendants'];
@@ -128,7 +142,7 @@ class HNItemStatus {
 
   HNItemAuthTokens authTokens;
 
-  HNItemStatus ({
+  HNItemStatus({
     @required this.id,
     this.loading = false,
     this.upvoted = false,
@@ -139,7 +153,7 @@ class HNItemStatus {
     this.authTokens,
   });
 
-  HNItemStatus.fromItem (HNItem item) {
+  HNItemStatus.fromItem(HNItem item) {
     this.id = item.id;
     this.loading = false;
     this.upvoted = false;
@@ -149,7 +163,7 @@ class HNItemStatus {
     this.seen = false;
   }
 
-  HNItemStatus.patch ({
+  HNItemStatus.patch({
     @required this.id,
     this.loading,
     this.upvoted,
@@ -187,7 +201,7 @@ class HNItemAuthTokens {
   String see;
   String reply;
 
-  HNItemAuthTokens ({
+  HNItemAuthTokens({
     this.upvote,
     this.downvote,
     this.save,
@@ -196,7 +210,7 @@ class HNItemAuthTokens {
     this.reply,
   });
 
-  HNItemAuthTokens.fromMap (Map<String, dynamic> map) {
+  HNItemAuthTokens.fromMap(Map<String, dynamic> map) {
     upvote = map['upvote'];
     downvote = map['downvote'];
     save = map['save'];
@@ -212,14 +226,14 @@ class HNItemComputed {
   String urlHostname;
   String imageUrl;
 
-  HNItemComputed ({
+  HNItemComputed({
     this.markdown,
     this.simpleText,
     this.urlHostname,
     this.imageUrl,
   });
 
-  HNItemComputed.fromItem (HNItem item) {
+  HNItemComputed.fromItem(HNItem item) {
     if (item.url != null) {
       this.urlHostname = Uri.parse(item.url).host;
       // this.imageUrl;
@@ -232,6 +246,4 @@ class HNItemComputed {
   }
 }
 
-enum HNItemType {
-  JOB, STORY, COMMENT, POLL, POLLOPT
-}
+enum HNItemType { JOB, STORY, COMMENT, POLL, POLLOPT }

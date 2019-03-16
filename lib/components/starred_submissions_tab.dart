@@ -15,16 +15,17 @@ import 'package:hn_flutter/components/story_card.dart';
 class StarredSubmissionsTab extends StatefulWidget {
   final String userId;
 
-  const StarredSubmissionsTab (
+  const StarredSubmissionsTab(
     this.userId, {
     Key key,
   }) : super(key: key);
 
   @override
-  createState () => new _StarredSubmissionsTabState();
+  createState() => new _StarredSubmissionsTabState();
 }
 
-class _StarredSubmissionsTabState extends State<StarredSubmissionsTab> with StoreWatcherMixin<StarredSubmissionsTab> {
+class _StarredSubmissionsTabState extends State<StarredSubmissionsTab>
+    with StoreWatcherMixin<StarredSubmissionsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
@@ -32,7 +33,7 @@ class _StarredSubmissionsTabState extends State<StarredSubmissionsTab> with Stor
   bool _loading = false;
 
   @override
-  initState () {
+  initState() {
     super.initState();
     this._hnItemStore = listenToStore(itemStoreToken);
     this._hnAccountStore = listenToStore(accountStoreToken);
@@ -41,30 +42,36 @@ class _StarredSubmissionsTabState extends State<StarredSubmissionsTab> with Stor
     this._refresh();
   }
 
-  Future<Null> _refresh () async {
-    await this._hnUserService.getSavedByUserID(widget.userId, true, this._hnAccountStore.primaryAccount.accessCookie);
+  Future<Null> _refresh() async {
+    await this._hnUserService.getSavedByUserID(
+        widget.userId, true, this._hnAccountStore.primaryAccount.accessCookie);
     setState(() => this._loading = false);
   }
 
   @override
-  Widget build (BuildContext context) {
-    final starredStories = this._hnItemStore.itemStatuses.values
-      .where((itemStatus) => itemStatus.saved);
+  Widget build(BuildContext context) {
+    final starredStories = this
+        ._hnItemStore
+        .itemStatuses
+        .values
+        .where((itemStatus) => itemStatus.saved);
 
     return (!this._loading)
-      ? new Scrollbar(
-        child: starredStories.length > 0
-          ? new ListView(
-            children: starredStories.map((itemStatus) => new StoryCard(
-              storyId: itemStatus.id,
-            ))?.toList(),
+        ? new Scrollbar(
+            child: starredStories.length > 0
+                ? new ListView(
+                    children: starredStories
+                        .map((itemStatus) => new StoryCard(
+                              storyId: itemStatus.id,
+                            ))
+                        ?.toList(),
+                  )
+                : new Center(
+                    child: new Text('No submissions'),
+                  ),
           )
-          : new Center(
-            child: new Text('No submissions'),
-          ),
-      )
-      : new Center(
-        child: new CircularProgressIndicator(),
-      );
+        : new Center(
+            child: new CircularProgressIndicator(),
+          );
   }
 }

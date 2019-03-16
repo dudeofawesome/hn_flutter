@@ -23,7 +23,7 @@ class UserPage extends StoreWatcher {
   final String userId;
   final bool showDrawer;
 
-  UserPage ({
+  UserPage({
     Key key,
     @required this.userId,
     this.showDrawer = false,
@@ -35,14 +35,14 @@ class UserPage extends StoreWatcher {
     listenToStore(userStoreToken);
   }
 
-  Future<Null> _shareUser (String userId) async {
+  Future<Null> _shareUser(String userId) async {
     await Share.share('https://news.ycombinator.com/user?id=$userId');
   }
 
-  void _saveUser () {}
+  void _saveUser() {}
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -78,12 +78,13 @@ class UserPage extends StoreWatcher {
             // ),
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
-                const PopupMenuItem<_OverflowMenuItems>(
-                  value: _OverflowMenuItems.SHARE,
-                  child: const Text('Share'),
-                ),
-              ],
+              itemBuilder: (BuildContext ctx) =>
+                  <PopupMenuEntry<_OverflowMenuItems>>[
+                    const PopupMenuItem<_OverflowMenuItems>(
+                      value: _OverflowMenuItems.SHARE,
+                      child: const Text('Share'),
+                    ),
+                  ],
               onSelected: (_OverflowMenuItems selection) async {
                 switch (selection) {
                   case _OverflowMenuItems.SHARE:
@@ -91,21 +92,23 @@ class UserPage extends StoreWatcher {
                 }
               },
             ),
-
           ],
           bottom: new TabBar(
             // isScrollable: true,
-            tabs: _choices.map((choice) => new Tab(
-              text: choice.title.toUpperCase(),
-              icon: new Icon(choice.icon),
-            )).toList(),
+            tabs: _choices
+                .map((choice) => new Tab(
+                      text: choice.title.toUpperCase(),
+                      icon: new Icon(choice.icon),
+                    ))
+                .toList(),
           ),
         ),
         drawer: this.showDrawer
-          ? new Builder(builder: (context) {
-            return new MainDrawer(MainPageSubPages.PROFILE, Scaffold.of(context));
-          })
-          : null,
+            ? new Builder(builder: (context) {
+                return new MainDrawer(
+                    MainPageSubPages.PROFILE, Scaffold.of(context));
+              })
+            : null,
         body: new TabBarView(
           children: <Widget>[
             new UserAboutTab(user),
@@ -129,7 +132,7 @@ enum SortModes {
 }
 
 class _Choice {
-  const _Choice({ this.title, this.icon });
+  const _Choice({this.title, this.icon});
   final String title;
   final IconData icon;
 }

@@ -13,64 +13,68 @@ class HNAuthServiceMock implements HNAuthService {
   final _config = new HNConfig();
   final _httpClient = new HttpClient();
 
-  HNAuthServiceMock._internal ();
+  HNAuthServiceMock._internal();
 
-  factory HNAuthServiceMock () {
+  factory HNAuthServiceMock() {
     return _singleton;
   }
 
-  Future<bool> addAccount (String userId, String userPassword) async {
-    final req = await _httpClient.postUrl(Uri.parse('${this._config.apiHost}/login?goto=%2Fuser%3Fid%3D$userId'))
-      ..headers.contentType = new ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8')
+  Future<bool> addAccount(String userId, String userPassword) async {
+    final req = await _httpClient.postUrl(
+        Uri.parse('${this._config.apiHost}/login?goto=%2Fuser%3Fid%3D$userId'))
+      ..headers.contentType = new ContentType(
+          'application', 'x-www-form-urlencoded',
+          charset: 'utf-8')
       ..write('acct=$userId&pw=$userPassword');
 
-    return req.close()
-      .then((res) {
-        if (
-          (res.statusCode == HttpStatus.ok || res.statusCode == HttpStatus.movedTemporarily) &&
-          res.cookies.firstWhere((cookie) => cookie.name == 'user') != null
-        ) {
-          return res;
-        } else {
-          throw res;
-        }
-      })
-      .then((res) async {
-        String email;
-        Cookie accessCookie = res.cookies.firstWhere((cookie) => cookie.name == 'user');
+    return req.close().then((res) {
+      if ((res.statusCode == HttpStatus.ok ||
+              res.statusCode == HttpStatus.movedTemporarily) &&
+          res.cookies.firstWhere((cookie) => cookie.name == 'user') != null) {
+        return res;
+      } else {
+        throw res;
+      }
+    }).then((res) async {
+      String email;
+      Cookie accessCookie =
+          res.cookies.firstWhere((cookie) => cookie.name == 'user');
 
-        final userReq = await (await _httpClient.getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
-          ..cookies.add(accessCookie)).close();
-        final body = await userReq.transform(utf8.decoder).toList().then((body) => body.join());
+      final userReq = await (await _httpClient
+              .getUrl(Uri.parse('${this._config.apiHost}/user?id=$userId'))
+            ..cookies.add(accessCookie))
+          .close();
+      final body = await userReq
+          .transform(utf8.decoder)
+          .toList()
+          .then((body) => body.join());
 
-        final emailMatch = _emailRegExp.firstMatch(body);
-        if (emailMatch != null) {
-          email = emailMatch[1];
-        }
+      final emailMatch = _emailRegExp.firstMatch(body);
+      if (emailMatch != null) {
+        email = emailMatch[1];
+      }
 
-        final canDownvote = _canDownvoteRegExp.hasMatch(body);
+      final canDownvote = _canDownvoteRegExp.hasMatch(body);
 
-        return new HNAccount(
-          id: userId,
-          email: email,
-          password: userPassword,
-          accessCookie: accessCookie,
-          permissions: new HNAccountPermissions(
-            canDownvote: canDownvote,
-          ),
-        );
-      })
-      .then((account) {
-        addHNAccount(account);
-        return true;
-      })
-      .catchError((err) {
-        print(err);
-        return false;
-      });
+      return new HNAccount(
+        id: userId,
+        email: email,
+        password: userPassword,
+        accessCookie: accessCookie,
+        permissions: new HNAccountPermissions(
+          canDownvote: canDownvote,
+        ),
+      );
+    }).then((account) {
+      addHNAccount(account);
+      return true;
+    }).catchError((err) {
+      print(err);
+      return false;
+    });
   }
 
-  Future<bool> removeAccount (String userId) async {
+  Future<bool> removeAccount(String userId) async {
     // return http.post(
     //     '${this._config.apiHost}/login',
     //     body: {
@@ -96,5 +100,6 @@ class HNAuthServiceMock implements HNAuthService {
   }
 }
 
-final _emailRegExp = new RegExp(r'''<input.*?name="uemail".*?value="(.*?)".*?>''');
+final _emailRegExp =
+    new RegExp(r'''<input.*?name="uemail".*?value="(.*?)".*?>''');
 final _canDownvoteRegExp = new RegExp(r'''<u>downvoted submissions</u>''');

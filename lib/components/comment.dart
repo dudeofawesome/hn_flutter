@@ -28,7 +28,7 @@ class Comment extends StatefulWidget {
   final List<BarButtons> buttons;
   final List<BarButtons> overflowButtons;
 
-  Comment ({
+  Comment({
     Key key,
     @required this.itemId,
     this.depth = 0,
@@ -48,12 +48,11 @@ class Comment extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CommentState createState () => new _CommentState();
+  _CommentState createState() => new _CommentState();
 }
 
 class _CommentState extends State<Comment>
-  with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin<Comment> {
-
+    with StoreWatcherMixin<Comment>, SingleTickerProviderStateMixin<Comment> {
   final _hnItemService = new Injector().hnItemService;
   HNItemStore _itemStore;
   UIStore _selectedItemStore;
@@ -64,7 +63,7 @@ class _CommentState extends State<Comment>
   ColorTween _backgroundColorTween;
 
   @override
-  void initState () {
+  void initState() {
     super.initState();
 
     this._itemStore = listenToStore(itemStoreToken);
@@ -76,41 +75,43 @@ class _CommentState extends State<Comment>
       vsync: this,
     );
     this._btnHeightAnimation = new CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-        reverseCurve: Curves.easeIn,
-      )..addListener(() => setState(() {
-        // the state that has changed here is the animation object’s value
-      }));
+      parent: _controller,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
+    )..addListener(() => setState(() {
+          // the state that has changed here is the animation object’s value
+        }));
     this._backgroundColorTween = new ColorTween(
       begin: Colors.transparent,
       end: Colors.red,
     )..animate(this._btnHeightAnimation);
   }
 
-  void _upvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(true, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  void _upvoteComment(
+      BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(true, status, account).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
-  void _downvoteComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
-    this._hnItemService.voteItem(false, status, account)
-      .catchError((err) {
-        Scaffold.of(ctx).showSnackBar(new SnackBar(
-          content: new Text(err.toString()),
-        ));
-      });
+  void _downvoteComment(
+      BuildContext ctx, HNItemStatus status, HNAccount account) {
+    this._hnItemService.voteItem(false, status, account).catchError((err) {
+      Scaffold.of(ctx).showSnackBar(new SnackBar(
+        content: new Text(err.toString()),
+      ));
+    });
   }
 
-  Future<Null> _saveComment (BuildContext ctx, HNItemStatus status, HNAccount account) {
+  Future<Null> _saveComment(
+      BuildContext ctx, HNItemStatus status, HNAccount account) {
     return new Future<Null>(() async {
       if (status.authTokens?.save == null) {
-        status = (await _hnItemService.getStoryItemAuthById(status.id, account.accessCookie))
-          .firstWhere((patch) => patch.id == status.id);
+        status = (await _hnItemService.getStoryItemAuthById(
+                status.id, account.accessCookie))
+            .firstWhere((patch) => patch.id == status.id);
 
         if (status?.authTokens?.save == null) {
           throw '''Couldn't favorite item''';
@@ -125,38 +126,39 @@ class _CommentState extends State<Comment>
     });
   }
 
-  Future<Null> _shareComment (final HNItem comment, final Map<int, HNItem> items) async {
+  Future<Null> _shareComment(
+      final HNItem comment, final Map<int, HNItem> items) async {
     HNItem parentStory = items[comment.parent];
     while (parentStory.type == HNItemType.COMMENT) {
       print(parentStory.id);
       parentStory = items[parentStory.parent];
     }
-    await Share.share('https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
+    await Share.share(
+        'https://news.ycombinator.com/item?id=${parentStory.id}#${comment.id}');
   }
 
-  Future<Null> _reply (BuildContext ctx, HNItemStatus status, HNAccount account) async {
-    Navigator.pushNamed(
-      ctx,
-      '/${Routes.SUBMIT_COMMENT}?parentId=${widget.itemId}&authToken=${status.authTokens.reply}'
-    );
+  Future<Null> _reply(
+      BuildContext ctx, HNItemStatus status, HNAccount account) async {
+    Navigator.pushNamed(ctx,
+        '/${Routes.SUBMIT_COMMENT}?parentId=${widget.itemId}&authToken=${status.authTokens.reply}');
   }
 
-  void _viewProfile (BuildContext ctx, String author) {
+  void _viewProfile(BuildContext ctx, String author) {
     Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
-  void _viewContext (BuildContext ctx, int parent) {
+  void _viewContext(BuildContext ctx, int parent) {
     // Navigator.pushNamed(ctx, '/${Routes.USERS}/$author');
   }
 
-  Future<Null> _copyText (String text) async {
+  Future<Null> _copyText(String text) async {
     await Clipboard.setData(new ClipboardData(text: text));
   }
 
-  void _toggleButtonBar (int commentId) => selectItem(commentId);
+  void _toggleButtonBar(int commentId) => selectItem(commentId);
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -168,12 +170,11 @@ class _CommentState extends State<Comment>
     final commentStatus = _itemStore.itemStatuses[widget.itemId];
     final account = _accountStore.primaryAccount;
 
-    if (_selectedItemStore.item != null && _selectedItemStore.item == comment?.id) {
+    if (_selectedItemStore.item != null &&
+        _selectedItemStore.item == comment?.id) {
       this._controller.forward();
-    } else if (
-      _selectedItemStore.item != comment?.id &&
-      (this._controller.isAnimating || this._controller.isCompleted)
-    ) {
+    } else if (_selectedItemStore.item != comment?.id &&
+        (this._controller.isAnimating || this._controller.isCompleted)) {
       this._controller.reverse();
     }
 
@@ -204,10 +205,9 @@ class _CommentState extends State<Comment>
             ),
           ),
         );
-      } else if (
-        comment.by != null && widget.indicateSelf &&
-        comment.by == account?.id
-      ) {
+      } else if (comment.by != null &&
+          widget.indicateSelf &&
+          comment.by == account?.id) {
         byline = new Container(
           padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
           decoration: new BoxDecoration(
@@ -235,25 +235,31 @@ class _CommentState extends State<Comment>
               padding: const EdgeInsets.fromLTRB(0.0, 0.0, 2.0, 0.0),
               child: byline,
             ),
-            comment.score != null ? new Padding(
-              padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-              child: new Text(
-                '${comment.score} points',
-                style: new TextStyle(
-                  color: (commentStatus?.upvoted ?? false) ? Colors.orange :
-                    (commentStatus?.downvoted ?? false) ? Colors.blue :
-                      Theme.of(context).textTheme.display1.color,
-                ),
-              ),
-            ) : new Container(),
+            comment.score != null
+                ? new Padding(
+                    padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                    child: new Text(
+                      '${comment.score} points',
+                      style: new TextStyle(
+                        color: (commentStatus?.upvoted ?? false)
+                            ? Colors.orange
+                            : (commentStatus?.downvoted ?? false)
+                                ? Colors.blue
+                                : Theme.of(context).textTheme.display1.color,
+                      ),
+                    ),
+                  )
+                : new Container(),
             new Padding(
               padding: const EdgeInsets.fromLTRB(2.0, 0.0, 0.0, 0.0),
               child: new Text(
                 '${timeAgo(comment.time)}',
                 style: new TextStyle(
-                  color: (commentStatus?.upvoted ?? false) ? Colors.orange :
-                    (commentStatus?.downvoted ?? false) ? Colors.blue :
-                      Theme.of(context).textTheme.display1.color,
+                  color: (commentStatus?.upvoted ?? false)
+                      ? Colors.orange
+                      : (commentStatus?.downvoted ?? false)
+                          ? Colors.blue
+                          : Theme.of(context).textTheme.display1.color,
                 ),
               ),
             ),
@@ -264,10 +270,13 @@ class _CommentState extends State<Comment>
       }
 
       final content = new Padding(
-        padding: new EdgeInsets.only(top: comment.computed.markdown == null ? 0.0 : 4.0),
-        child: comment.text != null ?
-          new HTMLText(comment.text) :
-          commentStatus.loading ? const Text('Loading…') : const Text('[deleted]'),
+        padding: new EdgeInsets.only(
+            top: comment.computed.markdown == null ? 0.0 : 4.0),
+        child: comment.text != null
+            ? new HTMLText(comment.text)
+            : commentStatus.loading
+                ? const Text('Loading…')
+                : const Text('[deleted]'),
       );
 
       final List<Widget> buttons = widget.buttons.map<Widget>((button) {
@@ -275,50 +284,55 @@ class _CommentState extends State<Comment>
           case BarButtons.UPVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_upward),
-              color: (commentStatus.upvoted ?? false) ? Colors.orange : Colors.white,
+              color: (commentStatus.upvoted ?? false)
+                  ? Colors.orange
+                  : Colors.white,
               tooltip: 'Upvote',
-              onPressed: commentStatus?.authTokens?.upvote != null ?
-                () {
-                  this._toggleButtonBar(comment.id);
-                  this._upvoteComment(context, commentStatus, account);
-                } :
-                null,
+              onPressed: commentStatus?.authTokens?.upvote != null
+                  ? () {
+                      this._toggleButtonBar(comment.id);
+                      this._upvoteComment(context, commentStatus, account);
+                    }
+                  : null,
             );
           case BarButtons.DOWNVOTE:
             return new IconButton(
               icon: const Icon(Icons.arrow_downward),
-              color: (commentStatus.downvoted ?? false) ? Colors.blue : Colors.black,
+              color: (commentStatus.downvoted ?? false)
+                  ? Colors.blue
+                  : Colors.black,
               tooltip: 'Downvote',
-              onPressed: commentStatus?.authTokens?.downvote != null ?
-                () {
-                  this._toggleButtonBar(comment.id);
-                  // this._downvoteStory()
-                } :
-                null,
+              onPressed: commentStatus?.authTokens?.downvote != null
+                  ? () {
+                      this._toggleButtonBar(comment.id);
+                      // this._downvoteStory()
+                    }
+                  : null,
             );
           case BarButtons.REPLY:
             return new IconButton(
               icon: const Icon(Icons.reply),
               color: Colors.white,
               tooltip: 'Reply',
-              onPressed: commentStatus?.authTokens?.reply != null ?
-                () {
-                  this._toggleButtonBar(comment.id);
-                  this._reply(context, commentStatus, account);
-                } :
-                null,
+              onPressed: commentStatus?.authTokens?.reply != null
+                  ? () {
+                      this._toggleButtonBar(comment.id);
+                      this._reply(context, commentStatus, account);
+                    }
+                  : null,
             );
           case BarButtons.SAVE:
             return new IconButton(
               icon: const Icon(Icons.star),
-              color: (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
+              color:
+                  (commentStatus?.saved ?? false) ? Colors.amber : Colors.white,
               tooltip: 'Save',
-              onPressed: account != null ?
-                () {
-                  this._toggleButtonBar(comment.id);
-                  this._saveComment(context, commentStatus, account);
-                } :
-                null,
+              onPressed: account != null
+                  ? () {
+                      this._toggleButtonBar(comment.id);
+                      this._saveComment(context, commentStatus, account);
+                    }
+                  : null,
             );
           case BarButtons.VIEW_PROFILE:
             return new IconButton(
@@ -364,79 +378,78 @@ class _CommentState extends State<Comment>
       }).toList();
 
       if (widget.overflowButtons != null && widget.overflowButtons.length > 0) {
-        buttons.add(
-          new PopupMenuButton<BarButtons>(
-            icon: const Icon(
-              Icons.more_horiz,
-              color: Colors.white,
-            ),
-            itemBuilder: (BuildContext ctx) => widget.overflowButtons.map((button) {
-              switch (button) {
-                case BarButtons.UPVOTE:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.UPVOTE,
-                    child: const Text('Upvote'),
-                  );
-                case BarButtons.DOWNVOTE:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.DOWNVOTE,
-                    child: const Text('Downvote'),
-                  );
-                case BarButtons.REPLY:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.REPLY,
-                    child: const Text('Reply'),
-                  );
-                case BarButtons.SAVE:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.SAVE,
-                    child: const Text('Save'),
-                  );
-                case BarButtons.VIEW_PROFILE:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.VIEW_PROFILE,
-                    child: const Text('View Profile'),
-                  );
-                case BarButtons.VIEW_CONTEXT:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.VIEW_CONTEXT,
-                    child: const Text('View Context'),
-                  );
-                case BarButtons.COPY_TEXT:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.COPY_TEXT,
-                    child: const Text('Copy Text'),
-                  );
-                case BarButtons.SHARE:
-                  return const PopupMenuItem<BarButtons>(
-                    value: BarButtons.SHARE,
-                    child: const Text('Share'),
-                  );
-              }
-            }).toList(),
-            onSelected: (BarButtons selection) async {
-              this._toggleButtonBar(comment.id);
-              switch (selection) {
-                case BarButtons.UPVOTE:
-                  return this._upvoteComment(context, commentStatus, account);
-                case BarButtons.DOWNVOTE:
-                  return this._downvoteComment(context, commentStatus, account);
-                case BarButtons.REPLY:
-                  return this._reply(context, commentStatus, account);
-                case BarButtons.SAVE:
-                  return this._saveComment(context, commentStatus, account);
-                case BarButtons.VIEW_PROFILE:
-                  return this._viewProfile(context, comment.by);
-                case BarButtons.VIEW_CONTEXT:
-                  return this._viewContext(context, comment.parent);
-                case BarButtons.COPY_TEXT:
-                  return this._copyText(comment.computed.simpleText);
-                case BarButtons.SHARE:
-                  return await this._shareComment(comment, _itemStore.items);
-              }
-            },
-          )
-        );
+        buttons.add(new PopupMenuButton<BarButtons>(
+          icon: const Icon(
+            Icons.more_horiz,
+            color: Colors.white,
+          ),
+          itemBuilder: (BuildContext ctx) =>
+              widget.overflowButtons.map((button) {
+                switch (button) {
+                  case BarButtons.UPVOTE:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.UPVOTE,
+                      child: const Text('Upvote'),
+                    );
+                  case BarButtons.DOWNVOTE:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.DOWNVOTE,
+                      child: const Text('Downvote'),
+                    );
+                  case BarButtons.REPLY:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.REPLY,
+                      child: const Text('Reply'),
+                    );
+                  case BarButtons.SAVE:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.SAVE,
+                      child: const Text('Save'),
+                    );
+                  case BarButtons.VIEW_PROFILE:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.VIEW_PROFILE,
+                      child: const Text('View Profile'),
+                    );
+                  case BarButtons.VIEW_CONTEXT:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.VIEW_CONTEXT,
+                      child: const Text('View Context'),
+                    );
+                  case BarButtons.COPY_TEXT:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.COPY_TEXT,
+                      child: const Text('Copy Text'),
+                    );
+                  case BarButtons.SHARE:
+                    return const PopupMenuItem<BarButtons>(
+                      value: BarButtons.SHARE,
+                      child: const Text('Share'),
+                    );
+                }
+              }).toList(),
+          onSelected: (BarButtons selection) async {
+            this._toggleButtonBar(comment.id);
+            switch (selection) {
+              case BarButtons.UPVOTE:
+                return this._upvoteComment(context, commentStatus, account);
+              case BarButtons.DOWNVOTE:
+                return this._downvoteComment(context, commentStatus, account);
+              case BarButtons.REPLY:
+                return this._reply(context, commentStatus, account);
+              case BarButtons.SAVE:
+                return this._saveComment(context, commentStatus, account);
+              case BarButtons.VIEW_PROFILE:
+                return this._viewProfile(context, comment.by);
+              case BarButtons.VIEW_CONTEXT:
+                return this._viewContext(context, comment.parent);
+              case BarButtons.COPY_TEXT:
+                return this._copyText(comment.computed.simpleText);
+              case BarButtons.SHARE:
+                return await this._shareComment(comment, _itemStore.items);
+            }
+          },
+        ));
       }
 
       final buttonRow = new ClipRect(
@@ -457,17 +470,19 @@ class _CommentState extends State<Comment>
         ),
       );
 
-      final childComments = (
-          comment.kids != null && widget.loadChildren && !(commentStatus?.hidden ?? false)
-        )
-        ? new Column(
-          children: comment.kids.map((kid) => new Comment(
-            itemId: kid,
-            depth: widget.depth + 1,
-            op: widget.op,
-          )).toList(),
-        )
-        : new Container();
+      final childComments = (comment.kids != null &&
+              widget.loadChildren &&
+              !(commentStatus?.hidden ?? false))
+          ? new Column(
+              children: comment.kids
+                  .map((kid) => new Comment(
+                        itemId: kid,
+                        depth: widget.depth + 1,
+                        op: widget.op,
+                      ))
+                  .toList(),
+            )
+          : new Container();
 
       Color commentColor;
       if (widget.depth > 0) {
@@ -478,7 +493,8 @@ class _CommentState extends State<Comment>
         commentColor = commentColors[index];
       }
 
-      this._backgroundColorTween.end = Theme.of(context).primaryColor.withOpacity(0.3);
+      this._backgroundColorTween.end =
+          Theme.of(context).primaryColor.withOpacity(0.3);
 
       return new Column(
         children: <Widget>[
@@ -487,11 +503,11 @@ class _CommentState extends State<Comment>
             child: new InkWell(
               splashColor: Theme.of(context).primaryColor.withOpacity(0.3),
               onTap: () {
-                if (
-                  _selectedItemStore.item != comment.id &&
-                  commentStatus.authTokens?.reply == null && account?.accessCookie != null
-                ) {
-                  _hnItemService.getCommentItemAuthById(comment.id, account.accessCookie);
+                if (_selectedItemStore.item != comment.id &&
+                    commentStatus.authTokens?.reply == null &&
+                    account?.accessCookie != null) {
+                  _hnItemService.getCommentItemAuthById(
+                      comment.id, account.accessCookie);
                 }
 
                 this._toggleButtonBar(comment.id);
@@ -501,23 +517,28 @@ class _CommentState extends State<Comment>
                 showHideItem(comment.id);
               },
               child: new Padding(
-                padding: new EdgeInsets.only(left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
+                padding: new EdgeInsets.only(
+                    left: widget.depth > 0 ? (widget.depth - 1) * 4.0 : 0.0),
                 child: new Container(
                   width: double.infinity,
                   decoration: new BoxDecoration(
                     border: new Border(
-                      left: widget.depth > 0 ? new BorderSide(
-                        width: 4.0,
-                        color: commentColor,
-                      ) : const BorderSide(
-                        width: 0.0,
-                      ),
+                      left: widget.depth > 0
+                          ? new BorderSide(
+                              width: 4.0,
+                              color: commentColor,
+                            )
+                          : const BorderSide(
+                              width: 0.0,
+                            ),
                       bottom: const BorderSide(
                         width: 1.0,
                         color: Colors.black12,
                       ),
                     ),
-                    color: this._backgroundColorTween.lerp(this._btnHeightAnimation.value),
+                    color: this
+                        ._backgroundColorTween
+                        .lerp(this._btnHeightAnimation.value),
                   ),
                   child: new Column(
                     children: <Widget>[
@@ -528,7 +549,9 @@ class _CommentState extends State<Comment>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             topRow,
-                            !(commentStatus?.hidden ?? false) ? content : new Container(),
+                            !(commentStatus?.hidden ?? false)
+                                ? content
+                                : new Container(),
                           ],
                         ),
                       ),
@@ -539,9 +562,7 @@ class _CommentState extends State<Comment>
             ),
           ),
           this._btnHeightAnimation.value > 0 ? buttonRow : new Container(),
-          !(commentStatus?.hidden ?? false) ?
-            childComments :
-            new Container(),
+          !(commentStatus?.hidden ?? false) ? childComments : new Container(),
         ],
       );
     } else {

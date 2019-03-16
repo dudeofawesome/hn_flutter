@@ -36,7 +36,7 @@ final staticRoutes = <String, WidgetBuilder>{
   '/${Routes.LICENSES}': (BuildContext context) => new LicensesPage(),
 };
 
-Route<Null> getRoute (RouteSettings settings) {
+Route<Null> getRoute(RouteSettings settings) {
   // Routes, by convention, are split on slashes, like filesystem paths.
   final parsed = Uri.parse(settings.name);
 
@@ -75,15 +75,12 @@ Route<Null> getRoute (RouteSettings settings) {
       }
       return new PageRouteBuilder<Null>(
         settings: settings,
-        pageBuilder: (
-          BuildContext context,
-          Animation<double> animation, Animation<double> secondaryAnimation
-        ) => subPage,
+        pageBuilder: (BuildContext context, Animation<double> animation,
+                Animation<double> secondaryAnimation) =>
+            subPage,
         transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (
-          BuildContext context, Animation<double> animation,
-          Animation<double> secondaryAnimation, Widget child
-        ) {
+        transitionsBuilder: (BuildContext context, Animation<double> animation,
+            Animation<double> secondaryAnimation, Widget child) {
           return new FadeTransition(
             opacity: animation,
             child: child,
@@ -110,7 +107,8 @@ Route<Null> getRoute (RouteSettings settings) {
       final userId = parsed.pathSegments[1];
       return new CupertinoPageRoute<Null>(
         settings: settings,
-        builder: (BuildContext context) => new UserPage(userId: userId, showDrawer: false),
+        builder: (BuildContext context) =>
+            new UserPage(userId: userId, showDrawer: false),
       );
     case Routes.SUBMIT_STORY:
       return new MaterialPageRoute<Null>(
@@ -126,9 +124,9 @@ Route<Null> getRoute (RouteSettings settings) {
         settings: settings,
         fullscreenDialog: true,
         builder: (BuildContext context) => new SubmitCommentPage(
-          parentId: int.parse(parsed.queryParameters['parentId']),
-          authToken: parsed.queryParameters['authToken'],
-        ),
+              parentId: int.parse(parsed.queryParameters['parentId']),
+              authToken: parsed.queryParameters['authToken'],
+            ),
       );
   }
 
@@ -136,8 +134,7 @@ Route<Null> getRoute (RouteSettings settings) {
   return null;
 }
 
-
-registerDeepLinkChannel (BuildContext ctx) {
+registerDeepLinkChannel(BuildContext ctx) {
   const MethodChannel(Channels.DEEP_LINK_RECEIVED)
     ..setMethodCallHandler((call) async {
       print('RECEIVED DEEP LINK');
@@ -149,7 +146,8 @@ registerDeepLinkChannel (BuildContext ctx) {
           if (passedObjs != null) {
             final route = passedObjs["route"] as String;
             // final a = await Navigator.pushNamed(ctx, route);
-            final a = await Navigator.of(ctx).pushNamed(route).catchError((err) {
+            final a =
+                await Navigator.of(ctx).pushNamed(route).catchError((err) {
               print(err);
               throw err;
             });

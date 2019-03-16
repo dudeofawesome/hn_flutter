@@ -16,7 +16,7 @@ import 'package:hn_flutter/components/starred_items_tab.dart';
 class StarredStoriesPage extends StoreWatcher {
   final bool showDrawer;
 
-  StarredStoriesPage ({
+  StarredStoriesPage({
     Key key,
     this.showDrawer = true,
   }) : super(key: key);
@@ -27,12 +27,12 @@ class StarredStoriesPage extends StoreWatcher {
     listenToStore(userStoreToken);
   }
 
-  Future<Null> _share (String userId) async {
+  Future<Null> _share(String userId) async {
     await Share.share('https://news.ycombinator.com/favorites?id=$userId');
   }
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     final HNAccountStore accountStore = stores[accountStoreToken];
 
     return new Scaffold(
@@ -43,12 +43,13 @@ class StarredStoriesPage extends StoreWatcher {
         actions: <Widget>[
           new PopupMenuButton<_OverflowMenuItems>(
             icon: const Icon(Icons.more_horiz),
-            itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
-              const PopupMenuItem<_OverflowMenuItems>(
-                value: _OverflowMenuItems.SHARE,
-                child: const Text('Share'),
-              ),
-            ],
+            itemBuilder: (BuildContext ctx) =>
+                <PopupMenuEntry<_OverflowMenuItems>>[
+                  const PopupMenuItem<_OverflowMenuItems>(
+                    value: _OverflowMenuItems.SHARE,
+                    child: const Text('Share'),
+                  ),
+                ],
             onSelected: (_OverflowMenuItems selection) async {
               switch (selection) {
                 case _OverflowMenuItems.SHARE:
@@ -56,14 +57,14 @@ class StarredStoriesPage extends StoreWatcher {
               }
             },
           ),
-
         ],
       ),
       drawer: this.showDrawer
-        ? new Builder(builder: (context) {
-          return new MainDrawer(MainPageSubPages.STARRED_STORIES, Scaffold.of(context));
-        })
-        : null,
+          ? new Builder(builder: (context) {
+              return new MainDrawer(
+                  MainPageSubPages.STARRED_STORIES, Scaffold.of(context));
+            })
+          : null,
       body: new StarredItemsTab(
         userId: accountStore.primaryAccountId,
         showStories: true,

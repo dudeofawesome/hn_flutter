@@ -20,7 +20,7 @@ class UpvotedItemsTab extends StatefulWidget {
   final bool showStories;
   final bool showComments;
 
-  const UpvotedItemsTab ({
+  const UpvotedItemsTab({
     this.userId,
     this.showStories = false,
     this.showComments = false,
@@ -28,16 +28,17 @@ class UpvotedItemsTab extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  createState () => new _UpvotedItemsTabState();
+  createState() => new _UpvotedItemsTabState();
 }
 
-class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixin<UpvotedItemsTab> {
+class _UpvotedItemsTabState extends State<UpvotedItemsTab>
+    with StoreWatcherMixin<UpvotedItemsTab> {
   HNUserService _hnUserService = new Injector().hnUserService;
   HNItemStore _hnItemStore;
   HNAccountStore _hnAccountStore;
 
   @override
-  initState () {
+  initState() {
     super.initState();
     this._hnItemStore = listenToStore(itemStoreToken);
     this._hnAccountStore = listenToStore(accountStoreToken);
@@ -45,15 +46,15 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
     this._refresh(context);
   }
 
-  Future<Null> _refresh (BuildContext context) async {
+  Future<Null> _refresh(BuildContext context) async {
     try {
       if (widget.showStories) {
-        await this._hnUserService.getVotedByUserID(
-          widget.userId, true, this._hnAccountStore.primaryAccount.accessCookie);
+        await this._hnUserService.getVotedByUserID(widget.userId, true,
+            this._hnAccountStore.primaryAccount.accessCookie);
       }
       if (widget.showComments) {
-        await this._hnUserService.getVotedByUserID(
-          widget.userId, false, this._hnAccountStore.primaryAccount.accessCookie);
+        await this._hnUserService.getVotedByUserID(widget.userId, false,
+            this._hnAccountStore.primaryAccount.accessCookie);
       }
     } on HandshakeException catch (err) {
       Scaffold.of(context).showSnackBar(new SnackBar(
@@ -63,46 +64,48 @@ class _UpvotedItemsTabState extends State<UpvotedItemsTab> with StoreWatcherMixi
   }
 
   @override
-  Widget build (BuildContext context) {
-    final upvotedItems = this._hnItemStore.itemStatuses.values
-      .where((itemStatus) => itemStatus.upvoted)
-      .where((itemStatus) {
-        if (widget.showStories && widget.showComments) {
-          return true;
-        } else if (this._hnItemStore.items[itemStatus.id] != null) {
-          if (widget.showStories) {
-            return this._hnItemStore.items[itemStatus.id]?.type == HNItemType.STORY;
-          } else if (widget.showComments) {
-            return this._hnItemStore.items[itemStatus.id]?.type == HNItemType.COMMENT;
-          }
-        }
+  Widget build(BuildContext context) {
+    final upvotedItems = this
+        ._hnItemStore
+        .itemStatuses
+        .values
+        .where((itemStatus) => itemStatus.upvoted)
+        .where((itemStatus) {
+      if (widget.showStories && widget.showComments) {
         return true;
-      })
-      .toList();
+      } else if (this._hnItemStore.items[itemStatus.id] != null) {
+        if (widget.showStories) {
+          return this._hnItemStore.items[itemStatus.id]?.type ==
+              HNItemType.STORY;
+        } else if (widget.showComments) {
+          return this._hnItemStore.items[itemStatus.id]?.type ==
+              HNItemType.COMMENT;
+        }
+      }
+      return true;
+    }).toList();
 
     return new RefreshIndicator(
-      onRefresh: () => this._refresh(context),
-      child: new Scrollbar(
-        child: (upvotedItems.length > 0)
-          ? new ListView.builder(
-            itemCount: upvotedItems.length,
-            itemBuilder: (context, index) =>
-              (this._hnItemStore.items[upvotedItems[index].id]?.type == HNItemType.STORY)
-                ? new StoryCard(
-                  storyId: upvotedItems[index].id,
+        onRefresh: () => this._refresh(context),
+        child: new Scrollbar(
+          child: (upvotedItems.length > 0)
+              ? new ListView.builder(
+                  itemCount: upvotedItems.length,
+                  itemBuilder: (context, index) =>
+                      (this._hnItemStore.items[upvotedItems[index].id]?.type ==
+                              HNItemType.STORY)
+                          ? new StoryCard(
+                              storyId: upvotedItems[index].id,
+                            )
+                          : new Comment(
+                              itemId: upvotedItems[index].id,
+                              loadChildren: false,
+                            ),
                 )
-                : new Comment(
-                  itemId: upvotedItems[index].id,
-                  loadChildren: false,
+              : new ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 32.0),
+                  children: [new Center(child: new Text('No submissions'))],
                 ),
-          )
-          : new ListView(
-            padding: const EdgeInsets.symmetric(vertical: 32.0),
-            children: [
-              new Center(child: new Text('No submissions'))
-            ],
-          ),
-      )
-    );
+        ));
   }
 }

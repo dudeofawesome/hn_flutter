@@ -19,17 +19,18 @@ class SubmitCommentPage extends StatefulWidget {
   final int parentId;
   final String authToken;
 
-  SubmitCommentPage ({
+  SubmitCommentPage({
     Key key,
     @required this.parentId,
     @required this.authToken,
   }) : super(key: key);
 
   @override
-  createState () => new _SubmitCommentPageState();
+  createState() => new _SubmitCommentPageState();
 }
 
-class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcherMixin<SubmitCommentPage> {
+class _SubmitCommentPageState extends State<SubmitCommentPage>
+    with StoreWatcherMixin<SubmitCommentPage> {
   final _hnItemService = new Injector().hnItemService;
 
   final _formKey = new GlobalKey<FormState>();
@@ -39,13 +40,13 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
   HNItemStore _itemStore;
 
   @override
-  void initState () {
+  void initState() {
     super.initState();
     this._accountStore = listenToStore(accountStoreToken);
     this._itemStore = listenToStore(itemStoreToken);
   }
 
-  Future<bool> _onWillPop (BuildContext context) async {
+  Future<bool> _onWillPop(BuildContext context) async {
     if (this._commentTextKey.currentState.value == '') return true;
 
     return await showDialog(
@@ -54,14 +55,16 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
     );
   }
 
-  void _submit (BuildContext context) async {
+  void _submit(BuildContext context) async {
     print(this._commentTextKey.currentState.value);
 
     try {
       await this._hnItemService.replyToItemById(
-        widget.parentId, this._commentTextKey.currentState.value,
-        widget.authToken, this._accountStore.primaryAccount.accessCookie,
-      );
+            widget.parentId,
+            this._commentTextKey.currentState.value,
+            widget.authToken,
+            this._accountStore.primaryAccount.accessCookie,
+          );
 
       Navigator.pop(context);
     } catch (err) {
@@ -73,7 +76,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     final parent = this._itemStore.items[widget.parentId];
 
     return new Form(
@@ -86,11 +89,11 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
           actions: <Widget>[
             new Builder(
               builder: (context) => new IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: widget.authToken != null
-                  ? () => this._submit(context)
-                  : null,
-              ),
+                    icon: const Icon(Icons.send),
+                    onPressed: widget.authToken != null
+                        ? () => this._submit(context)
+                        : null,
+                  ),
             ),
           ],
         ),
@@ -99,46 +102,43 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
           child: new Column(
             children: <Widget>[
               parent.type == HNItemType.COMMENT
-                ? new Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  child: new Column(
-                    children: <Widget>[
-                      new Container(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        decoration: new BoxDecoration(
-                          border: new Border(
-                            left: new BorderSide(
-                              color: Theme.of(context).accentColor,
-                              width: 3.0
-                            )
-                          )
-                        ),
-                        child: new Container(
-                          constraints: new BoxConstraints(
-                            maxHeight: 200.0,
-                          ),
-                          child: new ListView(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            shrinkWrap: true,
-                            children: <Widget>[
-                              new Text(
-                                parent.by,
-                                style: new TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                  ? new Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                      child: new Column(
+                        children: <Widget>[
+                          new Container(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            decoration: new BoxDecoration(
+                                border: new Border(
+                                    left: new BorderSide(
+                                        color: Theme.of(context).accentColor,
+                                        width: 3.0))),
+                            child: new Container(
+                              constraints: new BoxConstraints(
+                                maxHeight: 200.0,
                               ),
-                              new HTMLText(parent.text),
-                            ],
+                              child: new ListView(
+                                padding: const EdgeInsets.only(bottom: 4.0),
+                                shrinkWrap: true,
+                                children: <Widget>[
+                                  new Text(
+                                    parent.by,
+                                    style: new TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  new HTMLText(parent.text),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                          const Divider(),
+                        ],
                       ),
-                      const Divider(),
-                    ],
-                  ),
-                )
-                : const Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                ),
+                    )
+                  : const Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                    ),
               // new TextFormField(
               //   key: this._commentTextKey,
               //   autofocus: true,
@@ -148,11 +148,11 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
               // ),
               new FormField<String>(
                 builder: (builder) => new Expanded(
-                  child: new HackerNewsEditor(
-                    key: this._commentTextKey,
-                    labelText: 'Comment',
-                  ),
-                ),
+                      child: new HackerNewsEditor(
+                        key: this._commentTextKey,
+                        labelText: 'Comment',
+                      ),
+                    ),
               )
             ],
           ),
@@ -161,7 +161,7 @@ class _SubmitCommentPageState extends State<SubmitCommentPage> with StoreWatcher
     );
   }
 
-  Widget _buildPopConfirmDialog (BuildContext context) {
+  Widget _buildPopConfirmDialog(BuildContext context) {
     return new AlertDialog(
       title: const Text('Discard submission?'),
       actions: <Widget>[

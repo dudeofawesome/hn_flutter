@@ -15,16 +15,15 @@ class HNAccountStore extends Store {
   String _primaryAccountId;
   final Map<String, HNAccount> _accounts = new Map();
 
-  HNAccountStore._internal () {
+  HNAccountStore._internal() {
     new Future(() async {
       final primaryUserId = await this._localStorage.primaryUserId;
 
-      (await this._localStorage.accounts)
-        .forEach((account) {
-          print(account);
-          // TODO: this causes the DB to get rewritten every launch
-          addHNAccount(account);
-        });
+      (await this._localStorage.accounts).forEach((account) {
+        print(account);
+        // TODO: this causes the DB to get rewritten every launch
+        addHNAccount(account);
+      });
 
       if (primaryUserId != null) {
         print('primary account was $primaryUserId');
@@ -56,7 +55,7 @@ class HNAccountStore extends Store {
     });
   }
 
-  factory HNAccountStore () {
+  factory HNAccountStore() {
     return _singleton;
   }
 

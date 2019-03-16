@@ -7,22 +7,22 @@ class HackerNewsEditor extends StatefulWidget {
   final String initialValue;
   final ValueChanged<String> onChanged;
 
-  HackerNewsEditor ({
+  HackerNewsEditor({
     this.labelText = 'Text',
     this.initialValue,
     this.onChanged,
     Key key,
-  }): super(key: key);
+  }) : super(key: key);
 
   @override
-  createState () => new HackerNewsEditorState();
+  createState() => new HackerNewsEditorState();
 }
 
 class HackerNewsEditorState extends State<HackerNewsEditor> {
   final TextEditingController _controller = new TextEditingController();
 
   @override
-  void initState () {
+  void initState() {
     super.initState();
 
     this._controller.text = widget.initialValue;
@@ -33,51 +33,55 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
   }
 
   @override
-  void dispose () {
+  void dispose() {
     super.dispose();
     this._controller.dispose();
   }
 
   String get value => this._controller.text ?? '';
 
-  void _padSelection (String padding) {
-    final selection = this._controller.selection.textInside(this._controller.text);
+  void _padSelection(String padding) {
+    final selection =
+        this._controller.selection.textInside(this._controller.text);
     final modified = '$padding$selection$padding';
-    final modifiedOffset = this._controller.selection.extentOffset + padding.length * 2;
+    final modifiedOffset =
+        this._controller.selection.extentOffset + padding.length * 2;
     this._controller.text =
-      this._controller.selection.textBefore(this._controller.text) +
-      modified +
-      this._controller.selection.textAfter(this._controller.text);
-    this._controller.selection = new TextSelection.fromPosition(new TextPosition(
+        this._controller.selection.textBefore(this._controller.text) +
+            modified +
+            this._controller.selection.textAfter(this._controller.text);
+    this._controller.selection =
+        new TextSelection.fromPosition(new TextPosition(
       offset: modifiedOffset,
     ));
   }
 
-  void _createBlock (String blockString) {
-    final selection = this._controller.selection.textInside(this._controller.text);
+  void _createBlock(String blockString) {
+    final selection =
+        this._controller.selection.textInside(this._controller.text);
     final modified = selection.replaceAll('\n', '\n$blockString');
     this._controller.text =
-      this._controller.selection.textBefore(this._controller.text) +
-      '\n$blockString$modified\n' +
-      this._controller.selection.textAfter(this._controller.text);
+        this._controller.selection.textBefore(this._controller.text) +
+            '\n$blockString$modified\n' +
+            this._controller.selection.textAfter(this._controller.text);
   }
 
-  void _insertQuote () => this._createBlock('> ');
+  void _insertQuote() => this._createBlock('> ');
 
-  void _insertListBullet () => this._createBlock('- ');
+  void _insertListBullet() => this._createBlock('- ');
 
-  void _insertListNumber () => this._createBlock('1. ');
+  void _insertListNumber() => this._createBlock('1. ');
 
-  void _makeSelectionBold () => this._padSelection('**');
+  void _makeSelectionBold() => this._padSelection('**');
 
-  void _makeSelectionItalic () => this._padSelection('*');
+  void _makeSelectionItalic() => this._padSelection('*');
 
-  void _makeSelectionUnderlined () => this._padSelection('__');
+  void _makeSelectionUnderlined() => this._padSelection('__');
 
-  void _makeSelectionStruckThrough ()  => this._padSelection('~~');
+  void _makeSelectionStruckThrough() => this._padSelection('~~');
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     return new DefaultTabController(
       length: 2,
       child: new Column(
@@ -108,12 +112,13 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
     );
   }
 
-  Widget _buildEditor (BuildContext context) {
+  Widget _buildEditor(BuildContext context) {
     return new Column(
       children: <Widget>[
         new Expanded(
           child: new Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: new TextField(
               controller: this._controller,
               autofocus: true,
@@ -167,7 +172,7 @@ class HackerNewsEditorState extends State<HackerNewsEditor> {
     );
   }
 
-  Widget _buildPreview (BuildContext context) {
+  Widget _buildPreview(BuildContext context) {
     return new Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: new MarkdownBody(data: this._controller.text),

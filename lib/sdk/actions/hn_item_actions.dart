@@ -15,7 +15,8 @@ class HNItemAction {
   HNItem item;
   HNItemStatus status;
 
-  HNItemAction ([
-    this.item, this.status,
+  HNItemAction([
+    this.item,
+    this.status,
   ]);
 }

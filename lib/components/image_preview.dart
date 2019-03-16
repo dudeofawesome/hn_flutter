@@ -6,41 +6,44 @@ import 'package:flutter/services.dart';
 
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
-import 'package:flutter_web_browser/flutter_web_browser.dart' show FlutterWebBrowser;
+import 'package:flutter_web_browser/flutter_web_browser.dart'
+    show FlutterWebBrowser;
 
-class ImagePreview extends StatefulWidget{
+class ImagePreview extends StatefulWidget {
   final String imageUrl;
 
-  const ImagePreview ({
+  const ImagePreview({
     Key key,
     @required this.imageUrl,
   }) : super(key: key);
 
   @override
-  _ImagePreviewState createState () => new _ImagePreviewState();
+  _ImagePreviewState createState() => new _ImagePreviewState();
 }
 
 class _ImagePreviewState extends State<ImagePreview> {
   Key _dismissibleKey = new Key('dismissibleImage');
 
-  _openInBrowser (BuildContext ctx) async {
+  _openInBrowser(BuildContext ctx) async {
     if (await UrlLauncher.canLaunch(widget.imageUrl)) {
-      await FlutterWebBrowser.openWebPage(url: widget.imageUrl, androidToolbarColor: Theme.of(ctx).primaryColor);
+      await FlutterWebBrowser.openWebPage(
+          url: widget.imageUrl,
+          androidToolbarColor: Theme.of(ctx).primaryColor);
     }
   }
 
-  Future<Null> _copyUrl () async {
+  Future<Null> _copyUrl() async {
     await Clipboard.setData(new ClipboardData(text: widget.imageUrl));
   }
 
-  Future<Null> _shareImage () async {
+  Future<Null> _shareImage() async {
     await Share.share(widget.imageUrl);
   }
 
-  Future<Null> _download () async {}
+  Future<Null> _download() async {}
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     return new Scaffold(
       // appBar: new AppBar(
       //   leading: new IconButton(
@@ -67,7 +70,7 @@ class _ImagePreviewState extends State<ImagePreview> {
     );
   }
 
-  Widget _image (BuildContext context) {
+  Widget _image(BuildContext context) {
     return new Dismissible(
       key: this._dismissibleKey,
       direction: DismissDirection.vertical,
@@ -87,7 +90,7 @@ class _ImagePreviewState extends State<ImagePreview> {
     );
   }
 
-  Widget _bottomSheet (BuildContext context) {
+  Widget _bottomSheet(BuildContext context) {
     return new IconTheme(
       data: new IconThemeData(
         color: Colors.white,
@@ -164,7 +167,7 @@ class _ImagePreviewState extends State<ImagePreview> {
   }
 }
 
-Future<T> showOverlay<T> ({
+Future<T> showOverlay<T>({
   @required BuildContext context,
   @required String imageUrl,
 }) {
@@ -178,7 +181,7 @@ Future<T> showOverlay<T> ({
 }
 
 class _OverlayRoute<T> extends PopupRoute<T> {
-  _OverlayRoute ({
+  _OverlayRoute({
     @required this.theme,
     this.barrierLabel,
     @required this.child,
@@ -200,22 +203,18 @@ class _OverlayRoute<T> extends PopupRoute<T> {
   final String barrierLabel;
 
   @override
-  Widget buildPage (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    return new Builder(
-      builder: (BuildContext context) {
-        return theme != null ? new Theme(data: theme, child: child) : child;
-      }
-    );
+  Widget buildPage(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation) {
+    return new Builder(builder: (BuildContext context) {
+      return theme != null ? new Theme(data: theme, child: child) : child;
+    });
   }
 
   @override
-  Widget buildTransitions (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
     return new FadeTransition(
-      opacity: new CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOut
-      ),
-      child: child
-    );
+        opacity: new CurvedAnimation(parent: animation, curve: Curves.easeOut),
+        child: child);
   }
 }

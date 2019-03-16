@@ -16,7 +16,7 @@ import 'package:hn_flutter/components/upvoted_items_tab.dart';
 class VotedCommentsPage extends StoreWatcher {
   final bool showDrawer;
 
-  VotedCommentsPage ({
+  VotedCommentsPage({
     Key key,
     this.showDrawer = true,
   }) : super(key: key);
@@ -27,12 +27,13 @@ class VotedCommentsPage extends StoreWatcher {
     listenToStore(userStoreToken);
   }
 
-  Future<Null> _shareUser (String userId) async {
-    await Share.share('https://news.ycombinator.com/upvoted?id=$userId&comments=t');
+  Future<Null> _shareUser(String userId) async {
+    await Share.share(
+        'https://news.ycombinator.com/upvoted?id=$userId&comments=t');
   }
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -49,19 +50,19 @@ class VotedCommentsPage extends StoreWatcher {
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: new Text(
-            (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
-              ? 'Upvoted'
-              : 'Voted'
-          ),
+              (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+                  ? 'Upvoted'
+                  : 'Voted'),
           actions: <Widget>[
             new PopupMenuButton<_OverflowMenuItems>(
               icon: const Icon(Icons.more_horiz),
-              itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
-                const PopupMenuItem<_OverflowMenuItems>(
-                  value: _OverflowMenuItems.SHARE,
-                  child: const Text('Share'),
-                ),
-              ],
+              itemBuilder: (BuildContext ctx) =>
+                  <PopupMenuEntry<_OverflowMenuItems>>[
+                    const PopupMenuItem<_OverflowMenuItems>(
+                      value: _OverflowMenuItems.SHARE,
+                      child: const Text('Share'),
+                    ),
+                  ],
               onSelected: (_OverflowMenuItems selection) async {
                 switch (selection) {
                   case _OverflowMenuItems.SHARE:
@@ -69,36 +70,39 @@ class VotedCommentsPage extends StoreWatcher {
                 }
               },
             ),
-
           ],
-          bottom: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
-            ? new TabBar(
-              // isScrollable: true,
-              tabs: _choices.map((choice) => new Tab(
-                text: choice.title.toUpperCase(),
-                icon: new Icon(choice.icon),
-              )).toList(),
-            )
-            : null,
+          bottom:
+              (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
+                  ? new TabBar(
+                      // isScrollable: true,
+                      tabs: _choices
+                          .map((choice) => new Tab(
+                                text: choice.title.toUpperCase(),
+                                icon: new Icon(choice.icon),
+                              ))
+                          .toList(),
+                    )
+                  : null,
         ),
         drawer: this.showDrawer
-          ? new Builder(builder: (context) {
-            return new MainDrawer(MainPageSubPages.VOTED_COMMENTS, Scaffold.of(context));
-          })
-          : null,
+            ? new Builder(builder: (context) {
+                return new MainDrawer(
+                    MainPageSubPages.VOTED_COMMENTS, Scaffold.of(context));
+              })
+            : null,
         body: (accountStore.primaryAccount?.permissions?.canDownvote ?? false)
-          ? new TabBarView(
-            children: <Widget>[
-              new UpvotedItemsTab(
+            ? new TabBarView(
+                children: <Widget>[
+                  new UpvotedItemsTab(
+                    userId: accountStore.primaryAccountId,
+                    showComments: true,
+                  ),
+                ],
+              )
+            : new UpvotedItemsTab(
                 userId: accountStore.primaryAccountId,
                 showComments: true,
               ),
-            ],
-          )
-          : new UpvotedItemsTab(
-            userId: accountStore.primaryAccountId,
-            showComments: true,
-          ),
       ),
     );
   }
@@ -109,7 +113,7 @@ enum _OverflowMenuItems {
 }
 
 class _Choice {
-  const _Choice({ this.title, this.icon });
+  const _Choice({this.title, this.icon});
   final String title;
   final IconData icon;
 }

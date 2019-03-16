@@ -11,15 +11,16 @@ import 'package:hn_flutter/sdk/stores/hn_account_store.dart';
 import 'package:hn_flutter/components/hn_editor.dart';
 
 class SubmitStoryPage extends StatefulWidget {
-  SubmitStoryPage ({
+  SubmitStoryPage({
     Key key,
   }) : super(key: key);
 
   @override
-  createState () => new _SubmitStoryPageState();
+  createState() => new _SubmitStoryPageState();
 }
 
-class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixin<SubmitStoryPage> {
+class _SubmitStoryPageState extends State<SubmitStoryPage>
+    with StoreWatcherMixin<SubmitStoryPage> {
   final _hnItemService = new Injector().hnItemService;
 
   final _formKey = new GlobalKey<FormState>();
@@ -35,28 +36,29 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   String _submissionAuthToken;
 
   @override
-  void initState () {
+  void initState() {
     super.initState();
     this._accountStore = listenToStore(accountStoreToken);
     this._getFNID();
   }
 
-  void _getFNID () async {
+  void _getFNID() async {
     this._submissionAuthToken = null;
-    this._submissionAuthToken =
-      await this._hnItemService.getSubmissionAuthToken(this._accountStore.primaryAccount.accessCookie);
+    this._submissionAuthToken = await this
+        ._hnItemService
+        .getSubmissionAuthToken(this._accountStore.primaryAccount.accessCookie);
   }
 
-  Future<bool> _onWillPop (BuildContext context) async {
-    if (
-      this._storyTitleController.text == '' &&
-      ((storyType) {
-        switch (storyType) {
-          case _StoryTypes.TEXT: return this._storyTextVal == '';
-          case _StoryTypes.URL: return this._storyURLController.text == '';
-        }
-      })(this._storyType)
-    ) return true;
+  Future<bool> _onWillPop(BuildContext context) async {
+    if (this._storyTitleController.text == '' &&
+        ((storyType) {
+          switch (storyType) {
+            case _StoryTypes.TEXT:
+              return this._storyTextVal == '';
+            case _StoryTypes.URL:
+              return this._storyURLController.text == '';
+          }
+        })(this._storyType)) return true;
 
     return await showDialog(
       context: context,
@@ -64,16 +66,17 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
     );
   }
 
-  void _submit (BuildContext context) async {
+  void _submit(BuildContext context) async {
     print(this._storyTextVal);
 
     try {
       final itemId = await this._hnItemService.postItem(
-        this._submissionAuthToken, this._accountStore.primaryAccount.accessCookie,
-        this._storyTitleController.text,
-        url: this._storyURLController.text,
-        text: this._storyTextVal,
-      );
+            this._submissionAuthToken,
+            this._accountStore.primaryAccount.accessCookie,
+            this._storyTitleController.text,
+            url: this._storyURLController.text,
+            text: this._storyTextVal,
+          );
 
       Navigator.pushReplacementNamed(context, '/${Routes.STORIES}:$itemId');
     } catch (err) {
@@ -87,7 +90,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
   }
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     return new Form(
       key: this._formKey,
       onWillPop: () => this._onWillPop(context),
@@ -98,11 +101,11 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
           actions: <Widget>[
             new Builder(
               builder: (context) => new IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: this._submissionAuthToken != null
-                  ? () => this._submit(context)
-                  : null,
-              ),
+                    icon: const Icon(Icons.send),
+                    onPressed: this._submissionAuthToken != null
+                        ? () => this._submit(context)
+                        : null,
+                  ),
             ),
           ],
         ),
@@ -124,26 +127,31 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                     const Divider(),
                     new FormField<_StoryTypes>(
                       builder: (builder) => new Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: _StoryTypes.values.map((val) =>
-                          new SizedBox(
-                            width: 130.0,
-                            child: new RadioListTile<_StoryTypes>(
-                              groupValue: _storyType,
-                              value: val,
-                              onChanged: (val) => setState(() => this._storyType = val),
-                              title: new Text(
-                                ((val) {
-                                  switch (val) {
-                                    case _StoryTypes.TEXT: return 'Text';
-                                    case _StoryTypes.URL: return 'URL';
-                                  }
-                                })(val),
-                              ),
-                            ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: _StoryTypes.values
+                                .map(
+                                  (val) => new SizedBox(
+                                        width: 130.0,
+                                        child: new RadioListTile<_StoryTypes>(
+                                          groupValue: _storyType,
+                                          value: val,
+                                          onChanged: (val) => setState(
+                                              () => this._storyType = val),
+                                          title: new Text(
+                                            ((val) {
+                                              switch (val) {
+                                                case _StoryTypes.TEXT:
+                                                  return 'Text';
+                                                case _StoryTypes.URL:
+                                                  return 'URL';
+                                              }
+                                            })(val),
+                                          ),
+                                        ),
+                                      ),
+                                )
+                                .toList(),
                           ),
-                        ).toList(),
-                      ),
                     ),
                   ],
                 ),
@@ -153,11 +161,12 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
                   case _StoryTypes.TEXT:
                     return new FormField<String>(
                       builder: (builder) => new Expanded(
-                        child: new HackerNewsEditor(
-                          initialValue: this._storyTextVal,
-                          onChanged: (val) => setState(() => this._storyTextVal = val),
-                        ),
-                      ),
+                            child: new HackerNewsEditor(
+                              initialValue: this._storyTextVal,
+                              onChanged: (val) =>
+                                  setState(() => this._storyTextVal = val),
+                            ),
+                          ),
                     );
                   case _StoryTypes.URL:
                     return new Padding(
@@ -177,7 +186,7 @@ class _SubmitStoryPageState extends State<SubmitStoryPage> with StoreWatcherMixi
     );
   }
 
-  Widget _buildPopConfirmDialog (BuildContext context) {
+  Widget _buildPopConfirmDialog(BuildContext context) {
     return new AlertDialog(
       title: const Text('Discard submission?'),
       actions: <Widget>[

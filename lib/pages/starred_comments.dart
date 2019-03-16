@@ -16,7 +16,7 @@ import 'package:hn_flutter/components/starred_items_tab.dart';
 class StarredCommentsPage extends StoreWatcher {
   final bool showDrawer;
 
-  StarredCommentsPage ({
+  StarredCommentsPage({
     Key key,
     this.showDrawer = true,
   }) : super(key: key);
@@ -27,12 +27,13 @@ class StarredCommentsPage extends StoreWatcher {
     listenToStore(userStoreToken);
   }
 
-  Future<Null> _share (String userId) async {
-    await Share.share('https://news.ycombinator.com/favorites?id=$userId&comments=t');
+  Future<Null> _share(String userId) async {
+    await Share.share(
+        'https://news.ycombinator.com/favorites?id=$userId&comments=t');
   }
 
   @override
-  Widget build (BuildContext context, Map<StoreToken, Store> stores) {
+  Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     final HNAccountStore accountStore = stores[accountStoreToken];
 
     return new Scaffold(
@@ -43,12 +44,13 @@ class StarredCommentsPage extends StoreWatcher {
         actions: <Widget>[
           new PopupMenuButton<_OverflowMenuItems>(
             icon: const Icon(Icons.more_horiz),
-            itemBuilder: (BuildContext ctx) => <PopupMenuEntry<_OverflowMenuItems>>[
-              const PopupMenuItem<_OverflowMenuItems>(
-                value: _OverflowMenuItems.SHARE,
-                child: const Text('Share'),
-              ),
-            ],
+            itemBuilder: (BuildContext ctx) =>
+                <PopupMenuEntry<_OverflowMenuItems>>[
+                  const PopupMenuItem<_OverflowMenuItems>(
+                    value: _OverflowMenuItems.SHARE,
+                    child: const Text('Share'),
+                  ),
+                ],
             onSelected: (_OverflowMenuItems selection) async {
               switch (selection) {
                 case _OverflowMenuItems.SHARE:
@@ -56,14 +58,14 @@ class StarredCommentsPage extends StoreWatcher {
               }
             },
           ),
-
         ],
       ),
       drawer: this.showDrawer
-        ? new Builder(builder: (context) {
-          return new MainDrawer(MainPageSubPages.STARRED_COMMENTS, Scaffold.of(context));
-        })
-        : null,
+          ? new Builder(builder: (context) {
+              return new MainDrawer(
+                  MainPageSubPages.STARRED_COMMENTS, Scaffold.of(context));
+            })
+          : null,
       body: new StarredItemsTab(
         userId: accountStore.primaryAccountId,
         showComments: true,

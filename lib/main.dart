@@ -5,19 +5,19 @@ import 'package:hn_flutter/router.dart';
 
 import 'package:hn_flutter/injection/di.dart';
 
-void main () {
+void main() {
   Injector.configure(Flavor.PROD);
   new Injector().init().then((_) => runApp(new HNApp()));
 }
 
 class HNApp extends StatefulWidget {
   @override
-  HNAppState createState () => new HNAppState();
+  HNAppState createState() => new HNAppState();
 }
 
 class HNAppState extends State<HNApp> {
   @override
-  initState () {
+  initState() {
     super.initState();
 
     registerDeepLinkChannel(context);
@@ -25,7 +25,7 @@ class HNAppState extends State<HNApp> {
 
   // This widget is the root of your application.
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     // assert(() {
     //   debugPaintSizeEnabled = _configuration.debugShowSizes;
     //   debugPaintBaselinesEnabled = _configuration.debugShowBaselines;

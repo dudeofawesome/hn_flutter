@@ -10,54 +10,53 @@ import 'package:hn_flutter/components/html_text.dart';
 class UserAboutTab extends StatelessWidget {
   final HNUser user;
 
-  const UserAboutTab (
-    this.user,
-    {
-      Key key,
-    }
-  ) : super(key: key);
+  const UserAboutTab(
+    this.user, {
+    Key key,
+  }) : super(key: key);
 
   @override
-  Widget build (BuildContext context) {
+  Widget build(BuildContext context) {
     final aboutCard = new Card(
       child: new Padding(
-        padding: new EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
-        child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: const Text(
-                'About',
-                style: const TextStyle(fontSize: 24.0),
-              ),
-            ),
-            user != null ?
-              user.computed.aboutMarkdown != null ?
-                new HTMLText(user.about) :
-                new Container() :
+          padding: new EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 24.0),
+          child: new Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
               const Padding(
-                padding: const EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 16.0),
-                child: const Center(
-                  child: const SizedBox(
-                    width: 24.0,
-                    height: 24.0,
-                    child: const CircularProgressIndicator(value: null),
-                  ),
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: const Text(
+                  'About',
+                  style: const TextStyle(fontSize: 24.0),
                 ),
               ),
-          ],
-        )
-      ),
+              user != null
+                  ? user.computed.aboutMarkdown != null
+                      ? new HTMLText(user.about)
+                      : new Container()
+                  : const Padding(
+                      padding:
+                          const EdgeInsets.fromLTRB(32.0, 16.0, 32.0, 16.0),
+                      child: const Center(
+                        child: const SizedBox(
+                          width: 24.0,
+                          height: 24.0,
+                          child: const CircularProgressIndicator(value: null),
+                        ),
+                      ),
+                    ),
+            ],
+          )),
     );
 
-    final userCreated = user?.created != null ?
-      new DateTime.fromMillisecondsSinceEpoch(user.created * 1000) :
-      new DateTime.now();
+    final userCreated = user?.created != null
+        ? new DateTime.fromMillisecondsSinceEpoch(user.created * 1000)
+        : new DateTime.now();
     final String accountAge =
-      '${new DateTime.now().difference(userCreated).inDays} days' ??
-      '? years';
-    final String accountCakeDay = new DateFormat.yMMMMd("en_US").format(userCreated);
+        '${new DateTime.now().difference(userCreated).inDays} days' ??
+            '? years';
+    final String accountCakeDay =
+        new DateFormat.yMMMMd("en_US").format(userCreated);
 
     final summaryCard = new Card(
       child: new Padding(

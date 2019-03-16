@@ -4,7 +4,7 @@ import 'package:hn_flutter/sdk/actions/hn_user_actions.dart';
 import 'package:hn_flutter/sdk/models/hn_user.dart';
 
 class HNUserStore extends Store {
-  HNUserStore () {
+  HNUserStore() {
     triggerOnAction(addHNUser, (HNUser user) {
       _users[user.id] = user;
     });
