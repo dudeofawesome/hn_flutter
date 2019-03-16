@@ -20,6 +20,7 @@ import 'package:hn_flutter/sdk/models/hn_item.dart';
 import 'package:hn_flutter/components/comment.dart';
 import 'package:hn_flutter/components/fab_bottom_padding.dart';
 import 'package:hn_flutter/components/story_header.dart';
+import 'package:hn_flutter/components/story_header.dart' as story_header;
 
 class StoryPage extends StatefulWidget {
   final int itemId;
@@ -120,7 +121,15 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
           ),
         ],
       ),
-      child: StoryHeader(storyId: widget.itemId),
+      child: StoryHeader(
+        storyId: widget.itemId,
+        fadeIfSeen: false,
+        overflowMenuItems: [
+          story_header.OverflowMenuItems.SHARE,
+          story_header.OverflowMenuItems.COPY_TEXT,
+          story_header.OverflowMenuItems.VIEW_PROFILE,
+        ],
+      ),
     );
 
     return new Scaffold(

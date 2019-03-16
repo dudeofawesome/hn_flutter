@@ -25,11 +25,20 @@ class StoryHeader extends StoreWatcher {
   final _hnItemService = new Injector().hnItemService;
 
   final int storyId;
+  final bool fadeIfSeen;
+  final List<OverflowMenuItems> overflowMenuItems;
   final _popupMenuButtonKey = new GlobalKey();
 
   StoryHeader ({
     Key key,
-    @required this.storyId
+    @required this.storyId,
+    this.fadeIfSeen = true,
+    this.overflowMenuItems = const [
+      OverflowMenuItems.SHARE,
+      OverflowMenuItems.HIDE,
+      OverflowMenuItems.COPY_TEXT,
+      OverflowMenuItems.VIEW_PROFILE,
+    ],
   }) : super(key: key);
 
   @override
@@ -129,7 +138,7 @@ class StoryHeader extends StoreWatcher {
     final storyStatus = itemStore.itemStatuses[this.storyId];
     final account = accountStore.primaryAccount;
 
-    final storyTextOpacity = !(storyStatus?.seen ?? false) ? 1.0 : 0.5;
+    final storyTextOpacity = (fadeIfSeen) ? (!(storyStatus?.seen ?? false) ? 1.0 : 0.5) : 1.0;
 
     if (story == null || (storyStatus?.loading ?? true)) {
       if (story == null) {
@@ -242,25 +251,41 @@ class StoryHeader extends StoreWatcher {
         Icons.more_horiz,
         size: 20.0
       ),
-      itemBuilder: (BuildContext ctx) => <PopupMenuEntry<OverflowMenuItems>>[
-        const PopupMenuItem<OverflowMenuItems>(
-          value: OverflowMenuItems.SHARE,
-          child: const Text('Share'),
-        ),
-        new PopupMenuItem<OverflowMenuItems>(
-          value: OverflowMenuItems.HIDE,
-          child: const Text('Hide'),
-          enabled: storyStatus?.authTokens?.hide != null,
-        ),
-        const PopupMenuItem<OverflowMenuItems>(
-          value: OverflowMenuItems.COPY_TEXT,
-          child: const Text('Copy Text'),
-        ),
-        const PopupMenuItem<OverflowMenuItems>(
-          value: OverflowMenuItems.VIEW_PROFILE,
-          child: const Text('View Profile'),
-        ),
-      ],
+      itemBuilder: (BuildContext ctx) {
+        List<PopupMenuEntry<OverflowMenuItems>> popupMenuEntries = [];
+
+        for (final item in this.overflowMenuItems) {
+          switch (item) {
+            case OverflowMenuItems.COPY_TEXT:
+              popupMenuEntries.add(PopupMenuItem<OverflowMenuItems>(
+                value: OverflowMenuItems.COPY_TEXT,
+                child: const Text('Copy Text'),
+              ));
+              break;
+            case OverflowMenuItems.HIDE:
+              popupMenuEntries.add(PopupMenuItem<OverflowMenuItems>(
+                value: OverflowMenuItems.HIDE,
+                child: const Text('Hide'),
+                enabled: storyStatus?.authTokens?.hide != null,
+              ));
+              break;
+            case OverflowMenuItems.SHARE:
+              popupMenuEntries.add(PopupMenuItem<OverflowMenuItems>(
+                value: OverflowMenuItems.SHARE,
+                child: const Text('Share'),
+              ));
+              break;
+            case OverflowMenuItems.VIEW_PROFILE:
+              popupMenuEntries.add(PopupMenuItem<OverflowMenuItems>(
+                value: OverflowMenuItems.VIEW_PROFILE,
+                child: const Text('View Profile'),
+              ));
+              break;
+          }
+        }
+
+        return popupMenuEntries;
+      },
       onSelected: (OverflowMenuItems selection) async {
         switch (selection) {
           case OverflowMenuItems.HIDE:
