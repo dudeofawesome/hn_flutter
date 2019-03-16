@@ -161,7 +161,7 @@ class HNItemServiceProd implements HNItemService {
       ..cookies.add(accessCookie))
       .close();
 
-    final body = await req.transform(utf8.decoder).toList().then((body) => body.join());
+    final body = await req.timeout(new Duration(seconds: 5)).transform(utf8.decoder).toList().then((body) => body.join());
 
     if (body.contains(_loginLink)) {
       throw 'Invalid or expired auth cookie';
