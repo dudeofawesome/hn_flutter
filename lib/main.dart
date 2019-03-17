@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -16,11 +17,15 @@ class HNApp extends StatefulWidget {
 }
 
 class HNAppState extends State<HNApp> {
+  StreamSubscription _linkSub;
+
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   initState() {
     super.initState();
 
-    registerDeepLinkChannel(context);
+    initDeepLinks(_navigatorKey.currentState).then((sub) => _linkSub = sub);
   }
 
   // This widget is the root of your application.
@@ -50,10 +55,16 @@ class HNAppState extends State<HNApp> {
       // debugShowMaterialGrid: _configuration.debugShowGrid,
       // showPerformanceOverlay: _configuration.showPerformanceOverlay,
       // showSemanticsDebugger: _configuration.showSemanticsDebugger,
-      initialRoute: null,
+      navigatorKey: _navigatorKey,
       routes: staticRoutes,
       onGenerateRoute: getRoute,
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    this._linkSub?.cancel();
   }
 
   ThemeData get theme {

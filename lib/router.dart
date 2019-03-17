@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart' show MethodChannel;
+import 'package:flutter/services.dart' show PlatformException;
+import 'package:uni_links/uni_links.dart';
 
 import 'package:hn_flutter/pages/settings.dart';
 import 'package:hn_flutter/pages/licenses.dart';
@@ -134,29 +137,55 @@ Route<Null> getRoute(RouteSettings settings) {
   return null;
 }
 
-registerDeepLinkChannel(BuildContext ctx) {
-  const MethodChannel(Channels.DEEP_LINK_RECEIVED)
-    ..setMethodCallHandler((call) async {
-      print('RECEIVED DEEP LINK');
-      print(call);
+Future<StreamSubscription> initDeepLinks(NavigatorState navState) async {
+  // Platform messages may fail, so we use a try/catch PlatformException.
+  try {
+    var initialLink = await getInitialLink();
+    if (initialLink != null) {
+      navState.pushNamed(_convertLink(initialLink));
+    }
+  } on PlatformException {
+    // Handle exception by warning the user their action did not succeed
+    // return?
+  }
 
-      switch (call.method) {
-        case 'linkReceived':
-          Map<String, dynamic> passedObjs = call.arguments;
-          if (passedObjs != null) {
-            final route = passedObjs["route"] as String;
-            // final a = await Navigator.pushNamed(ctx, route);
-            final a =
-                await Navigator.of(ctx).pushNamed(route).catchError((err) {
-              print(err);
-              throw err;
-            });
-            print('PUSHED ROUTE');
-            print(a);
-          }
-          break;
+  final linkSub = getLinksStream().listen((String link) {
+    print(link);
+    navState.pushNamed(_convertLink(link));
+  }, onError: (err) {
+    // Handle exception by warning the user their action did not succeed
+  });
+
+  return linkSub;
+}
+
+String _convertLink(String hnLink) {
+  final uri = Uri.parse(hnLink);
+  switch (uri.pathSegments[0]) {
+    case '':
+    case 'news':
+      return '/';
+    case 'newest':
+      return '/';
+    case 'ask':
+      return '/';
+    case 'show':
+      return '/';
+    case 'jobs':
+      return '/';
+    case 'item':
+      if (uri.queryParameters['id'] != null) {
+        return "/${Routes.STORIES}/${uri.queryParameters['id']}";
       }
-    });
+      return '/';
+    case 'user':
+      if (uri.queryParameters['id'] != null) {
+        return "/${Routes.USERS}/${uri.queryParameters['id']}";
+      }
+      return '/';
+    default:
+      return '/';
+  }
 }
 
 enum MainPageSubPages {
