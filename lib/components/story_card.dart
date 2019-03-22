@@ -10,6 +10,12 @@ class StoryCard extends StoryHeader {
   Widget build(BuildContext context, Map<StoreToken, Store> stores) {
     final borderRadius = BorderRadius.all(Radius.circular(6.0));
 
+    final storyHeader = super.build(context, stores);
+
+    if (storyHeader is Container) {
+      return storyHeader;
+    }
+
     return Card(
       margin: EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
       shape: RoundedRectangleBorder(
@@ -20,7 +26,7 @@ class StoryCard extends StoryHeader {
         onLongPress: () => super.showOverflowMenu(context),
         child: ClipRRect(
           borderRadius: borderRadius,
-          child: super.build(context, stores),
+          child: storyHeader,
         ),
       ),
     );
