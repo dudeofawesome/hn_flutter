@@ -25,7 +25,7 @@ class HNAppState extends State<HNApp> {
   initState() {
     super.initState();
 
-    initDeepLinks(_navigatorKey.currentState).then((sub) => _linkSub = sub);
+    initDeepLinks(_navigatorKey).then((sub) => _linkSub = sub);
   }
 
   // This widget is the root of your application.

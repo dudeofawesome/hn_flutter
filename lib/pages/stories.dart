@@ -44,14 +44,24 @@ class _StoriesPageState extends State<StoriesPage>
   void initState() {
     super.initState();
 
+    SortModes oldSortMode;
+
     this._accountStore = listenToStore(accountStoreToken);
     this._itemStore = listenToStore(itemStoreToken);
-    this._uiStore = listenToStore(uiStoreToken);
+    this._uiStore = listenToStore(uiStoreToken, (uiStore) {
+      if (this._uiStore.sortMode != oldSortMode) {
+        _refresh(this._uiStore.sortMode,
+            this._accountStore?.primaryAccount?.accessCookie);
+      }
+      oldSortMode = this._uiStore.sortMode;
+    });
 
     this._scrollController = new ScrollController();
   }
 
   Future<Null> _refresh(SortModes sortMode, Cookie accessCookie) async {
+    assert(sortMode != null);
+
     switch (sortMode) {
       case SortModes.TOP:
         await this._hnStoryService.getTopStories(accessCookie: accessCookie);
@@ -78,7 +88,6 @@ class _StoriesPageState extends State<StoriesPage>
 
   Future<Null> _changeSortMode(SortModes sortMode, Cookie accessCookie) async {
     setStorySortMode(sortMode);
-    await this._refresh(sortMode, accessCookie);
   }
 
   Future<Null> _scrollToTop() async {
@@ -101,7 +110,7 @@ class _StoriesPageState extends State<StoriesPage>
 
     final stories = this._itemStore.sortedStoryIds;
 
-    final sortMode = this._uiStore.sortMode;
+    final sortMode = this._uiStore.sortMode ?? SortModes.TOP;
 
     if (stories == null || stories.length == 0) {
       this._refresh(sortMode, account?.accessCookie);

@@ -56,7 +56,7 @@ class UIStore extends Store {
   factory UIStore() => _singleton;
 
   int _selectedItem;
-  SortModes _sortMode = SortModes.TOP;
+  SortModes _sortMode;
   Map<int, double> _storyScrollPos = new Map();
 
   int get item => this._selectedItem;

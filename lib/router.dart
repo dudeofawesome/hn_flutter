@@ -17,11 +17,17 @@ import 'package:hn_flutter/pages/user.dart';
 import 'package:hn_flutter/pages/voted_comments.dart';
 import 'package:hn_flutter/pages/voted_stories.dart';
 
-import 'package:hn_flutter/utils/channels.dart';
+import 'package:hn_flutter/sdk/stores/ui_store.dart' as UIStore;
+import 'package:hn_flutter/sdk/actions/ui_actions.dart';
 
 class Routes {
   static const MAIN = 'main';
   static const STORIES = 'item';
+  static const TOP = 'top';
+  static const NEW = 'new';
+  static const ASK = 'ask';
+  static const SHOW = 'show';
+  static const JOBS = 'jobs';
   static const USERS = 'user';
   static const STARRED = 'starred';
   static const VOTED = 'voted';
@@ -35,6 +41,27 @@ class Routes {
 
 final staticRoutes = <String, WidgetBuilder>{
   '/': (BuildContext context) => new StoriesPage(),
+  '/stories': (BuildContext context) => new StoriesPage(),
+  '/stories/top': (BuildContext context) {
+    setStorySortMode(UIStore.SortModes.TOP);
+    return new StoriesPage();
+  },
+  '/stories/new': (BuildContext context) {
+    setStorySortMode(UIStore.SortModes.NEW);
+    return new StoriesPage();
+  },
+  '/stories/ask': (BuildContext context) {
+    setStorySortMode(UIStore.SortModes.ASK_HN);
+    return new StoriesPage();
+  },
+  '/stories/show': (BuildContext context) {
+    setStorySortMode(UIStore.SortModes.SHOW_HN);
+    return new StoriesPage();
+  },
+  '/stories/jobs': (BuildContext context) {
+    setStorySortMode(UIStore.SortModes.JOB);
+    return new StoriesPage();
+  },
   '/${Routes.SETTINGS}': (BuildContext context) => new SettingsPage(),
   '/${Routes.LICENSES}': (BuildContext context) => new LicensesPage(),
 };
@@ -74,6 +101,23 @@ Route<Null> getRoute(RouteSettings settings) {
           break;
         case Routes.STORIES:
         default:
+          switch (parsed.pathSegments[2]) {
+            case Routes.TOP:
+              setStorySortMode(UIStore.SortModes.TOP);
+              break;
+            case Routes.NEW:
+              setStorySortMode(UIStore.SortModes.NEW);
+              break;
+            case Routes.ASK:
+              setStorySortMode(UIStore.SortModes.ASK_HN);
+              break;
+            case Routes.SHOW:
+              setStorySortMode(UIStore.SortModes.SHOW_HN);
+              break;
+            case Routes.JOBS:
+              setStorySortMode(UIStore.SortModes.JOB);
+              break;
+          }
           subPage = new StoriesPage(showDrawer: true);
       }
       return new PageRouteBuilder<Null>(
@@ -137,12 +181,13 @@ Route<Null> getRoute(RouteSettings settings) {
   return null;
 }
 
-Future<StreamSubscription> initDeepLinks(NavigatorState navState) async {
+Future<StreamSubscription> initDeepLinks(
+    GlobalKey<NavigatorState> navKey) async {
   // Platform messages may fail, so we use a try/catch PlatformException.
   try {
     var initialLink = await getInitialLink();
     if (initialLink != null) {
-      navState.pushNamed(_convertLink(initialLink));
+      _setRoute(navKey.currentState, initialLink);
     }
   } on PlatformException {
     // Handle exception by warning the user their action did not succeed
@@ -151,7 +196,7 @@ Future<StreamSubscription> initDeepLinks(NavigatorState navState) async {
 
   final linkSub = getLinksStream().listen((String link) {
     print(link);
-    navState.pushNamed(_convertLink(link));
+    _setRoute(navKey.currentState, link);
   }, onError: (err) {
     // Handle exception by warning the user their action did not succeed
   });
@@ -159,20 +204,32 @@ Future<StreamSubscription> initDeepLinks(NavigatorState navState) async {
   return linkSub;
 }
 
+void _setRoute(NavigatorState navState, String link) {
+  final route = _convertLink(link);
+  final routeUri = Uri.parse(route);
+  if (routeUri.pathSegments[0] == Routes.MAIN) {
+    navState.pushReplacementNamed(route);
+  } else {
+    navState.pushNamed(route);
+  }
+}
+
 String _convertLink(String hnLink) {
   final uri = Uri.parse(hnLink);
   switch (uri.pathSegments[0]) {
     case '':
+      return '/stories';
     case 'news':
-      return '/';
+    case 'top':
+      return '/${Routes.MAIN}/${Routes.STORIES}/${Routes.TOP}';
     case 'newest':
-      return '/';
+      return '/${Routes.MAIN}/${Routes.STORIES}/${Routes.NEW}';
     case 'ask':
-      return '/';
+      return '/${Routes.MAIN}/${Routes.STORIES}/${Routes.ASK}';
     case 'show':
-      return '/';
+      return '/${Routes.MAIN}/${Routes.STORIES}/${Routes.SHOW}';
     case 'jobs':
-      return '/';
+      return '/${Routes.MAIN}/${Routes.STORIES}/${Routes.JOBS}';
     case 'item':
       if (uri.queryParameters['id'] != null) {
         return "/${Routes.STORIES}/${uri.queryParameters['id']}";
