@@ -389,6 +389,7 @@ class StoryHeader extends StoreWatcher {
               onChanged: (value) {
                 this._upvoteStory(context, storyStatus, account);
               },
+              disabled: storyStatus?.authTokens?.upvote == null,
             ),
             // new IconButtonToggle(
             //   value: storyStatus?.downvoted,
@@ -411,6 +412,7 @@ class StoryHeader extends StoreWatcher {
               onChanged: (value) {
                 this._saveStory(context, storyStatus, account);
               },
+              disabled: storyStatus?.authTokens?.upvote == null,
             ),
             _buildOverflowButton(context, story, storyStatus),
           ],
