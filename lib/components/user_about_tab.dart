@@ -31,7 +31,7 @@ class UserAboutTab extends StatelessWidget {
                 ),
               ),
               user != null
-                  ? user.computed.aboutMarkdown != null
+                  ? user.about != null
                       ? new HTMLText(user.about)
                       : new Container()
                   : const Padding(
