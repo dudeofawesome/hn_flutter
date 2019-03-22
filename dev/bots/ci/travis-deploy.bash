@@ -2,7 +2,7 @@
 
 set -e
 
-bundle install
+bundle install --quiet
 
 pushd android
 bundle exec fastlane deploy_play_store
