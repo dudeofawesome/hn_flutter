@@ -178,7 +178,7 @@ class _StoriesPageState extends State<StoriesPage>
             tooltip: 'Refresh',
             onPressed: () {
               this._refreshIndicatorKey.currentState.show();
-              this._refresh(sortMode, account.accessCookie);
+              this._refresh(sortMode, account?.accessCookie);
             },
           ),
           new PopupMenuButton<SortModes>(
