@@ -71,12 +71,10 @@ else
   req = Net::HTTP::Post.new("/repos/#{owner}/#{repo}/releases", headers)
 end
 
-changelog = nil
+changelog = "<a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='65px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>"
 if File.file?("changelogs/#{package_version}.md")
   changelog_file = open("changelogs/#{package_version}.md")
-  changelog =
-    "<a href='https://play.google.com/store/apps/details?id=io.orleans.hnflutter'><img alt='Get it on Google Play' height='65px' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>\n\n" +
-    changelog_file.read
+  changelog += "\n\n" + changelog_file.read
   changelog_file.close()
 end
 
@@ -92,7 +90,8 @@ req.body = body.to_json
 
 res = github_api.request(req)
 if res.code.to_i < 200 || res.code.to_i >= 300
-  puts "Error creating release (response code #{res.code})"
+  puts "Error creating release (response code #{res.code})\n"
+  puts res.body
   exit 1
 end
 
