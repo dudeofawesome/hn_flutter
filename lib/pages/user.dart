@@ -77,7 +77,7 @@ class UserPage extends StoreWatcher {
             //   // color: user.computed.saved ? Colors.amber : Colors.black,
             // ),
             new PopupMenuButton<_OverflowMenuItems>(
-              icon: const Icon(Icons.more_horiz),
+              icon: const Icon(Icons.more_vert),
               itemBuilder: (BuildContext ctx) =>
                   <PopupMenuEntry<_OverflowMenuItems>>[
                     const PopupMenuItem<_OverflowMenuItems>(
