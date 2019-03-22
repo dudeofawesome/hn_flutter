@@ -515,6 +515,10 @@ class _CommentState extends State<Comment>
               onLongPress: () {
                 SystemChannels.platform.invokeMethod('HapticFeedback.vibrate');
                 showHideItem(comment.id);
+                if (!commentStatus.hidden &&
+                    _selectedItemStore.item == comment.id) {
+                  this._toggleButtonBar(comment.id);
+                }
               },
               child: new Padding(
                 padding: new EdgeInsets.only(
