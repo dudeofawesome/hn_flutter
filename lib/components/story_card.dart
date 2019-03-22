@@ -8,12 +8,18 @@ class StoryCard extends StoryHeader {
 
   @override
   Widget build(BuildContext context, Map<StoreToken, Store> stores) {
-    return new Padding(
-      padding: EdgeInsets.fromLTRB(4.0, 1.0, 4.0, 1.0),
-      child: new Card(
-        child: new InkWell(
-          onTap: () => super.openStory(context),
-          onLongPress: () => super.showOverflowMenu(context),
+    final borderRadius = BorderRadius.all(Radius.circular(6.0));
+
+    return Card(
+      margin: EdgeInsets.fromLTRB(8.0, 5.0, 8.0, 5.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: borderRadius,
+      ),
+      child: InkWell(
+        onTap: () => super.openStory(context),
+        onLongPress: () => super.showOverflowMenu(context),
+        child: ClipRRect(
+          borderRadius: borderRadius,
           child: super.build(context, stores),
         ),
       ),

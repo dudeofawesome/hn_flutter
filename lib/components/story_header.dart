@@ -364,7 +364,7 @@ class StoryHeader extends StoreWatcher {
       children: <Widget>[
         new Expanded(
           child: new Padding(
-            padding: new EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(left: 8.0),
             child: new Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
