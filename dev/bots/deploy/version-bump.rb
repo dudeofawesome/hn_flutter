@@ -149,7 +149,6 @@ end
 
 def write_version_to_files (options)
   write_version_to_pubspec(options)
-  write_version_to_android(options)
 end
 
 def write_version_to_pubspec (options)
@@ -159,19 +158,6 @@ def write_version_to_pubspec (options)
     File.open(options.pubspec_path, 'w') { |f|
       f.write(
         curr.gsub(/^(\s*version:\s*)\d+(?:\.\d+){2,2}(?:\w|-)*$/m) { |match| "#{$1}#{options.version}"})
-      f.close()
-    }
-  }
-end
-
-def write_version_to_android (options)
-  File.open(options.android_build_gradle_path, 'r') { |f|
-    curr = f.read()
-    f.close()
-    File.open(options.android_build_gradle_path, 'w') { |f|
-      f.write(curr
-        .gsub(/^(\s*versionCode\s*)(\d+)$/m) { |match| "#{$1}#{$2.to_i + 1}"}
-        .gsub(/^(\s*versionName\s*)".*?"$/m) { |match| "#{$1}\"#{options.version}\""})
       f.close()
     }
   }
