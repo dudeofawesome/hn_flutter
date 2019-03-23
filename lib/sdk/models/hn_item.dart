@@ -240,7 +240,8 @@ class HNItemComputed {
     }
 
     if (item.text != null) {
-      this.markdown = SimpleMarkdownConversion.htmlToMD(item.text);
+      // this.markdown = SimpleMarkdownConversion.htmlToMD(item.text);
+      this.markdown = 'WARNING! MARKDOWN IN USE!';
       this.simpleText = this.markdown;
     }
   }
