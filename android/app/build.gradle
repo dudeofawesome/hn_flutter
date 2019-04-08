@@ -18,19 +18,20 @@ if (flutterVersionName == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
+    def segmentLength = [2, 2, 2, 3]
+
     def split = flutterVersionName
         .tokenize('.')
         .collect { it.tokenize('-') }
         .flatten()
     if (split.size() < 4) {
-        split[3] = '99'
+        split[3] = '999'
     }
 
-    flutterVersionCode = split
-        .each { it != null }
-        .collect { it?.padLeft(2, '0') }
-        .join()
-        .toInteger()
+    for (int i = 0; i < split.size(); i++) {
+        split[i] = split[i]?.padLeft(segmentLength[i], '0')
+    }
+    flutterVersionCode = split.join().toInteger()
 }
 
 apply plugin: 'com.android.application'
