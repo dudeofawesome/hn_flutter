@@ -79,11 +79,6 @@ class _StoryPageState extends State<StoryPage> with StoreWatcherMixin<StoryPage>
     }
   }
 
-  Future<bool> _onPopScope () async {
-    setStoryScrollPos(new Tuple2<int, double>(widget.itemId, this._scrollController.offset));
-    return true;
-  }
-
   @override
   Widget build (BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
